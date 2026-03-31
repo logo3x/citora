@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__search-docs",
+      "Bash(composer require:*)",
+      "Bash(mkdir -p bootstrap/cache)",
+      "Bash(composer dump-autoload:*)",
+      "Bash(chmod -R 777 bootstrap/cache)",
+      "Bash(php artisan:*)",
+      "Bash(vendor/bin/pint --dirty --format agent)",
+      "mcp__laravel-boost__database-schema",
+      "Bash(mysql -u root -e \"CREATE DATABASE IF NOT EXISTS citora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"/c/wamp64/bin/mysql/mysql9.1.0/bin/mysql.exe\" -u root -e \"CREATE DATABASE IF NOT EXISTS citora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"/c/wamp64/bin/mysql/mysql8.0.31/bin/mysql.exe\" -u root -e \"CREATE DATABASE IF NOT EXISTS citora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"/c/wamp64/bin/mysql/mysql8.4.7/bin/mysql.exe\" -u root -e \"CREATE DATABASE IF NOT EXISTS citora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(\"/c/wamp64/bin/mysql/mysql8.4.7/bin/mysql.exe\" -u root -e \"DROP DATABASE IF EXISTS citora; CREATE DATABASE citora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(grep -r RenderHook vendor/filament/filament/src/ --include=*.php -l)",
+      "Bash(grep -rn \"function renderHook\\\\|public function renderHook\" vendor/filament/ --include=*.php)",
+      "Bash(find /c/wamp64/www/citora/app/Filament -type f -name *.php)",
+      "Bash(find /c/wamp64/www/citora -maxdepth 1 -type f -name *.json -o -name *.js -o -name *.ts)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "mcp__laravel-boost__get-absolute-url",
+      "Bash(grep -c \"lg\\\\\\\\:\" public/build/assets/app-Dwrbmlbj.css)",
+      "Bash(grep \"booking-layout\\\\|booking-sidebar\\\\|booking-main\" public/build/assets/*.css)",
+      "Bash(curl -s http://localhost:8000/caballeros)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
