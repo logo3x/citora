@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function checkout(Business $business, WompiService $wompi): View
     {
-        abort_unless(auth()->user()->business_id === $business->id || auth()->user()->hasRole('super_admin'), 403);
+        abort_unless((int) auth()->user()->business_id === (int) $business->id || auth()->user()->hasRole('super_admin'), 403);
 
         $paymentData = $wompi->createPaymentLink($business);
 
