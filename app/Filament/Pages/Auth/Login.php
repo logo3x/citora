@@ -8,8 +8,6 @@ use Illuminate\Support\HtmlString;
 
 class Login extends BaseLogin
 {
-    protected string $view = 'filament.pages.auth.login';
-
     protected function getFormActions(): array
     {
         return [
@@ -20,7 +18,7 @@ class Login extends BaseLogin
 
     public function getSubheading(): string|Htmlable|null
     {
-        return null;
+        return new HtmlString('La forma inteligente de gestionar tu agenda');
     }
 
     public function getHeading(): string|Htmlable
@@ -32,6 +30,6 @@ class Login extends BaseLogin
             default => '¡Buenas noches!',
         };
 
-        return new HtmlString($greeting);
+        return new HtmlString('<img src="/images/logo-light.png" alt="Citora" style="height:48px;margin:0 auto 8px" onerror="this.style.display=\'none\'"><br>'.$greeting);
     }
 }
