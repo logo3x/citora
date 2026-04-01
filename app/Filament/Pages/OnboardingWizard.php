@@ -16,8 +16,10 @@ use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Spatie\MediaLibrary\HasMedia;
 
 /**
@@ -345,15 +347,34 @@ class OnboardingWizard extends Page
             $filePath = reset($filePath);
         }
 
+        if ($filePath instanceof TemporaryUploadedFile) {
+            $model->addMedia($filePath->getRealPath())
+                ->usingFileName($filePath->getClientOriginalName())
+                ->toMediaCollection($collection);
+
+            return;
+        }
+
         if (! is_string($filePath) || empty($filePath)) {
             return;
         }
 
-        $publicPath = Storage::disk('public')->path($filePath);
+        $paths = [
+            Storage::disk('public')->path($filePath),
+            Storage::disk('local')->path($filePath),
+            storage_path('app/livewire-tmp/'.$filePath),
+            storage_path('app/'.$filePath),
+        ];
 
-        if (file_exists($publicPath)) {
-            $model->addMedia($publicPath)->toMediaCollection($collection);
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                $model->addMedia($path)->toMediaCollection($collection);
+
+                return;
+            }
         }
+
+        Log::warning('attachMedia: file not found', ['filePath' => $filePath, 'collection' => $collection]);
     }
 
     /**
