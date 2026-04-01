@@ -35,9 +35,19 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
                     <span style="font-size:13px;color:#dc2626;font-weight:600">{{ $used }} / {{ $limit }} citas usadas</span>
                     <a href="{{ route('payment.checkout', $slug) }}"
-                       style="display:inline-flex;align-items:center;gap:6px;padding:8px 20px;background:#d97706;color:white;font-weight:700;border-radius:10px;font-size:13px;text-decoration:none">
+                       style="display:inline-flex;align-items:center;gap:6px;padding:10px 24px;background:#d97706;color:white;font-weight:700;border-radius:10px;font-size:14px;text-decoration:none">
                         🔓 Desbloquear por $29,900
                     </a>
+                </div>
+
+                <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;margin-top:4px">
+                    <p style="font-size:12px;font-weight:700;color:#92400e;margin-bottom:6px">Con el plan ilimitado obtienes:</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px">
+                        <span style="font-size:11px;color:#92400e">✅ Citas sin límite por 30 días</span>
+                        <span style="font-size:11px;color:#92400e">✅ WhatsApp automático</span>
+                        <span style="font-size:11px;color:#92400e">✅ Sin suscripción</span>
+                        <span style="font-size:11px;color:#92400e">✅ Clientes reservan al instante</span>
+                    </div>
                 </div>
             </div>
 
@@ -51,12 +61,10 @@
                             <p style="font-size:12px;color:#6b7280">{{ $remaining }} citas disponibles</p>
                         </div>
                     </div>
-                    @if($remaining <= 50)
-                        <a href="{{ route('payment.checkout', $slug) }}"
-                           style="display:inline-flex;align-items:center;gap:4px;padding:6px 14px;background:#d97706;color:white;font-weight:600;border-radius:8px;font-size:12px;text-decoration:none">
-                            ⚡ Pasar a ilimitado
-                        </a>
-                    @endif
+                    <a href="{{ route('payment.checkout', $slug) }}"
+                       style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#d97706;color:white;font-weight:600;border-radius:8px;font-size:12px;text-decoration:none">
+                        🚀 Pasar a ilimitado · $29,900
+                    </a>
                 </div>
 
                 <div style="width:100%;background:#e5e7eb;border-radius:9999px;height:10px;overflow:hidden">
@@ -66,6 +74,13 @@
                 <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280">
                     <span><strong style="color:#111827">{{ $used }}</strong> usadas</span>
                     <span><strong style="color:#111827">{{ $limit }}</strong> total</span>
+                </div>
+
+                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+                    <span style="font-size:11px;color:#166534">✅ Reservas online</span>
+                    <span style="font-size:11px;color:#166534">✅ WhatsApp automático</span>
+                    <span style="font-size:11px;color:#166534">✅ Panel de control</span>
+                    <span style="font-size:11px;color:#166534;font-weight:600">Mejora a ilimitado →</span>
                 </div>
             </div>
         @endif
