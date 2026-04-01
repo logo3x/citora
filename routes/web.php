@@ -9,6 +9,7 @@ use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Business;
 use App\Models\Service;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -47,6 +48,31 @@ Route::post('webhook/deploy', [DeployController::class, 'handle'])
     ->name('webhook.deploy')
     ->withoutMiddleware(PreventRequestForgery::class)
     ->middleware('throttle:5,1');
+
+// Search
+Route::get('buscar', function (Request $request) {
+    $q = $request->input('q', '');
+    if (strlen($q) < 2) {
+        return response()->json(['businesses' => [], 'services' => []]);
+    }
+
+    $businesses = Business::where('is_active', true)
+        ->where(fn ($query) => $query->where('name', 'like', "%{$q}%")->orWhere('address', 'like', "%{$q}%"))
+        ->with('media')
+        ->limit(5)
+        ->get()
+        ->map(fn ($b) => ['name' => $b->name, 'slug' => $b->slug, 'address' => $b->address, 'logo' => $b->getFirstMediaUrl('logo')]);
+
+    $services = Service::where('is_active', true)
+        ->where('name', 'like', "%{$q}%")
+        ->whereHas('business', fn ($query) => $query->where('is_active', true))
+        ->with(['business', 'media'])
+        ->limit(5)
+        ->get()
+        ->map(fn ($s) => ['name' => $s->name, 'price' => $s->price, 'duration' => $s->duration_minutes, 'slug' => $s->business->slug, 'business' => $s->business->name, 'image' => $s->getFirstMediaUrl('image')]);
+
+    return response()->json(['businesses' => $businesses, 'services' => $services]);
+})->name('search');
 
 // Customer appointments
 Route::middleware('auth')->group(function () {

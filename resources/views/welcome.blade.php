@@ -19,84 +19,160 @@
 <body class="text-[#111111] antialiased">
 
     {{-- Nav --}}
-    <nav class="fixed top-0 w-full z-50 bg-[#FAFAF8]/90 backdrop-blur border-b border-[#E7E5DF]">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2">
-                <img src="/images/logo-light.png" alt="Citora" class="h-9" onerror="this.style.display='none'">
-                <span class="text-xl font-bold text-[#0F172A]" style="font-family:Poppins,sans-serif">Citora</span>
+    <nav style="position:fixed;top:0;width:100%;z-index:50;background:rgba(250,250,248,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #E7E5DF">
+        <div style="max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+            <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+                <img src="/images/logo-light.png" alt="Citora" style="height:32px" onerror="this.style.display='none'">
+                <span style="font-size:18px;font-weight:700;color:#0F172A;font-family:Poppins,sans-serif">Citora</span>
             </a>
-            <div class="flex items-center gap-3">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
                 @auth
-                    <a href="{{ filament()->getUrl() }}" class="px-5 py-2.5 cta-primary text-white text-sm font-semibold rounded-lg transition">Mi panel</a>
+                    <a href="{{ route('customer.appointments') }}" style="padding:8px 14px;color:#374151;text-decoration:none;font-weight:500;border:1px solid #E7E5DF;border-radius:8px">📅 Mis citas</a>
+                    @if(auth()->user()->business_id)
+                        <a href="{{ filament()->getUrl() }}" style="padding:8px 14px;background:#D97706;color:white;font-weight:600;border-radius:8px;text-decoration:none">Mi panel</a>
+                    @endif
                 @else
-                    <a href="{{ route('auth.google.redirect') }}" class="px-5 py-2.5 cta-primary text-white text-sm font-semibold rounded-lg transition">Comenzar gratis</a>
+                    <a href="{{ route('auth.google.redirect') }}" style="padding:8px 14px;color:#374151;text-decoration:none;font-weight:500;border:1px solid #E7E5DF;border-radius:8px">📅 Mis citas</a>
+                    <a href="{{ route('auth.google.redirect') }}" style="padding:8px 14px;background:#D97706;color:white;font-weight:600;border-radius:8px;text-decoration:none">🏪 Registra tu negocio</a>
                 @endauth
             </div>
         </div>
     </nav>
 
     {{-- Hero --}}
-    <section class="gradient-hero pt-28 pb-24 px-4">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full text-sm text-[#5EAEFF] font-medium mb-6 border border-white/10">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-                La forma inteligente de gestionar tu agenda
-            </div>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
-                Control total de tu negocio,
-                <span class="block text-[#F59E0B]">citas sin esfuerzo</span>
+    <section style="background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);padding:90px 16px 60px">
+        <div style="max-width:700px;margin:0 auto;text-align:center">
+            <h1 style="font-size:clamp(28px,5vw,48px);font-weight:800;color:white;line-height:1.15;font-family:Poppins,sans-serif">
+                Reserva tu cita en segundos
             </h1>
-            <p class="mt-6 text-lg sm:text-xl text-[#9CA3AF] max-w-2xl mx-auto">
-                Página de reservas, notificaciones WhatsApp, gestión de equipo y métricas. Todo automatizado para que tú te enfoques en lo que importa.
+            <p style="margin-top:12px;font-size:17px;color:#9CA3AF;max-width:500px;margin-left:auto;margin-right:auto">
+                Encuentra tu barbería, salón o spa favorito y agenda online. Sin llamadas.
             </p>
-            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('auth.google.redirect') }}" class="px-8 py-4 cta-primary text-white font-bold rounded-xl transition text-lg shadow-lg shadow-amber-500/25 flex items-center justify-center gap-3">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" opacity=".7"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" opacity=".8"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" opacity=".6"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" opacity=".9"/></svg>
-                    Crear mi negocio gratis
-                </a>
-                <a href="#como-funciona" class="px-8 py-4 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/5 transition text-lg flex items-center justify-center gap-2">
-                    Ver cómo funciona
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </a>
+
+            {{-- Search bar --}}
+            <div style="position:relative;max-width:520px;margin:28px auto 0">
+                <div style="display:flex;align-items:center;background:white;border-radius:14px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+                    <span style="padding:0 12px;font-size:20px">🔍</span>
+                    <input type="text" id="search-input" placeholder="Buscar negocio o servicio..."
+                           style="flex:1;border:none;outline:none;font-size:15px;padding:12px 0;background:transparent;font-family:Inter,sans-serif"
+                           autocomplete="off">
+                    <button onclick="document.getElementById('search-input').value && (window.location.hash='resultados')"
+                            style="padding:10px 20px;background:#D97706;color:white;font-weight:600;border-radius:10px;border:none;font-size:14px;cursor:pointer">
+                        Buscar
+                    </button>
+                </div>
+                {{-- Search results dropdown --}}
+                <div id="search-results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:8px;background:white;border-radius:12px;border:1px solid #E7E5DF;box-shadow:0 12px 40px rgba(0,0,0,0.15);max-height:360px;overflow-y:auto;z-index:10"></div>
             </div>
-            <p class="mt-5 text-[#666666] text-sm">Sin tarjeta de crédito · 200 citas/mes gratis · Configura en 5 minutos</p>
+
+            <div style="display:flex;justify-content:center;gap:10px;margin-top:24px;flex-wrap:wrap">
+                <a href="{{ route('auth.google.redirect') }}" style="padding:10px 20px;background:#D97706;color:white;font-weight:700;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
+                    🏪 Registra tu negocio gratis
+                </a>
+                @auth
+                    <a href="{{ route('customer.appointments') }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);color:white;font-weight:600;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
+                        📅 Consultar mis citas
+                    </a>
+                @else
+                    <a href="{{ route('auth.google.redirect') }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);color:white;font-weight:600;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
+                        📅 Consultar mis citas
+                    </a>
+                @endauth
+            </div>
         </div>
     </section>
 
-    {{-- Services showcase --}}
+    {{-- Search JS --}}
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const q = this.value.trim();
+            if (q.length < 2) { searchResults.style.display = 'none'; return; }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/buscar?q=${encodeURIComponent(q)}`);
+                    const data = await res.json();
+                    let html = '';
+
+                    if (data.services.length > 0) {
+                        html += '<div style="padding:10px 16px 6px;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">Servicios</div>';
+                        data.services.forEach(s => {
+                            html += `<a href="/${s.slug}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;text-decoration:none;border-bottom:1px solid #f3f4f6"
+                                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                                ${s.image ? `<img src="${s.image}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">` : '<span style="width:36px;height:36px;border-radius:8px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:16px">✂️</span>'}
+                                <div style="flex:1;min-width:0">
+                                    <p style="font-weight:600;font-size:14px;color:#0F172A">${s.name}</p>
+                                    <p style="font-size:12px;color:#6b7280">${s.business} · ${s.duration} min · $${Number(s.price).toLocaleString()}</p>
+                                </div>
+                            </a>`;
+                        });
+                    }
+
+                    if (data.businesses.length > 0) {
+                        html += '<div style="padding:10px 16px 6px;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">Negocios</div>';
+                        data.businesses.forEach(b => {
+                            html += `<a href="/${b.slug}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;text-decoration:none;border-bottom:1px solid #f3f4f6"
+                                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
+                                ${b.logo ? `<img src="${b.logo}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">` : '<span style="width:36px;height:36px;border-radius:8px;background:#D97706;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px">' + b.name[0] + '</span>'}
+                                <div style="flex:1;min-width:0">
+                                    <p style="font-weight:600;font-size:14px;color:#0F172A">${b.name}</p>
+                                    <p style="font-size:12px;color:#6b7280">${b.address || 'Sin dirección'}</p>
+                                </div>
+                            </a>`;
+                        });
+                    }
+
+                    if (!html) html = '<p style="padding:20px;text-align:center;color:#9ca3af;font-size:14px">No se encontraron resultados</p>';
+
+                    searchResults.innerHTML = html;
+                    searchResults.style.display = 'block';
+                } catch(e) { searchResults.style.display = 'none'; }
+            }, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+    </script>
+
+    {{-- Services carousel --}}
     @if($services->count() > 0)
-    <section class="py-20 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-12">
-                <span class="text-sm font-semibold text-[#D97706] uppercase tracking-wider">Explora</span>
-                <h2 class="text-3xl sm:text-4xl font-bold mt-2 text-[#0F172A]">Servicios disponibles</h2>
-                <p class="text-[#666666] mt-3 text-lg">Encuentra el servicio perfecto y reserva en segundos</p>
+    <section style="padding:48px 0">
+        <div style="max-width:1100px;margin:0 auto;padding:0 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div>
+                    <p style="font-size:12px;font-weight:700;color:#D97706;text-transform:uppercase;letter-spacing:0.05em">Explora</p>
+                    <h2 style="font-size:24px;font-weight:700;color:#0F172A;font-family:Poppins,sans-serif">Servicios disponibles</h2>
+                </div>
             </div>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        </div>
+        <div style="overflow-x:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch">
+            <div style="display:flex;gap:16px;max-width:1100px;margin:0 auto">
                 @foreach($services as $service)
-                <a href="{{ route('booking.show', $service->business->slug) }}"
-                   class="bg-white rounded-xl border border-[#E7E5DF] overflow-hidden hover:shadow-lg hover:border-[#D97706]/30 transition group">
+                <a href="{{ route('booking.show', $service->business->slug) }}" style="flex-shrink:0;width:260px;background:white;border:1px solid #E7E5DF;border-radius:12px;overflow:hidden;text-decoration:none;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
                     @if($service->getFirstMediaUrl('image'))
-                        <div class="h-40 overflow-hidden">
-                            <img src="{{ $service->getFirstMediaUrl('image') }}" alt="{{ $service->name }}"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        </div>
+                        <img src="{{ $service->getFirstMediaUrl('image') }}" alt="{{ $service->name }}" style="width:100%;height:140px;object-fit:cover">
                     @else
-                        <div class="h-40 bg-gradient-to-br from-[#D97706]/10 to-[#0D9488]/10 flex items-center justify-center">
-                            <svg class="w-12 h-12 text-[#D97706]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
+                        <div style="width:100%;height:140px;background:linear-gradient(135deg,rgba(217,119,6,0.1),rgba(13,148,136,0.1));display:flex;align-items:center;justify-content:center;font-size:40px">✂️</div>
                     @endif
-                    <div class="p-4">
-                        <div class="flex items-center gap-2 mb-2">
+                    <div style="padding:12px">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
                             @if($service->business->getFirstMediaUrl('logo'))
-                                <img src="{{ $service->business->getFirstMediaUrl('logo') }}" alt="" class="w-6 h-6 rounded-full object-cover">
+                                <img src="{{ $service->business->getFirstMediaUrl('logo') }}" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover">
                             @endif
-                            <span class="text-xs text-[#666666]">{{ $service->business->name }}</span>
+                            <span style="font-size:11px;color:#6b7280">{{ $service->business->name }}</span>
                         </div>
-                        <h3 class="font-bold text-[#0F172A] group-hover:text-[#D97706] transition">{{ $service->name }}</h3>
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="text-sm text-[#666666]">{{ $service->duration_minutes }} min</span>
-                            <span class="text-sm font-bold text-[#D97706]">${{ number_format($service->price) }}</span>
+                        <p style="font-weight:700;font-size:15px;color:#0F172A">{{ $service->name }}</p>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+                            <span style="font-size:12px;color:#6b7280">⏱ {{ $service->duration_minutes }} min</span>
+                            <span style="font-size:14px;font-weight:700;color:#D97706">${{ number_format($service->price) }}</span>
                         </div>
                     </div>
                 </a>
@@ -106,50 +182,40 @@
     </section>
     @endif
 
-    {{-- Businesses showcase --}}
+    {{-- Businesses carousel --}}
     @if($businesses->count() > 0)
-    <section class="py-20 px-4 bg-white border-y border-[#E7E5DF]">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-12">
-                <span class="text-sm font-semibold text-[#0D9488] uppercase tracking-wider">Directorio</span>
-                <h2 class="text-3xl sm:text-4xl font-bold mt-2 text-[#0F172A]">Negocios en Citora</h2>
-                <p class="text-[#666666] mt-3 text-lg">Reserva tu cita con los mejores profesionales</p>
+    <section style="padding:48px 0;background:white;border-top:1px solid #E7E5DF;border-bottom:1px solid #E7E5DF">
+        <div style="max-width:1100px;margin:0 auto;padding:0 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div>
+                    <p style="font-size:12px;font-weight:700;color:#0D9488;text-transform:uppercase;letter-spacing:0.05em">Directorio</p>
+                    <h2 style="font-size:24px;font-weight:700;color:#0F172A;font-family:Poppins,sans-serif">Negocios en Citora</h2>
+                </div>
             </div>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+        <div style="overflow-x:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch">
+            <div style="display:flex;gap:16px;max-width:1100px;margin:0 auto">
                 @foreach($businesses as $business)
-                <a href="{{ route('booking.show', $business->slug) }}"
-                   class="bg-[#FAFAF8] rounded-xl border border-[#E7E5DF] p-6 hover:shadow-lg hover:border-[#0D9488]/30 transition group">
-                    <div class="flex items-center gap-4 mb-4">
+                <a href="{{ route('booking.show', $business->slug) }}" style="flex-shrink:0;width:280px;background:#FAFAF8;border:1px solid #E7E5DF;border-radius:12px;padding:16px;text-decoration:none;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
                         @if($business->getFirstMediaUrl('logo'))
-                            <img src="{{ $business->getFirstMediaUrl('logo') }}" alt="{{ $business->name }}"
-                                 class="w-14 h-14 rounded-xl object-cover border border-[#E7E5DF]">
+                            <img src="{{ $business->getFirstMediaUrl('logo') }}" alt="{{ $business->name }}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:1px solid #E7E5DF">
                         @else
-                            <div class="w-14 h-14 rounded-xl bg-[#D97706]/10 flex items-center justify-center text-[#D97706] font-bold text-xl" style="font-family:Poppins">
-                                {{ substr($business->name, 0, 1) }}
-                            </div>
+                            <div style="width:48px;height:48px;border-radius:10px;background:rgba(217,119,6,0.1);display:flex;align-items:center;justify-content:center;color:#D97706;font-weight:700;font-size:18px;font-family:Poppins">{{ substr($business->name, 0, 1) }}</div>
                         @endif
                         <div>
-                            <h3 class="font-bold text-[#0F172A] group-hover:text-[#0D9488] transition">{{ $business->name }}</h3>
+                            <p style="font-weight:700;font-size:15px;color:#0F172A">{{ $business->name }}</p>
                             @if($business->address)
-                                <p class="text-xs text-[#666666] mt-0.5 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                    {{ Str::limit($business->address, 40) }}
-                                </p>
+                                <p style="font-size:12px;color:#6b7280">📍 {{ Str::limit($business->address, 30) }}</p>
                             @endif
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 text-xs text-[#666666]">
-                        <span class="flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                            {{ $business->services_count }} servicios
-                        </span>
-                        <span class="flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5 text-[#0D9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            {{ $business->employees_count }} profesionales
-                        </span>
+                    <div style="display:flex;gap:12px;font-size:12px;color:#6b7280">
+                        <span>✂️ {{ $business->services_count }} servicios</span>
+                        <span>👤 {{ $business->employees_count }} profesionales</span>
                     </div>
-                    <div class="mt-4 pt-3 border-t border-[#E7E5DF] text-center">
-                        <span class="text-sm font-semibold text-[#0D9488] group-hover:text-[#D97706] transition">Reservar cita →</span>
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #E7E5DF;text-align:center">
+                        <span style="font-size:13px;font-weight:600;color:#0D9488">Reservar cita →</span>
                     </div>
                 </a>
                 @endforeach
