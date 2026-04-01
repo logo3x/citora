@@ -18,7 +18,25 @@
         .employee-card.selected { border-color: #D97706; box-shadow: 0 0 0 2px #D97706; }
     </style>
 </head>
-<body class="min-h-screen">
+<body style="min-height:100vh">
+    {{-- Top bar for authenticated users --}}
+    @auth
+    <div style="background:white;border-bottom:1px solid #E7E5DF;padding:8px 16px">
+        <div style="max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
+            <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none">
+                <img src="/images/logo-light.png" alt="Citora" style="height:24px" onerror="this.style.display='none'">
+                <span style="font-weight:700;font-size:14px;color:#0F172A;font-family:Poppins,sans-serif">Citora</span>
+            </a>
+            <div style="display:flex;align-items:center;gap:14px;font-size:13px">
+                <a href="{{ route('customer.appointments') }}" style="color:#374151;text-decoration:none;font-weight:500">📅 Mis citas</a>
+                @if(auth()->user()->business_id)
+                    <a href="{{ filament()->getUrl() }}" style="color:#D97706;text-decoration:none;font-weight:600">Mi panel</a>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endauth
+
     {{ $slot }}
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

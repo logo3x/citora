@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CustomerAppointmentController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WhatsAppWebhookController;
@@ -46,6 +47,15 @@ Route::post('webhook/deploy', [DeployController::class, 'handle'])
     ->name('webhook.deploy')
     ->withoutMiddleware(PreventRequestForgery::class)
     ->middleware('throttle:5,1');
+
+// Customer appointments
+Route::middleware('auth')->group(function () {
+    Route::get('mis-citas', [CustomerAppointmentController::class, 'index'])->name('customer.appointments');
+    Route::post('mis-citas/{appointment}/cancelar', [CustomerAppointmentController::class, 'cancel'])->name('customer.cancel');
+    Route::get('mis-citas/{appointment}/reprogramar', [CustomerAppointmentController::class, 'rescheduleForm'])->name('customer.reschedule');
+    Route::get('mis-citas/{appointment}/slots', [CustomerAppointmentController::class, 'rescheduleSlots'])->name('customer.reschedule.slots');
+    Route::post('mis-citas/{appointment}/reprogramar', [CustomerAppointmentController::class, 'reschedule'])->name('customer.reschedule.save');
+});
 
 // Payments
 Route::get('payment/{business:slug}/checkout', [PaymentController::class, 'checkout'])
