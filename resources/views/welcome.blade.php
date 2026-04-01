@@ -32,7 +32,7 @@
                         <a href="{{ filament()->getUrl() }}" style="padding:8px 14px;background:#D97706;color:white;font-weight:600;border-radius:8px;text-decoration:none">Mi panel</a>
                     @endif
                 @else
-                    <a href="{{ route('auth.google.redirect') }}" style="padding:8px 14px;color:#374151;text-decoration:none;font-weight:500;border:1px solid #E7E5DF;border-radius:8px">📅 Mis citas</a>
+                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="padding:8px 14px;color:#374151;text-decoration:none;font-weight:500;border:1px solid #E7E5DF;border-radius:8px">📅 Mis citas</a>
                     <a href="{{ route('auth.google.redirect') }}" style="padding:8px 14px;background:#D97706;color:white;font-weight:600;border-radius:8px;text-decoration:none">🏪 Registra tu negocio</a>
                 @endauth
             </div>
@@ -74,7 +74,7 @@
                         📅 Consultar mis citas
                     </a>
                 @else
-                    <a href="{{ route('auth.google.redirect') }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);color:white;font-weight:600;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
+                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);color:white;font-weight:600;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
                         📅 Consultar mis citas
                     </a>
                 @endauth
