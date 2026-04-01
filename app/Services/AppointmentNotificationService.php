@@ -46,28 +46,36 @@ class AppointmentNotificationService
         );
     }
 
-    public function notifyCancelled(Appointment $appointment): void
+    public function notifyCancelled(Appointment $appointment, string $changedBy = 'sistema'): void
     {
         $appointment->loadMissing(['service', 'employee', 'customer', 'business']);
 
         $date = Carbon::parse($appointment->starts_at)->translatedFormat('l d \\d\\e F');
         $time = Carbon::parse($appointment->starts_at)->format('g:i A');
         $business = $appointment->business->name;
+        $byLabel = match ($changedBy) {
+            'cliente' => 'Cancelada por el cliente',
+            'negocio' => 'Cancelada por el negocio',
+            default => 'Cancelada',
+        };
 
         $this->sendTo($appointment->customer->phone,
             "❌ *Cita cancelada - {$business}*\n\n"
-            ."📋 {$appointment->service->name}\n📅 {$date}\n🕐 {$time}\n\n"
+            ."📋 {$appointment->service->name}\n📅 {$date}\n🕐 {$time}\n"
+            ."📌 {$byLabel}\n\n"
             .'Puedes agendar una nueva cita en cualquier momento.'
         );
 
         $this->sendTo($appointment->employee?->phone,
             "❌ *Cita cancelada - {$business}*\n\n"
-            ."🧑 {$appointment->customer->name}\n📋 {$appointment->service->name}\n📅 {$date} {$time}"
+            ."🧑 {$appointment->customer->name}\n📋 {$appointment->service->name}\n📅 {$date} {$time}\n"
+            ."📌 {$byLabel}"
         );
 
         $this->sendTo($appointment->business->phone,
             "❌ *Cita cancelada - {$business}*\n\n"
-            ."🧑 {$appointment->customer->name}\n📋 {$appointment->service->name}\n📅 {$date} {$time}"
+            ."🧑 {$appointment->customer->name}\n📋 {$appointment->service->name}\n📅 {$date} {$time}\n"
+            ."📌 {$byLabel}"
         );
     }
 
@@ -83,18 +91,24 @@ class AppointmentNotificationService
         );
     }
 
-    public function notifyRescheduled(Appointment $appointment, string $oldDate, string $oldTime): void
+    public function notifyRescheduled(Appointment $appointment, string $oldDate, string $oldTime, string $changedBy = 'sistema'): void
     {
         $appointment->loadMissing(['service', 'employee', 'customer', 'business']);
 
         $newDate = Carbon::parse($appointment->starts_at)->translatedFormat('l d \\d\\e F');
         $newTime = Carbon::parse($appointment->starts_at)->format('g:i A');
         $business = $appointment->business->name;
+        $byLabel = match ($changedBy) {
+            'cliente' => 'Reprogramada por el cliente',
+            'negocio' => 'Reprogramada por el negocio',
+            default => 'Reprogramada',
+        };
 
         $msg = "🔄 *Cita reprogramada - {$business}*\n\n"
             ."📋 {$appointment->service->name}\n"
             ."❌ Antes: {$oldDate} {$oldTime}\n"
-            ."✅ Ahora: {$newDate} {$newTime}";
+            ."✅ Ahora: {$newDate} {$newTime}\n"
+            ."📌 {$byLabel}";
 
         $this->sendTo($appointment->customer->phone, $msg);
         $this->sendTo($appointment->employee?->phone, $msg);

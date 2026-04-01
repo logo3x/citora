@@ -11,9 +11,11 @@ class AppointmentObserver
 {
     public function updated(Appointment $appointment): void
     {
+        $changedBy = $this->getChangedBy($appointment);
+
         if ($appointment->wasChanged('status')) {
             match ($appointment->status) {
-                AppointmentStatus::Cancelled => SendWhatsAppNotification::dispatch('appointment.cancelled', $appointment),
+                AppointmentStatus::Cancelled => SendWhatsAppNotification::dispatch('appointment.cancelled', $appointment, ['changed_by' => $changedBy]),
                 AppointmentStatus::Completed => SendWhatsAppNotification::dispatch('appointment.completed', $appointment),
                 default => null,
             };
@@ -25,7 +27,23 @@ class AppointmentObserver
             SendWhatsAppNotification::dispatch('appointment.rescheduled', $appointment, [
                 'old_date' => $oldStartsAt->translatedFormat('l d \\d\\e F'),
                 'old_time' => $oldStartsAt->format('g:i A'),
+                'changed_by' => $changedBy,
             ]);
         }
+    }
+
+    private function getChangedBy(Appointment $appointment): string
+    {
+        $userId = auth()->id();
+
+        if (! $userId) {
+            return 'sistema';
+        }
+
+        if ($userId === $appointment->customer_id) {
+            return 'cliente';
+        }
+
+        return 'negocio';
     }
 }

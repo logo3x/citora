@@ -32,12 +32,13 @@ class SendWhatsAppNotification implements ShouldQueue
     {
         match ($this->event) {
             'appointment.created' => $notifier->notifyCreated($this->appointment),
-            'appointment.cancelled' => $notifier->notifyCancelled($this->appointment),
+            'appointment.cancelled' => $notifier->notifyCancelled($this->appointment, $this->extra['changed_by'] ?? 'sistema'),
             'appointment.completed' => $notifier->notifyCompleted($this->appointment),
             'appointment.rescheduled' => $notifier->notifyRescheduled(
                 $this->appointment,
                 $this->extra['old_date'] ?? '',
                 $this->extra['old_time'] ?? '',
+                $this->extra['changed_by'] ?? 'sistema',
             ),
             'appointment.reminder_24h' => $notifier->notifyReminder24h($this->appointment),
             'appointment.reminder_1h' => $notifier->notifyReminder1h($this->appointment),
