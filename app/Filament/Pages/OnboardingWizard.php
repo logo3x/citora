@@ -85,11 +85,10 @@ class OnboardingWizard extends Page
                                 ->label('Eslogan')
                                 ->placeholder('Ej: Los mejores cortes de la ciudad')
                                 ->maxLength(255),
-                            Textarea::make('address')
+                            TextInput::make('address')
                                 ->label('Dirección')
-                                ->rows(2)
-                                ->maxLength(500)
-                                ->columnSpanFull(),
+                                ->placeholder('Ej: Calle 31 #51-13, Bucaramanga')
+                                ->maxLength(500),
                             Textarea::make('description')
                                 ->label('Descripción del negocio')
                                 ->placeholder('Cuéntale a tus clientes sobre tu negocio...')
