@@ -81,19 +81,31 @@ class OnboardingWizard extends Page
                                 ->label('Teléfono / WhatsApp')
                                 ->tel()
                                 ->maxLength(20),
+                            TextInput::make('slogan')
+                                ->label('Eslogan')
+                                ->placeholder('Ej: Los mejores cortes de la ciudad')
+                                ->maxLength(255),
                             Textarea::make('address')
                                 ->label('Dirección')
                                 ->rows(2)
                                 ->maxLength(500)
                                 ->columnSpanFull(),
+                            Textarea::make('description')
+                                ->label('Descripción del negocio')
+                                ->placeholder('Cuéntale a tus clientes sobre tu negocio...')
+                                ->rows(3)
+                                ->maxLength(1000)
+                                ->columnSpanFull(),
                             FileUpload::make('logo')
                                 ->label('Logo (opcional)')
+                                ->helperText('Cuadrado, 400x400px recomendado')
                                 ->image()
                                 ->disk('public')
                                 ->directory('tmp-uploads')
                                 ->maxSize(2048),
                             FileUpload::make('banner')
                                 ->label('Banner (opcional)')
+                                ->helperText('Horizontal, 1200x400px recomendado')
                                 ->image()
                                 ->disk('public')
                                 ->directory('tmp-uploads')
@@ -245,7 +257,9 @@ class OnboardingWizard extends Page
                 'slug' => $data['slug'],
                 'email' => $data['email'] ?? null,
                 'phone' => $data['phone'] ?? null,
+                'slogan' => $data['slogan'] ?? null,
                 'address' => $data['address'] ?? null,
+                'description' => $data['description'] ?? null,
             ]);
 
             $this->attachMedia($business, $data['logo'] ?? null, 'logo');
