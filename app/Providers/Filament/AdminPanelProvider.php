@@ -37,12 +37,14 @@ class AdminPanelProvider extends PanelProvider
                 'info' => Color::Blue,
                 'danger' => Color::Red,
                 'warning' => Color::Orange,
+                'gray' => Color::Slate,
             ])
             ->brandName('Citora')
             ->brandLogo(asset('images/logo-light.png'))
             ->darkModeBrandLogo(asset('images/logo-dark.png'))
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('images/logo-light.png'))
+            ->font('Inter')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([])
@@ -64,7 +66,17 @@ class AdminPanelProvider extends PanelProvider
                 EnsureBusinessOnboarded::class,
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->gridColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                        'lg' => 3,
+                    ])
+                    ->sectionColumnSpan(1)
+                    ->checkboxListColumns([
+                        'default' => 1,
+                        'sm' => 2,
+                    ]),
             ])
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,

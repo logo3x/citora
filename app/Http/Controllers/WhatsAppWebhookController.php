@@ -8,30 +8,49 @@ use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Twilio\Security\RequestValidator;
 
 class WhatsAppWebhookController extends Controller
 {
     public function handle(Request $request, WhatsAppService $whatsApp): Response
     {
+        if (! $this->validateTwilioSignature($request)) {
+            Log::warning('WhatsApp webhook: invalid Twilio signature');
+
+            return response('Unauthorized', 403);
+        }
+
         $body = trim($request->input('Body', ''));
         $from = $request->input('From', '');
         $buttonPayload = $request->input('ButtonPayload', $request->input('ButtonText', ''));
 
-        Log::info('WhatsApp webhook', ['from' => $from, 'body' => $body, 'button' => $buttonPayload]);
+        Log::info('WhatsApp webhook', ['from' => $from, 'body' => $body]);
 
         $action = strtoupper($buttonPayload ?: $body);
 
-        // Button responses from templates: "Confirm" or "Cancel"
         if (in_array($action, ['CONFIRM', 'CANCEL'])) {
             return $this->handleButtonResponse($from, $action, $whatsApp);
         }
 
-        // Text responses: CONFIRMAR CITA-X, CANCELAR CITA-X, COMPLETAR CITA-X
         if (preg_match('/^(CONFIRMAR|CANCELAR|COMPLETAR)\s+CITA-(\d+)$/i', $action, $matches)) {
             return $this->handleTextResponse($from, strtoupper($matches[1]), (int) $matches[2], $whatsApp);
         }
 
         return response('OK', 200);
+    }
+
+    private function validateTwilioSignature(Request $request): bool
+    {
+        $token = config('services.twilio.auth_token');
+
+        if (! $token) {
+            return true;
+        }
+
+        $validator = new RequestValidator($token);
+        $signature = $request->header('X-Twilio-Signature', '');
+
+        return $validator->validate($signature, $request->fullUrl(), $request->all());
     }
 
     private function handleButtonResponse(string $from, string $action, WhatsAppService $whatsApp): Response
@@ -40,8 +59,6 @@ class WhatsAppWebhookController extends Controller
         $cached = cache()->pull("wa_pending:{$phone}");
 
         if (! $cached) {
-            $whatsApp->send($from, '⚠️ No hay citas pendientes de respuesta.');
-
             return response('OK', 200);
         }
 
@@ -49,64 +66,19 @@ class WhatsAppWebhookController extends Controller
             ->find($cached['appointment_id']);
 
         if (! $appointment) {
-            $whatsApp->send($from, '⚠️ Cita no encontrada.');
-
             return response('OK', 200);
         }
 
-        $cachedAction = $cached['action'] ?? 'confirm';
-
-        if ($cachedAction === 'complete') {
-            return $this->handleCompletion($appointment, $action, $whatsApp, $from);
-        }
-
-        if ($cachedAction === 'reschedule_confirm') {
-            return $this->handleRescheduleConfirmation($appointment, $action, $whatsApp, $from);
-        }
-
-        // Default: confirm/cancel appointment
         if ($action === 'CONFIRM') {
             if ($appointment->status === AppointmentStatus::Pending) {
                 $appointment->update(['status' => AppointmentStatus::Confirmed]);
-                $whatsApp->send($from, '✅ ¡Cita confirmada exitosamente!');
-            } else {
-                $whatsApp->send($from, "⚠️ Esta cita ya tiene estado: {$appointment->status->value}");
+                $whatsApp->send($from, '✅ ¡Cita confirmada!');
             }
         } else {
             if ($appointment->status !== AppointmentStatus::Cancelled) {
                 $appointment->update(['status' => AppointmentStatus::Cancelled]);
                 $whatsApp->send($from, '❌ Cita cancelada.');
-            } else {
-                $whatsApp->send($from, '⚠️ Esta cita ya estaba cancelada.');
             }
-        }
-
-        return response('OK', 200);
-    }
-
-    private function handleCompletion(Appointment $appointment, string $action, WhatsAppService $whatsApp, string $from): Response
-    {
-        if ($action === 'CONFIRM') {
-            $appointment->update(['status' => AppointmentStatus::Completed]);
-            $whatsApp->send($from, '✅ ¡Servicio completado! Se notificará al cliente.');
-        } else {
-            $whatsApp->send($from, '⚠️ El servicio no fue marcado como completado.');
-        }
-
-        return response('OK', 200);
-    }
-
-    private function handleRescheduleConfirmation(Appointment $appointment, string $action, WhatsAppService $whatsApp, string $from): Response
-    {
-        if ($action === 'CONFIRM') {
-            if ($appointment->status === AppointmentStatus::Pending) {
-                $appointment->update(['status' => AppointmentStatus::Confirmed]);
-            }
-
-            $whatsApp->send($from, '✅ ¡Cita reprogramada confirmada!');
-        } else {
-            $appointment->update(['status' => AppointmentStatus::Cancelled]);
-            $whatsApp->send($from, '❌ Cita reprogramada cancelada.');
         }
 
         return response('OK', 200);
@@ -123,49 +95,49 @@ class WhatsAppWebhookController extends Controller
             return response('OK', 200);
         }
 
+        $phone = preg_replace('/[^0-9]/', '', $from);
+        $authorized = str_contains($phone, preg_replace('/[^0-9]/', '', $appointment->employee?->phone ?? ''))
+            || str_contains($phone, preg_replace('/[^0-9]/', '', $appointment->business?->phone ?? ''))
+            || str_contains($phone, preg_replace('/[^0-9]/', '', $appointment->customer?->phone ?? ''));
+
+        if (! $authorized) {
+            $whatsApp->send($from, '⚠️ No tienes permiso para modificar esta cita.');
+
+            return response('OK', 200);
+        }
+
         match ($action) {
-            'CONFIRMAR' => $this->textConfirm($appointment, $whatsApp, $from),
-            'CANCELAR' => $this->textCancel($appointment, $whatsApp, $from),
-            'COMPLETAR' => $this->textComplete($appointment, $whatsApp, $from),
+            'CONFIRMAR' => $this->updateStatus($appointment, AppointmentStatus::Confirmed, AppointmentStatus::Pending, $whatsApp, $from),
+            'CANCELAR' => $this->updateStatus($appointment, AppointmentStatus::Cancelled, null, $whatsApp, $from),
+            'COMPLETAR' => $this->updateStatus($appointment, AppointmentStatus::Completed, null, $whatsApp, $from),
             default => null,
         };
 
         return response('OK', 200);
     }
 
-    private function textConfirm(Appointment $appointment, WhatsAppService $whatsApp, string $from): void
+    private function updateStatus(Appointment $appointment, AppointmentStatus $newStatus, ?AppointmentStatus $requiredCurrent, WhatsAppService $whatsApp, string $from): void
     {
-        if ($appointment->status !== AppointmentStatus::Pending) {
+        if ($requiredCurrent && $appointment->status !== $requiredCurrent) {
             $whatsApp->send($from, "⚠️ Esta cita ya tiene estado: {$appointment->status->value}");
 
             return;
         }
 
-        $appointment->update(['status' => AppointmentStatus::Confirmed]);
-        $whatsApp->send($from, '✅ ¡Cita confirmada!');
-    }
-
-    private function textCancel(Appointment $appointment, WhatsAppService $whatsApp, string $from): void
-    {
-        if ($appointment->status === AppointmentStatus::Cancelled) {
-            $whatsApp->send($from, '⚠️ Esta cita ya estaba cancelada.');
+        if ($appointment->status === $newStatus) {
+            $whatsApp->send($from, '⚠️ La cita ya tiene ese estado.');
 
             return;
         }
 
-        $appointment->update(['status' => AppointmentStatus::Cancelled]);
-        $whatsApp->send($from, '❌ Cita cancelada.');
-    }
+        $appointment->update(['status' => $newStatus]);
 
-    private function textComplete(Appointment $appointment, WhatsAppService $whatsApp, string $from): void
-    {
-        if ($appointment->status === AppointmentStatus::Completed) {
-            $whatsApp->send($from, '⚠️ Esta cita ya fue completada.');
+        $labels = [
+            'confirmed' => '✅ ¡Cita confirmada!',
+            'cancelled' => '❌ Cita cancelada.',
+            'completed' => '✅ ¡Servicio completado!',
+        ];
 
-            return;
-        }
-
-        $appointment->update(['status' => AppointmentStatus::Completed]);
-        $whatsApp->send($from, '✅ ¡Servicio completado!');
+        $whatsApp->send($from, $labels[$newStatus->value] ?? '✅ Estado actualizado.');
     }
 }

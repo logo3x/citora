@@ -2,6 +2,11 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AppointmentsChart;
+use App\Filament\Widgets\PlanUsageWidget;
+use App\Filament\Widgets\ServicePopularityChart;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\UpcomingAppointments;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -14,14 +19,25 @@ class Dashboard extends BaseDashboard
             return 'Panel de Administración';
         }
 
-        return '¡Hola, '.$user->name.'!';
+        $hour = now()->hour;
+        $greeting = match (true) {
+            $hour < 12 => 'Buenos días',
+            $hour < 18 => 'Buenas tardes',
+            default => 'Buenas noches',
+        };
+
+        return "{$greeting}, {$user->name}";
     }
 
     public function getSubheading(): ?string
     {
         $user = auth()->user();
 
-        if ($user->hasRole('super_admin') || ! $user->business_id) {
+        if ($user->hasRole('super_admin')) {
+            return now()->translatedFormat('l d \\d\\e F, Y');
+        }
+
+        if (! $user->business_id) {
             return null;
         }
 
@@ -41,6 +57,32 @@ class Dashboard extends BaseDashboard
             return "📊 Te quedan {$remaining} citas disponibles este mes.";
         }
 
-        return null;
+        return now()->translatedFormat('l d \\d\\e F, Y');
+    }
+
+    public function getWidgets(): array
+    {
+        $user = auth()->user();
+
+        if ($user->hasRole('super_admin')) {
+            return [
+                StatsOverview::class,
+                AppointmentsChart::class,
+                UpcomingAppointments::class,
+            ];
+        }
+
+        return [
+            PlanUsageWidget::class,
+            StatsOverview::class,
+            AppointmentsChart::class,
+            ServicePopularityChart::class,
+            UpcomingAppointments::class,
+        ];
+    }
+
+    public function getColumns(): int|array
+    {
+        return 2;
     }
 }

@@ -51,6 +51,10 @@ class GoogleController extends Controller
 
         $redirectTo = session()->pull('booking_redirect');
 
+        if ($redirectTo && ! str_starts_with($redirectTo, '/') && ! str_starts_with($redirectTo, config('app.url'))) {
+            $redirectTo = null;
+        }
+
         return redirect()->to($redirectTo ?? filament()->getPanel('admin')->getUrl());
     }
 }

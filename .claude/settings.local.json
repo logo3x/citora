@@ -26,7 +26,11 @@
       "Bash(grep \"booking-layout\\\\|booking-sidebar\\\\|booking-main\" public/build/assets/*.css)",
       "Bash(curl -s http://localhost:8000/caballeros)",
       "Bash(git remote:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

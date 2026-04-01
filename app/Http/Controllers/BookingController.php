@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -39,8 +40,8 @@ class BookingController extends Controller
     {
         $request->validate([
             'date' => ['required', 'date', 'after_or_equal:today'],
-            'service_id' => ['required', 'exists:services,id'],
-            'employee_id' => ['nullable', 'exists:employees,id'],
+            'service_id' => ['required', Rule::exists('services', 'id')->where('business_id', $business->id)],
+            'employee_id' => ['nullable', Rule::exists('employees', 'id')->where('business_id', $business->id)],
         ]);
 
         $service = Service::findOrFail($request->service_id);
@@ -69,8 +70,8 @@ class BookingController extends Controller
         }
 
         $validated = $request->validate([
-            'service_id' => ['required', 'exists:services,id'],
-            'employee_id' => ['nullable', 'exists:employees,id'],
+            'service_id' => ['required', Rule::exists('services', 'id')->where('business_id', $business->id)],
+            'employee_id' => ['nullable', Rule::exists('employees', 'id')->where('business_id', $business->id)],
             'date' => ['required', 'date', 'after_or_equal:today'],
             'time' => ['required', 'date_format:H:i'],
             'phone' => ['required', 'string', 'max:20'],

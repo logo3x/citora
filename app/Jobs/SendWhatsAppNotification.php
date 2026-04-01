@@ -6,10 +6,18 @@ use App\Models\Appointment;
 use App\Services\AppointmentNotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 
 class SendWhatsAppNotification implements ShouldQueue
 {
     use Queueable;
+
+    public int $tries = 3;
+
+    public int $timeout = 30;
+
+    /** @var array<int> */
+    public array $backoff = [10, 60, 300];
 
     /**
      * @param  array<string, mixed>  $extra
@@ -45,5 +53,14 @@ class SendWhatsAppNotification implements ShouldQueue
             ),
             default => null,
         };
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('WhatsApp notification failed', [
+            'event' => $this->event,
+            'appointment_id' => $this->appointment?->id,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }

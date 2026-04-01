@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Business;
@@ -27,17 +28,24 @@ Route::get('/', function () {
     return view('welcome', compact('businesses', 'services'));
 });
 
-Route::get('auth/google/redirect', [GoogleController::class, 'redirect'])->name('auth.google.redirect');
-Route::get('auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
+Route::get('auth/google/redirect', [GoogleController::class, 'redirect'])->name('auth.google.redirect')->middleware('throttle:10,1');
+Route::get('auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback')->middleware('throttle:10,1');
 
-// Webhooks (no CSRF)
+// Webhooks (no CSRF, rate limited)
 Route::post('webhook/whatsapp', [WhatsAppWebhookController::class, 'handle'])
     ->name('webhook.whatsapp')
-    ->withoutMiddleware(PreventRequestForgery::class);
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->middleware('throttle:120,1');
 
 Route::post('webhook/wompi', [PaymentController::class, 'webhook'])
     ->name('webhook.wompi')
-    ->withoutMiddleware(PreventRequestForgery::class);
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->middleware('throttle:60,1');
+
+Route::post('webhook/deploy', [DeployController::class, 'handle'])
+    ->name('webhook.deploy')
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->middleware('throttle:5,1');
 
 // Payments
 Route::get('payment/{business:slug}/checkout', [PaymentController::class, 'checkout'])
@@ -49,5 +57,5 @@ Route::get('payment/{business:slug}/result', [PaymentController::class, 'result'
 
 // Public booking (keep at bottom - catches slugs)
 Route::get('{business:slug}', [BookingController::class, 'show'])->name('booking.show');
-Route::get('{business:slug}/slots', [BookingController::class, 'slots'])->name('booking.slots');
-Route::post('{business:slug}/book', [BookingController::class, 'store'])->name('booking.store')->middleware('auth');
+Route::get('{business:slug}/slots', [BookingController::class, 'slots'])->name('booking.slots')->middleware('throttle:60,1');
+Route::post('{business:slug}/book', [BookingController::class, 'store'])->name('booking.store')->middleware(['auth', 'throttle:10,1']);

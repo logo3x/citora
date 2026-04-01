@@ -8,20 +8,30 @@ use Illuminate\Support\HtmlString;
 
 class Login extends BaseLogin
 {
+    protected string $view = 'filament.pages.auth.login';
+
     protected function getFormActions(): array
     {
         return [
-            $this->getAuthenticateFormAction(),
+            $this->getAuthenticateFormAction()
+                ->label('Iniciar sesión'),
         ];
     }
 
     public function getSubheading(): string|Htmlable|null
     {
-        return new HtmlString('La forma inteligente de gestionar tu agenda');
+        return null;
     }
 
     public function getHeading(): string|Htmlable
     {
-        return new HtmlString('<img src="/images/logo-light.png" alt="Citora" class="h-12 mx-auto mb-2" onerror="this.outerHTML=\'<span class=text-2xl>Citora</span>\'">');
+        $hour = now()->hour;
+        $greeting = match (true) {
+            $hour < 12 => '¡Buenos días!',
+            $hour < 18 => '¡Buenas tardes!',
+            default => '¡Buenas noches!',
+        };
+
+        return new HtmlString($greeting);
     }
 }

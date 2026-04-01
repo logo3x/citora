@@ -1,0 +1,26 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest code on server
+        run: |
+          curl -s -X POST \
+            "${{ secrets.CPANEL_GIT_PULL_URL }}" \
+            -H "Authorization: cpanel ${{ secrets.CPANEL_USERNAME }}:${{ secrets.CPANEL_API_TOKEN }}" \
+            --max-time 60 || true
+
+      - name: Wait for pull to complete
+        run: sleep 10
+
+      - name: Run deploy commands
+        run: |
+          curl -s -X POST \
+            "https://citora.com.co/webhook/deploy" \
+            -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
+            --max-time 120

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Database\Factories\BusinessFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -99,14 +100,22 @@ class Business extends Model implements HasMedia
         return $this->getMonthlyAppointmentCount() >= $this->monthly_appointment_limit;
     }
 
-    public function isUnlockedForPeriod(?string $period = null): bool
+    public function isUnlockedForPeriod(): bool
     {
-        $period ??= now()->format('Y-m');
-
         return $this->payments()
-            ->where('period', $period)
             ->where('status', 'approved')
+            ->where('paid_at', '>=', now()->subDays(30))
             ->exists();
+    }
+
+    public function getUnlockExpiresAt(): ?Carbon
+    {
+        $lastPayment = $this->payments()
+            ->where('status', 'approved')
+            ->latest('paid_at')
+            ->first();
+
+        return $lastPayment?->paid_at?->addDays(30);
     }
 
     public function canAcceptAppointments(): bool

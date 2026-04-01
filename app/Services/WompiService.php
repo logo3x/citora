@@ -87,7 +87,7 @@ class WompiService
 
     public function verifyTransaction(string $transactionId): ?array
     {
-        $response = Http::get(config('services.wompi.base_url')."/v1/transactions/{$transactionId}");
+        $response = Http::timeout(10)->retry(2, 200)->get(config('services.wompi.base_url')."/v1/transactions/{$transactionId}");
 
         if ($response->successful()) {
             return $response->json('data');

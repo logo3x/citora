@@ -32,7 +32,8 @@ class ServiceForm
                             ->collection('image')
                             ->disk('public')
                             ->image()
-                            ->imageEditor(),
+                            ->imageEditor()
+                            ->maxSize(2048),
                         Select::make('duration_minutes')
                             ->label('Duración')
                             ->options([

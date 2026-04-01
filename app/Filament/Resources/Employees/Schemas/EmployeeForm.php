@@ -37,7 +37,8 @@ class EmployeeForm
                             ->collection('photo')
                             ->disk('public')
                             ->image()
-                            ->imageEditor(),
+                            ->imageEditor()
+                            ->maxSize(2048),
                         Select::make('services')
                             ->label('Servicios que realiza')
                             ->multiple()

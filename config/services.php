@@ -60,4 +60,8 @@ return [
             : 'https://sandbox.wompi.co',
     ],
 
+    'deploy' => [
+        'secret' => env('DEPLOY_SECRET'),
+    ],
+
 ];

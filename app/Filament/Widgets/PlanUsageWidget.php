@@ -3,11 +3,10 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
-use Illuminate\Support\Facades\DB;
 
 class PlanUsageWidget extends Widget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 0;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -32,11 +31,8 @@ class PlanUsageWidget extends Widget
         $isBlocked = $business->hasReachedMonthlyLimit() && ! $business->isUnlockedForPeriod();
         $isUnlocked = $business->isUnlockedForPeriod();
         $percentage = $limit > 0 ? min(100, round(($used / $limit) * 100)) : 0;
-
-        // Count WhatsApp messages this month from logs
-        $messagesThisMonth = DB::table('jobs')
-            ->whereMonth('created_at', now()->month)
-            ->count();
+        $expiresAt = $business->getUnlockExpiresAt();
+        $daysLeft = $expiresAt ? max(0, (int) now()->diffInDays($expiresAt, false)) : null;
 
         return [
             'used' => $used,
@@ -45,8 +41,9 @@ class PlanUsageWidget extends Widget
             'percentage' => $percentage,
             'isBlocked' => $isBlocked,
             'isUnlocked' => $isUnlocked,
+            'daysLeft' => $daysLeft,
+            'expiresAt' => $expiresAt?->translatedFormat('d \\d\\e F, Y'),
             'slug' => $business->slug,
-            'period' => now()->translatedFormat('F Y'),
         ];
     }
 }

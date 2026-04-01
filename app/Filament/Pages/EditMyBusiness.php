@@ -62,7 +62,7 @@ class EditMyBusiness extends Page
                 ->icon('heroicon-o-clipboard-document')
                 ->color('gray')
                 ->action(function () use ($publicUrl): void {
-                    $this->js("navigator.clipboard.writeText('{$publicUrl}')");
+                    $this->js('navigator.clipboard.writeText('.json_encode($publicUrl).')');
 
                     Notification::make()
                         ->success()
@@ -141,14 +141,16 @@ class EditMyBusiness extends Page
                                 ->collection('logo')
                                 ->disk('public')
                                 ->image()
-                                ->imageEditor(),
+                                ->imageEditor()
+                                ->maxSize(2048),
                             SpatieMediaLibraryFileUpload::make('banner')
                                 ->label('Banner')
                                 ->helperText('Horizontal, 1200x400px')
                                 ->collection('banner')
                                 ->disk('public')
                                 ->image()
-                                ->imageEditor(),
+                                ->imageEditor()
+                                ->maxSize(5120),
                         ])
                         ->columns(2),
 

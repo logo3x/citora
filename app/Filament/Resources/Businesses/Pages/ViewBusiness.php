@@ -34,7 +34,7 @@ class ViewBusiness extends ViewRecord
                 ->icon('heroicon-o-clipboard-document')
                 ->color('gray')
                 ->action(function () use ($publicUrl): void {
-                    $this->js("navigator.clipboard.writeText('{$publicUrl}')");
+                    $this->js('navigator.clipboard.writeText('.json_encode($publicUrl).')');
 
                     Notification::make()
                         ->success()
