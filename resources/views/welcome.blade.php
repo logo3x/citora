@@ -7,77 +7,534 @@
     <meta name="description" content="Plataforma SaaS para gestión de citas en barberías, salones de belleza y centros estéticos. Reservas online, WhatsApp automático y panel de control.">
     <link rel="icon" href="/images/logo-light.png" type="image/png">
     @vite(['resources/css/app.css'])
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #FAFAF8; }
-        h1, h2, h3 { font-family: 'Poppins', sans-serif; }
-        .gradient-hero { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); }
-        .cta-primary { background: #D97706; }
-        .cta-primary:hover { background: #B45309; }
+        :root {
+            --amber: #D97706;
+            --amber-light: #F59E0B;
+            --teal: #0D9488;
+            --slate-900: #0F172A;
+            --slate-800: #1E293B;
+            --slate-700: #334155;
+            --slate-400: #94A3B8;
+            --slate-300: #CBD5E1;
+            --cream: #FAFAF8;
+            --border: #E7E5DF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--cream); color: #111; overflow-x: hidden; }
+        h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(3deg); }
+        }
+        @keyframes float-reverse {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(20px) rotate(-3deg); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(217,119,6,0.15); }
+            50% { box-shadow: 0 0 40px rgba(217,119,6,0.3); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes scroll-hint {
+            0%, 100% { opacity: 1; transform: translateY(0); }
+            50% { opacity: 0.5; transform: translateY(8px); }
+        }
+        @keyframes slide-in-left {
+            from { opacity: 0; transform: translateX(-40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes counter-up {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-fade-up { animation: fadeUp 0.7s ease-out both; }
+        .animate-fade-up-delay-1 { animation: fadeUp 0.7s ease-out 0.15s both; }
+        .animate-fade-up-delay-2 { animation: fadeUp 0.7s ease-out 0.3s both; }
+        .animate-fade-up-delay-3 { animation: fadeUp 0.7s ease-out 0.45s both; }
+        .animate-fade-in { animation: fadeIn 1s ease-out both; }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Nav */
+        .nav-glass {
+            position: fixed; top: 0; width: 100%; z-index: 50;
+            background: rgba(250,250,248,0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(231,229,223,0.6);
+            transition: all 0.3s ease;
+        }
+        .nav-glass.scrolled {
+            background: rgba(250,250,248,0.95);
+            box-shadow: 0 1px 20px rgba(0,0,0,0.06);
+        }
+
+        /* Hero */
+        .hero-section {
+            position: relative;
+            background: linear-gradient(135deg, #0a0f1e 0%, #0F172A 30%, #1a2744 60%, #0F172A 100%);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+            padding: 120px 16px 80px;
+            overflow: hidden;
+        }
+        .hero-mesh {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 20% 50%, rgba(217,119,6,0.12), transparent),
+                radial-gradient(ellipse 500px 300px at 80% 30%, rgba(13,148,136,0.08), transparent),
+                radial-gradient(ellipse 300px 300px at 50% 80%, rgba(37,99,235,0.06), transparent);
+            pointer-events: none;
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+        .hero-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+        .hero-orb-1 {
+            width: 300px; height: 300px;
+            background: rgba(217,119,6,0.15);
+            top: -50px; right: -50px;
+            animation: float 8s ease-in-out infinite;
+        }
+        .hero-orb-2 {
+            width: 200px; height: 200px;
+            background: rgba(13,148,136,0.1);
+            bottom: -30px; left: -30px;
+            animation: float-reverse 10s ease-in-out infinite;
+        }
+
+        /* Search */
+        .search-wrapper {
+            position: relative;
+            max-width: 560px;
+            margin: 32px auto 0;
+        }
+        .search-box {
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            padding: 5px 5px 5px 18px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1);
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        .search-box:focus-within {
+            box-shadow: 0 12px 50px rgba(0,0,0,0.3), 0 0 0 2px rgba(217,119,6,0.4);
+            transform: translateY(-2px);
+        }
+        .search-box input {
+            flex: 1; border: none; outline: none;
+            font-size: 15px; padding: 14px 12px;
+            background: transparent; font-family: Inter, sans-serif;
+            color: #111;
+        }
+        .search-box input::placeholder { color: #9ca3af; }
+        .search-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #D97706, #B45309);
+            color: white; font-weight: 700; font-size: 14px;
+            border-radius: 12px; border: none; cursor: pointer;
+            font-family: Inter, sans-serif;
+            transition: all 0.2s;
+        }
+        .search-btn:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+        #search-results {
+            display: none; position: absolute;
+            top: 100%; left: 0; right: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-height: 380px; overflow-y: auto;
+            z-index: 10;
+        }
+
+        /* Cards */
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Service card */
+        .service-card {
+            flex-shrink: 0; width: 280px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            text-decoration: none;
+            transition: all 0.35s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-color: rgba(217,119,6,0.3);
+        }
+        .service-card .card-img {
+            position: relative; overflow: hidden;
+            height: 160px;
+        }
+        .service-card .card-img img,
+        .service-card .card-img .img-placeholder {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .service-card:hover .card-img img,
+        .service-card:hover .card-img .img-placeholder {
+            transform: scale(1.08);
+        }
+        .service-card .card-img::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.06) 100%);
+        }
+        .service-card .price-badge {
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(15,23,42,0.85);
+            backdrop-filter: blur(8px);
+            color: var(--amber-light);
+            font-weight: 700; font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            z-index: 2;
+        }
+
+        /* Business card */
+        .biz-card {
+            flex-shrink: 0; width: 300px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-decoration: none;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .biz-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--amber), var(--teal));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .biz-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+        }
+        .biz-card:hover::before { opacity: 1; }
+
+        /* Feature bento */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 16px;
+        }
+        .bento-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .bento-card::before {
+            content: ''; position: absolute;
+            top: -50%; right: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(217,119,6,0.04) 0%, transparent 60%);
+            opacity: 0; transition: opacity 0.4s;
+            pointer-events: none;
+        }
+        .bento-card:hover { border-color: rgba(217,119,6,0.2); }
+        .bento-card:hover::before { opacity: 1; }
+        .bento-featured {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--slate-900), var(--slate-800));
+            border-color: transparent;
+        }
+        .bento-featured:hover { border-color: transparent; }
+        .bento-featured h3, .bento-featured p { color: white !important; }
+        .bento-featured p { color: var(--slate-400) !important; }
+
+        /* Steps */
+        .step-card {
+            text-align: center; position: relative;
+            padding: 32px 24px;
+        }
+        .step-number {
+            width: 64px; height: 64px;
+            border-radius: 20px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 800;
+            font-family: Poppins, sans-serif;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .step-connector {
+            position: absolute;
+            top: 58px; left: 60%; right: -40%;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 8px, transparent 8px, transparent 16px);
+        }
+
+        /* Pricing */
+        .pricing-card {
+            background: white;
+            border-radius: 24px;
+            padding: 36px;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+        .pricing-featured {
+            border: 2px solid var(--amber);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        .pricing-featured:hover {
+            animation: none;
+            box-shadow: 0 20px 60px rgba(217,119,6,0.2);
+            transform: translateY(-4px);
+        }
+        .pricing-regular {
+            border: 1px solid var(--border);
+        }
+        .pricing-regular:hover {
+            border-color: rgba(13,148,136,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+            transform: translateY(-4px);
+        }
+
+        /* Segments */
+        .segment-card {
+            padding: 28px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.35s ease;
+            cursor: default;
+        }
+        .segment-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            border-color: var(--amber);
+        }
+        .segment-card:hover .segment-icon {
+            transform: scale(1.15);
+        }
+        .segment-icon {
+            display: inline-block;
+            font-size: 42px;
+            margin-bottom: 12px;
+            transition: transform 0.35s ease;
+        }
+
+        /* CTA section */
+        .cta-section {
+            position: relative;
+            background: linear-gradient(135deg, #0a0f1e, #0F172A, #1a2744);
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: ''; position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 400px 300px at 30% 50%, rgba(217,119,6,0.1), transparent),
+                radial-gradient(ellipse 300px 200px at 70% 50%, rgba(13,148,136,0.08), transparent);
+            pointer-events: none;
+        }
+        .cta-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 16px 36px;
+            background: linear-gradient(135deg, #D97706, #B45309);
+            color: white; font-weight: 700; font-size: 17px;
+            border-radius: 14px; text-decoration: none;
+            font-family: Inter, sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(217,119,6,0.3);
+        }
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(217,119,6,0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Footer */
+        .footer-link {
+            color: var(--slate-400);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .footer-link:hover { color: var(--amber-light); }
+
+        /* Carousel scroll */
+        .carousel-track {
+            overflow-x: auto;
+            padding: 8px 16px 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .carousel-track::-webkit-scrollbar { display: none; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .bento-featured {
+                grid-column: span 1;
+            }
+            .hero-section { padding: 100px 16px 60px; }
+            .nav-actions .nav-label { display: none; }
+            .steps-grid { flex-direction: column; }
+            .step-connector { display: none; }
+            .pricing-grid { grid-template-columns: 1fr !important; }
+            .segments-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+            .segments-grid { grid-template-columns: 1fr !important; }
+        }
     </style>
 </head>
-<body class="text-[#111111] antialiased">
+<body class="antialiased">
 
-    {{-- Nav --}}
-    <nav style="position:fixed;top:0;width:100%;z-index:50;background:rgba(250,250,248,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #E7E5DF">
-        <div style="max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
-            <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none">
-                <img src="/images/logo-light.png" alt="Citora" style="height:32px" onerror="this.style.display='none'">
-                <span style="font-size:18px;font-weight:700;color:#0F172A;font-family:Poppins,sans-serif">Citora</span>
+    {{-- Navigation --}}
+    <nav class="nav-glass" id="main-nav">
+        <div style="max-width:1140px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+            <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+                <img src="/images/logo-light.png" alt="Citora" style="height:30px" onerror="this.style.display='none'">
+                <span style="font-size:20px;font-weight:800;color:var(--slate-900);font-family:Poppins,sans-serif;letter-spacing:-0.02em">Citora</span>
             </a>
-            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
+            <div class="nav-actions" style="display:flex;align-items:center;gap:8px;font-size:13px">
                 @auth
-                    <a href="{{ route('customer.appointments') }}" style="padding:8px 14px;color:#374151;text-decoration:none;font-weight:500;border:1px solid #E7E5DF;border-radius:8px">📅 Mis citas</a>
+                    <a href="{{ route('customer.appointments') }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;color:var(--slate-700);text-decoration:none;font-weight:500;border:1px solid var(--border);border-radius:10px;transition:all 0.2s"
+                       onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--slate-700)'">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="nav-label">Mis citas</span>
+                    </a>
                     @if(auth()->user()->business_id)
-                        <a href="{{ filament()->getUrl() }}" style="padding:8px 14px;background:#D97706;color:white;font-weight:600;border-radius:8px;text-decoration:none">Mi panel</a>
+                        <a href="{{ filament()->getUrl() }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#D97706,#B45309);color:white;font-weight:600;border-radius:10px;text-decoration:none;transition:all 0.2s;font-size:13px"
+                           onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                            <span class="nav-label">Mi panel</span>
+                        </a>
                     @endif
                 @else
-                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="padding:8px 14px;color:#374151;text-decoration:none;font-weight:500;border:1px solid #E7E5DF;border-radius:8px">📅 Mis citas</a>
-                    <a href="{{ route('auth.google.redirect') }}" style="padding:8px 14px;background:#D97706;color:white;font-weight:600;border-radius:8px;text-decoration:none">🏪 Registra tu negocio</a>
+                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;color:var(--slate-700);text-decoration:none;font-weight:500;border:1px solid var(--border);border-radius:10px;transition:all 0.2s"
+                       onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--slate-700)'">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="nav-label">Mis citas</span>
+                    </a>
+                    <a href="{{ route('auth.google.redirect') }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#D97706,#B45309);color:white;font-weight:600;border-radius:10px;text-decoration:none;transition:all 0.2s;font-size:13px"
+                       onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span class="nav-label">Registra tu negocio</span>
+                    </a>
                 @endauth
             </div>
         </div>
     </nav>
 
     {{-- Hero --}}
-    <section style="background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);padding:90px 16px 60px">
-        <div style="max-width:700px;margin:0 auto;text-align:center">
-            <h1 style="font-size:clamp(28px,5vw,48px);font-weight:800;color:white;line-height:1.15;font-family:Poppins,sans-serif">
-                Reserva tu cita en segundos
-            </h1>
-            <p style="margin-top:12px;font-size:17px;color:#9CA3AF;max-width:500px;margin-left:auto;margin-right:auto">
-                Encuentra tu barbería, salón o spa favorito y agenda online. Sin llamadas.
-            </p>
+    <section class="hero-section">
+        <div class="hero-mesh"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
 
-            {{-- Search bar --}}
-            <div style="position:relative;max-width:520px;margin:28px auto 0">
-                <div style="display:flex;align-items:center;background:white;border-radius:14px;padding:4px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
-                    <span style="padding:0 12px;font-size:20px">🔍</span>
-                    <input type="text" id="search-input" placeholder="Buscar negocio o servicio..."
-                           style="flex:1;border:none;outline:none;font-size:15px;padding:12px 0;background:transparent;font-family:Inter,sans-serif"
-                           autocomplete="off">
-                    <button onclick="document.getElementById('search-input').value && (window.location.hash='resultados')"
-                            style="padding:10px 20px;background:#D97706;color:white;font-weight:600;border-radius:10px;border:none;font-size:14px;cursor:pointer">
-                        Buscar
-                    </button>
-                </div>
-                {{-- Search results dropdown --}}
-                <div id="search-results" style="display:none;position:absolute;top:100%;left:0;right:0;margin-top:8px;background:white;border-radius:12px;border:1px solid #E7E5DF;box-shadow:0 12px 40px rgba(0,0,0,0.15);max-height:360px;overflow-y:auto;z-index:10"></div>
+        <div style="position:relative;z-index:2;max-width:720px;margin:0 auto;text-align:center">
+            {{-- Pill badge --}}
+            <div class="animate-fade-up" style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 8px;background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.2);border-radius:999px;margin-bottom:24px">
+                <span style="background:var(--amber);color:white;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em">Nuevo</span>
+                <span style="font-size:13px;color:rgba(255,255,255,0.8)">Agenda inteligente para negocios</span>
             </div>
 
-            <div style="display:flex;justify-content:center;gap:10px;margin-top:24px;flex-wrap:wrap">
-                <a href="{{ route('auth.google.redirect') }}" style="padding:10px 20px;background:#D97706;color:white;font-weight:700;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
-                    🏪 Registra tu negocio gratis
+            <h1 class="animate-fade-up-delay-1" style="font-size:clamp(32px,5.5vw,56px);font-weight:900;color:white;line-height:1.08;letter-spacing:-0.03em">
+                Reserva tu cita
+                <span style="background:linear-gradient(135deg,#F59E0B,#D97706,#0D9488);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">en segundos</span>
+            </h1>
+
+            <p class="animate-fade-up-delay-2" style="margin-top:16px;font-size:18px;color:var(--slate-400);max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6">
+                Encuentra tu barbería, salón o spa favorito y agenda online. Sin llamadas, sin esperas.
+            </p>
+
+            {{-- Search --}}
+            <div class="search-wrapper animate-fade-up-delay-3">
+                <div class="search-box">
+                    <svg width="20" height="20" fill="none" stroke="#9ca3af" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="11" cy="11" r="8" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="search-input" placeholder="Buscar negocio o servicio..." autocomplete="off">
+                    <button class="search-btn" onclick="document.getElementById('search-input').value && (window.location.hash='resultados')">Buscar</button>
+                </div>
+                <div id="search-results"></div>
+            </div>
+
+            {{-- CTAs --}}
+            <div class="animate-fade-up-delay-3" style="display:flex;justify-content:center;gap:12px;margin-top:28px;flex-wrap:wrap">
+                <a href="{{ route('auth.google.redirect') }}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:linear-gradient(135deg,#D97706,#B45309);color:white;font-weight:700;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.3s;box-shadow:0 4px 20px rgba(217,119,6,0.3)"
+                   onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(217,119,6,0.4)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 20px rgba(217,119,6,0.3)'">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Registra tu negocio gratis
                 </a>
                 @auth
-                    <a href="{{ route('customer.appointments') }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);color:white;font-weight:600;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
-                        📅 Consultar mis citas
+                    <a href="{{ route('customer.appointments') }}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);font-weight:600;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.2s;background:rgba(255,255,255,0.04)"
+                       onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.15)'">
+                        Consultar mis citas
                     </a>
                 @else
-                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="padding:10px 20px;border:1px solid rgba(255,255,255,0.2);color:white;font-weight:600;border-radius:10px;text-decoration:none;font-size:14px;display:inline-flex;align-items:center;gap:6px">
-                        📅 Consultar mis citas
+                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);font-weight:600;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.2s;background:rgba(255,255,255,0.04)"
+                       onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.15)'">
+                        Consultar mis citas
                     </a>
                 @endauth
+            </div>
+
+            {{-- Scroll hint --}}
+            <div style="margin-top:48px;animation:scroll-hint 2s ease-in-out infinite">
+                <svg width="24" height="24" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24" style="margin:0 auto"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
             </div>
         </div>
     </section>
@@ -100,34 +557,34 @@
                     let html = '';
 
                     if (data.services.length > 0) {
-                        html += '<div style="padding:10px 16px 6px;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">Servicios</div>';
+                        html += '<div style="padding:12px 18px 6px;font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em">Servicios</div>';
                         data.services.forEach(s => {
-                            html += `<a href="/${s.slug}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;text-decoration:none;border-bottom:1px solid #f3f4f6"
-                                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
-                                ${s.image ? `<img src="${s.image}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">` : '<span style="width:36px;height:36px;border-radius:8px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:16px">✂️</span>'}
+                            html += `<a href="/${s.slug}" style="display:flex;align-items:center;gap:12px;padding:10px 18px;text-decoration:none;transition:background 0.15s"
+                                        onmouseover="this.style.background='#f8f8f6'" onmouseout="this.style.background='white'">
+                                ${s.image ? `<img src="${s.image}" style="width:40px;height:40px;border-radius:10px;object-fit:cover">` : '<span style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(217,119,6,0.1),rgba(13,148,136,0.1));display:flex;align-items:center;justify-content:center;font-size:18px">&#9986;</span>'}
                                 <div style="flex:1;min-width:0">
-                                    <p style="font-weight:600;font-size:14px;color:#0F172A">${s.name}</p>
-                                    <p style="font-size:12px;color:#6b7280">${s.business} · ${s.duration} min · $${Number(s.price).toLocaleString()}</p>
+                                    <p style="font-weight:600;font-size:14px;color:#0F172A;margin:0">${s.name}</p>
+                                    <p style="font-size:12px;color:#6b7280;margin:2px 0 0">${s.business} &middot; ${s.duration} min &middot; $${Number(s.price).toLocaleString()}</p>
                                 </div>
                             </a>`;
                         });
                     }
 
                     if (data.businesses.length > 0) {
-                        html += '<div style="padding:10px 16px 6px;font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.05em">Negocios</div>';
+                        html += '<div style="padding:12px 18px 6px;font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.08em">Negocios</div>';
                         data.businesses.forEach(b => {
-                            html += `<a href="/${b.slug}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;text-decoration:none;border-bottom:1px solid #f3f4f6"
-                                        onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='white'">
-                                ${b.logo ? `<img src="${b.logo}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">` : '<span style="width:36px;height:36px;border-radius:8px;background:#D97706;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px">' + b.name[0] + '</span>'}
+                            html += `<a href="/${b.slug}" style="display:flex;align-items:center;gap:12px;padding:10px 18px;text-decoration:none;transition:background 0.15s"
+                                        onmouseover="this.style.background='#f8f8f6'" onmouseout="this.style.background='white'">
+                                ${b.logo ? `<img src="${b.logo}" style="width:40px;height:40px;border-radius:10px;object-fit:cover">` : '<span style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#D97706,#B45309);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px">' + b.name[0] + '</span>'}
                                 <div style="flex:1;min-width:0">
-                                    <p style="font-weight:600;font-size:14px;color:#0F172A">${b.name}</p>
-                                    <p style="font-size:12px;color:#6b7280">${b.address || 'Sin dirección'}</p>
+                                    <p style="font-weight:600;font-size:14px;color:#0F172A;margin:0">${b.name}</p>
+                                    <p style="font-size:12px;color:#6b7280;margin:2px 0 0">${b.address || 'Sin direcci\u00f3n'}</p>
                                 </div>
                             </a>`;
                         });
                     }
 
-                    if (!html) html = '<p style="padding:20px;text-align:center;color:#9ca3af;font-size:14px">No se encontraron resultados</p>';
+                    if (!html) html = '<p style="padding:24px;text-align:center;color:#9ca3af;font-size:14px">No se encontraron resultados</p>';
 
                     searchResults.innerHTML = html;
                     searchResults.style.display = 'block';
@@ -144,35 +601,44 @@
 
     {{-- Services carousel --}}
     @if($services->count() > 0)
-    <section style="padding:48px 0">
-        <div style="max-width:1100px;margin:0 auto;padding:0 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <section style="padding:64px 0 48px" class="reveal">
+        <div style="max-width:1140px;margin:0 auto;padding:0 16px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px">
                 <div>
-                    <p style="font-size:12px;font-weight:700;color:#D97706;text-transform:uppercase;letter-spacing:0.05em">Explora</p>
-                    <h2 style="font-size:24px;font-weight:700;color:#0F172A;font-family:Poppins,sans-serif">Servicios disponibles</h2>
+                    <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(217,119,6,0.08);border-radius:8px;margin-bottom:8px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span>
+                        <span style="font-size:12px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:0.06em">Explora</span>
+                    </div>
+                    <h2 style="font-size:28px;font-weight:800;color:var(--slate-900);letter-spacing:-0.02em">Servicios disponibles</h2>
                 </div>
+                <p style="font-size:13px;color:var(--slate-400);display:none">Desliza para ver más &rarr;</p>
             </div>
         </div>
-        <div style="overflow-x:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch">
-            <div style="display:flex;gap:16px;max-width:1100px;margin:0 auto">
+        <div class="carousel-track">
+            <div style="display:flex;gap:18px;max-width:1140px;margin:0 auto;padding:0 16px">
                 @foreach($services as $service)
-                <a href="{{ route('booking.show', $service->business->slug) }}" style="flex-shrink:0;width:260px;background:white;border:1px solid #E7E5DF;border-radius:12px;overflow:hidden;text-decoration:none;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
-                    @if($service->getFirstMediaUrl('image'))
-                        <img src="{{ $service->getFirstMediaUrl('image') }}" alt="{{ $service->name }}" style="width:100%;height:140px;object-fit:cover">
-                    @else
-                        <div style="width:100%;height:140px;background:linear-gradient(135deg,rgba(217,119,6,0.1),rgba(13,148,136,0.1));display:flex;align-items:center;justify-content:center;font-size:40px">✂️</div>
-                    @endif
-                    <div style="padding:12px">
-                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                <a href="{{ route('booking.show', $service->business->slug) }}" class="service-card">
+                    <div class="card-img">
+                        @if($service->getFirstMediaUrl('image'))
+                            <img src="{{ $service->getFirstMediaUrl('image') }}" alt="{{ $service->name }}">
+                        @else
+                            <div class="img-placeholder" style="background:linear-gradient(135deg,rgba(217,119,6,0.08),rgba(13,148,136,0.08));display:flex;align-items:center;justify-content:center;font-size:42px">&#9986;</div>
+                        @endif
+                        <span class="price-badge">${{ number_format($service->price) }}</span>
+                    </div>
+                    <div style="padding:14px 16px 16px">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
                             @if($service->business->getFirstMediaUrl('logo'))
-                                <img src="{{ $service->business->getFirstMediaUrl('logo') }}" alt="" style="width:20px;height:20px;border-radius:50%;object-fit:cover">
+                                <img src="{{ $service->business->getFirstMediaUrl('logo') }}" alt="" style="width:22px;height:22px;border-radius:6px;object-fit:cover;border:1px solid var(--border)">
+                            @else
+                                <span style="width:22px;height:22px;border-radius:6px;background:rgba(217,119,6,0.1);display:flex;align-items:center;justify-content:center;color:var(--amber);font-weight:700;font-size:10px">{{ substr($service->business->name, 0, 1) }}</span>
                             @endif
-                            <span style="font-size:11px;color:#6b7280">{{ $service->business->name }}</span>
+                            <span style="font-size:12px;color:#6b7280;font-weight:500">{{ $service->business->name }}</span>
                         </div>
-                        <p style="font-weight:700;font-size:15px;color:#0F172A">{{ $service->name }}</p>
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-                            <span style="font-size:12px;color:#6b7280">⏱ {{ $service->duration_minutes }} min</span>
-                            <span style="font-size:14px;font-weight:700;color:#D97706">${{ number_format($service->price) }}</span>
+                        <p style="font-weight:700;font-size:15px;color:var(--slate-900);margin-bottom:6px">{{ $service->name }}</p>
+                        <div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--slate-400)">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="M12 6v6l4 2"/></svg>
+                            {{ $service->duration_minutes }} min
                         </div>
                     </div>
                 </a>
@@ -184,38 +650,53 @@
 
     {{-- Businesses carousel --}}
     @if($businesses->count() > 0)
-    <section style="padding:48px 0;background:white;border-top:1px solid #E7E5DF;border-bottom:1px solid #E7E5DF">
-        <div style="max-width:1100px;margin:0 auto;padding:0 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <section style="padding:48px 0 64px;background:white;border-top:1px solid var(--border);border-bottom:1px solid var(--border)" class="reveal">
+        <div style="max-width:1140px;margin:0 auto;padding:0 16px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px">
                 <div>
-                    <p style="font-size:12px;font-weight:700;color:#0D9488;text-transform:uppercase;letter-spacing:0.05em">Directorio</p>
-                    <h2 style="font-size:24px;font-weight:700;color:#0F172A;font-family:Poppins,sans-serif">Negocios en Citora</h2>
+                    <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(13,148,136,0.08);border-radius:8px;margin-bottom:8px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--teal)"></span>
+                        <span style="font-size:12px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:0.06em">Directorio</span>
+                    </div>
+                    <h2 style="font-size:28px;font-weight:800;color:var(--slate-900);letter-spacing:-0.02em">Negocios en Citora</h2>
                 </div>
             </div>
         </div>
-        <div style="overflow-x:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch">
-            <div style="display:flex;gap:16px;max-width:1100px;margin:0 auto">
+        <div class="carousel-track">
+            <div style="display:flex;gap:18px;max-width:1140px;margin:0 auto;padding:0 16px">
                 @foreach($businesses as $business)
-                <a href="{{ route('booking.show', $business->slug) }}" style="flex-shrink:0;width:280px;background:#FAFAF8;border:1px solid #E7E5DF;border-radius:12px;padding:16px;text-decoration:none;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'" onmouseout="this.style.boxShadow='none'">
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <a href="{{ route('booking.show', $business->slug) }}" class="biz-card">
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
                         @if($business->getFirstMediaUrl('logo'))
-                            <img src="{{ $business->getFirstMediaUrl('logo') }}" alt="{{ $business->name }}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:1px solid #E7E5DF">
+                            <img src="{{ $business->getFirstMediaUrl('logo') }}" alt="{{ $business->name }}" style="width:52px;height:52px;border-radius:14px;object-fit:cover;border:1px solid var(--border)">
                         @else
-                            <div style="width:48px;height:48px;border-radius:10px;background:rgba(217,119,6,0.1);display:flex;align-items:center;justify-content:center;color:#D97706;font-weight:700;font-size:18px;font-family:Poppins">{{ substr($business->name, 0, 1) }}</div>
+                            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(217,119,6,0.12),rgba(217,119,6,0.06));display:flex;align-items:center;justify-content:center;color:var(--amber);font-weight:800;font-size:20px;font-family:Poppins">{{ substr($business->name, 0, 1) }}</div>
                         @endif
-                        <div>
-                            <p style="font-weight:700;font-size:15px;color:#0F172A">{{ $business->name }}</p>
+                        <div style="flex:1;min-width:0">
+                            <p style="font-weight:700;font-size:16px;color:var(--slate-900);margin:0">{{ $business->name }}</p>
                             @if($business->address)
-                                <p style="font-size:12px;color:#6b7280">📍 {{ Str::limit($business->address, 30) }}</p>
+                                <p style="font-size:12px;color:#6b7280;margin:3px 0 0;display:flex;align-items:center;gap:4px">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    {{ Str::limit($business->address, 35) }}
+                                </p>
                             @endif
                         </div>
                     </div>
-                    <div style="display:flex;gap:12px;font-size:12px;color:#6b7280">
-                        <span>✂️ {{ $business->services_count }} servicios</span>
-                        <span>👤 {{ $business->employees_count }} profesionales</span>
+                    <div style="display:flex;gap:16px;font-size:12px;color:#6b7280;margin-bottom:16px">
+                        <span style="display:flex;align-items:center;gap:4px">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            {{ $business->services_count }} servicios
+                        </span>
+                        <span style="display:flex;align-items:center;gap:4px">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            {{ $business->employees_count }} profesionales
+                        </span>
                     </div>
-                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #E7E5DF;text-align:center">
-                        <span style="font-size:13px;font-weight:600;color:#0D9488">Reservar cita →</span>
+                    <div style="padding-top:14px;border-top:1px solid var(--border);text-align:center">
+                        <span style="font-size:13px;font-weight:700;color:var(--teal);display:inline-flex;align-items:center;gap:6px;transition:gap 0.2s">
+                            Reservar cita
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        </span>
                     </div>
                 </a>
                 @endforeach
@@ -224,178 +705,261 @@
     </section>
     @endif
 
-    {{-- Features --}}
-    <section class="py-24 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <span class="text-sm font-semibold text-[#D97706] uppercase tracking-wider">Funcionalidades</span>
-                <h2 class="text-3xl sm:text-4xl font-bold mt-2 text-[#0F172A]">Todo lo que necesitas para crecer</h2>
-                <p class="text-[#666666] mt-3 text-lg max-w-xl mx-auto">Herramientas diseñadas para negocios reales. Sin complicaciones.</p>
+    {{-- Features Bento Grid --}}
+    <section style="padding:80px 16px" class="reveal">
+        <div style="max-width:1000px;margin:0 auto">
+            <div style="text-align:center;margin-bottom:48px">
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(217,119,6,0.08);border-radius:8px;margin-bottom:12px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span>
+                    <span style="font-size:12px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:0.06em">Funcionalidades</span>
+                </div>
+                <h2 style="font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--slate-900);letter-spacing:-0.02em">Todo lo que necesitas para crecer</h2>
+                <p style="color:#6b7280;margin-top:10px;font-size:17px;max-width:500px;margin-left:auto;margin-right:auto">Herramientas diseñadas para negocios reales. Sin complicaciones.</p>
             </div>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-7 rounded-xl border border-[#E7E5DF] hover:shadow-md hover:border-[#D97706]/30 transition group">
-                    <div class="w-12 h-12 bg-[#D97706]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#D97706]/20 transition">
-                        <svg class="w-6 h-6 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+
+            <div class="bento-grid">
+                {{-- Featured: Booking page --}}
+                <div class="bento-card bento-featured" style="display:flex;flex-direction:column;justify-content:center">
+                    <div style="width:48px;height:48px;background:rgba(245,158,11,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                        <svg width="24" height="24" fill="none" stroke="#F59E0B" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-[#0F172A] mb-2">Tu página de reservas</h3>
-                    <p class="text-[#666666] text-sm leading-relaxed">Enlace personalizado para tu negocio. Compártelo en redes, WhatsApp o donde quieras.</p>
+                    <h3 style="font-size:20px;font-weight:800;margin-bottom:8px">Tu página de reservas propia</h3>
+                    <p style="font-size:15px;line-height:1.6">Enlace personalizado para tu negocio. Compártelo en redes, WhatsApp o donde quieras. Tus clientes reservan sin descargar nada.</p>
                 </div>
-                <div class="bg-white p-7 rounded-xl border border-[#E7E5DF] hover:shadow-md hover:border-[#0D9488]/30 transition group">
-                    <div class="w-12 h-12 bg-[#0D9488]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#0D9488]/20 transition">
-                        <svg class="w-6 h-6 text-[#0D9488]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+
+                {{-- WhatsApp --}}
+                <div class="bento-card">
+                    <div style="width:48px;height:48px;background:rgba(13,148,136,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                        <svg width="24" height="24" fill="var(--teal)" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-[#0F172A] mb-2">WhatsApp automático</h3>
-                    <p class="text-[#666666] text-sm leading-relaxed">Confirmaciones, recordatorios 24h y 1h antes, cancelaciones. Todo automático.</p>
+                    <h3 style="font-size:17px;font-weight:700;color:var(--slate-900);margin-bottom:6px">WhatsApp automático</h3>
+                    <p style="color:#6b7280;font-size:14px;line-height:1.6">Confirmaciones, recordatorios 24h y 1h antes, cancelaciones. Todo automático.</p>
                 </div>
-                <div class="bg-white p-7 rounded-xl border border-[#E7E5DF] hover:shadow-md hover:border-[#2563EB]/30 transition group">
-                    <div class="w-12 h-12 bg-[#2563EB]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#2563EB]/20 transition">
-                        <svg class="w-6 h-6 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+
+                {{-- Anti-cruces --}}
+                <div class="bento-card">
+                    <div style="width:48px;height:48px;background:rgba(37,99,235,0.08);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                        <svg width="24" height="24" fill="none" stroke="#2563EB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-[#0F172A] mb-2">Anti-cruces inteligente</h3>
-                    <p class="text-[#666666] text-sm leading-relaxed">Nunca más citas cruzadas. Validación en tiempo real por profesional y horario.</p>
+                    <h3 style="font-size:17px;font-weight:700;color:var(--slate-900);margin-bottom:6px">Anti-cruces inteligente</h3>
+                    <p style="color:#6b7280;font-size:14px;line-height:1.6">Nunca más citas cruzadas. Validación en tiempo real por profesional y horario.</p>
                 </div>
-                <div class="bg-white p-7 rounded-xl border border-[#E7E5DF] hover:shadow-md hover:border-[#D97706]/30 transition group">
-                    <div class="w-12 h-12 bg-[#D97706]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#D97706]/20 transition">
-                        <svg class="w-6 h-6 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+
+                {{-- Team --}}
+                <div class="bento-card">
+                    <div style="width:48px;height:48px;background:rgba(217,119,6,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+                        <svg width="24" height="24" fill="none" stroke="var(--amber)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-[#0F172A] mb-2">Gestión de equipo</h3>
-                    <p class="text-[#666666] text-sm leading-relaxed">Empleados, servicios asignados y horarios individuales. Todo bajo tu control.</p>
+                    <h3 style="font-size:17px;font-weight:700;color:var(--slate-900);margin-bottom:6px">Gestión de equipo</h3>
+                    <p style="color:#6b7280;font-size:14px;line-height:1.6">Empleados, servicios asignados y horarios individuales. Todo bajo tu control.</p>
                 </div>
-                <div class="bg-white p-7 rounded-xl border border-[#E7E5DF] hover:shadow-md hover:border-[#0D9488]/30 transition group">
-                    <div class="w-12 h-12 bg-[#0D9488]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#0D9488]/20 transition">
-                        <svg class="w-6 h-6 text-[#0D9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+
+                {{-- Featured: Metrics + Mobile --}}
+                <div class="bento-card bento-featured" style="display:flex;flex-direction:column;justify-content:center">
+                    <div style="display:flex;gap:12px;margin-bottom:16px">
+                        <div style="width:48px;height:48px;background:rgba(13,148,136,0.15);border-radius:14px;display:flex;align-items:center;justify-content:center">
+                            <svg width="24" height="24" fill="none" stroke="#0D9488" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <div style="width:48px;height:48px;background:rgba(37,99,235,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center">
+                            <svg width="24" height="24" fill="none" stroke="#2563EB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                        </div>
                     </div>
-                    <h3 class="text-lg font-bold text-[#0F172A] mb-2">Métricas en tiempo real</h3>
-                    <p class="text-[#666666] text-sm leading-relaxed">Citas del día, ingresos mensuales, ocupación de equipo. Decisiones informadas.</p>
-                </div>
-                <div class="bg-white p-7 rounded-xl border border-[#E7E5DF] hover:shadow-md hover:border-[#2563EB]/30 transition group">
-                    <div class="w-12 h-12 bg-[#2563EB]/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#2563EB]/20 transition">
-                        <svg class="w-6 h-6 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-[#0F172A] mb-2">Mobile-first</h3>
-                    <p class="text-[#666666] text-sm leading-relaxed">Tus clientes reservan desde el celular en segundos. Experiencia rápida y fluida.</p>
+                    <h3 style="font-size:20px;font-weight:800;margin-bottom:8px">Métricas en tiempo real, desde cualquier lugar</h3>
+                    <p style="font-size:15px;line-height:1.6">Citas del día, ingresos mensuales, ocupación. Panel optimizado para celular. Decisiones informadas, estés donde estés.</p>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- How it works --}}
-    <section id="como-funciona" class="py-24 px-4 bg-white border-y border-[#E7E5DF]">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-16">
-                <span class="text-sm font-semibold text-[#0D9488] uppercase tracking-wider">Proceso</span>
-                <h2 class="text-3xl sm:text-4xl font-bold mt-2 text-[#0F172A]">Listo en 3 pasos</h2>
+    <section style="padding:80px 16px;background:white;border-top:1px solid var(--border);border-bottom:1px solid var(--border)" class="reveal">
+        <div style="max-width:900px;margin:0 auto">
+            <div style="text-align:center;margin-bottom:56px">
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(13,148,136,0.08);border-radius:8px;margin-bottom:12px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--teal)"></span>
+                    <span style="font-size:12px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:0.06em">Proceso</span>
+                </div>
+                <h2 style="font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--slate-900);letter-spacing:-0.02em">Listo en 3 pasos</h2>
             </div>
-            <div class="grid sm:grid-cols-3 gap-10">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-[#0F172A] text-[#F59E0B] rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl font-bold" style="font-family:Poppins">1</div>
-                    <h3 class="font-bold text-lg mb-2 text-[#0F172A]">Crea tu cuenta</h3>
-                    <p class="text-[#666666] text-sm">Regístrate con Google en segundos. Sin formularios largos ni verificaciones.</p>
+
+            <div class="steps-grid" style="display:flex;gap:0;justify-content:center">
+                <div class="step-card" style="flex:1;max-width:280px">
+                    <div class="step-number" style="background:var(--slate-900);color:var(--amber-light)">1</div>
+                    <div class="step-connector"></div>
+                    <h3 style="font-size:18px;font-weight:700;color:var(--slate-900);margin-bottom:8px">Crea tu cuenta</h3>
+                    <p style="font-size:14px;color:#6b7280;line-height:1.6">Regístrate con Google en segundos. Sin formularios largos ni verificaciones.</p>
                 </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-[#0F172A] text-[#F59E0B] rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl font-bold" style="font-family:Poppins">2</div>
-                    <h3 class="font-bold text-lg mb-2 text-[#0F172A]">Configura tu negocio</h3>
-                    <p class="text-[#666666] text-sm">Wizard guiado: servicios, empleados, horarios e imágenes. En 5 minutos.</p>
+                <div class="step-card" style="flex:1;max-width:280px">
+                    <div class="step-number" style="background:var(--slate-900);color:var(--amber-light)">2</div>
+                    <div class="step-connector"></div>
+                    <h3 style="font-size:18px;font-weight:700;color:var(--slate-900);margin-bottom:8px">Configura tu negocio</h3>
+                    <p style="font-size:14px;color:#6b7280;line-height:1.6">Wizard guiado: servicios, empleados, horarios e imágenes. En 5 minutos.</p>
                 </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-[#0F172A] text-[#F59E0B] rounded-2xl flex items-center justify-center mx-auto mb-5 text-2xl font-bold" style="font-family:Poppins">3</div>
-                    <h3 class="font-bold text-lg mb-2 text-[#0F172A]">Comparte tu enlace</h3>
-                    <p class="text-[#666666] text-sm">Tus clientes reservan online. Tú recibes todo en tu panel y WhatsApp.</p>
+                <div class="step-card" style="flex:1;max-width:280px">
+                    <div class="step-number" style="background:linear-gradient(135deg,var(--amber),#B45309);color:white">3</div>
+                    <h3 style="font-size:18px;font-weight:700;color:var(--slate-900);margin-bottom:8px">Comparte tu enlace</h3>
+                    <p style="font-size:14px;color:#6b7280;line-height:1.6">Tus clientes reservan online. Tú recibes todo en tu panel y WhatsApp.</p>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- Pricing --}}
-    <section class="py-24 px-4">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-16">
-                <span class="text-sm font-semibold text-[#2563EB] uppercase tracking-wider">Precios</span>
-                <h2 class="text-3xl sm:text-4xl font-bold mt-2 text-[#0F172A]">Simple y transparente</h2>
-                <p class="text-[#666666] mt-3 text-lg">Sin suscripciones. Paga solo si lo necesitas.</p>
-            </div>
-            <div class="grid sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
-                <div class="bg-white p-8 rounded-2xl border-2 border-[#D97706] relative shadow-sm">
-                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#D97706] text-white text-xs font-bold px-4 py-1 rounded-full">POPULAR</span>
-                    <h3 class="text-xl font-bold text-[#0F172A] mb-2">Gratis</h3>
-                    <div class="text-4xl font-bold text-[#0F172A] mb-1" style="font-family:Poppins">$0</div>
-                    <p class="text-[#666666] mb-6">Para siempre</p>
-                    <ul class="space-y-3 text-sm text-[#111111]">
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> 200 citas al mes</li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Página de reservas propia</li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> WhatsApp automático</li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Panel de control completo</li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Empleados ilimitados</li>
-                    </ul>
+    <section style="padding:80px 16px" class="reveal">
+        <div style="max-width:800px;margin:0 auto">
+            <div style="text-align:center;margin-bottom:48px">
+                <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(37,99,235,0.08);border-radius:8px;margin-bottom:12px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#2563EB"></span>
+                    <span style="font-size:12px;font-weight:600;color:#2563EB;text-transform:uppercase;letter-spacing:0.06em">Precios</span>
                 </div>
-                <div class="bg-white p-8 rounded-2xl border border-[#E7E5DF] shadow-sm">
-                    <h3 class="text-xl font-bold text-[#0F172A] mb-2">Desbloqueo mensual</h3>
-                    <div class="text-4xl font-bold text-[#0F172A] mb-1" style="font-family:Poppins">$29,900</div>
-                    <p class="text-[#666666] mb-6">Pago único por mes</p>
-                    <ul class="space-y-3 text-sm text-[#111111]">
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> <strong>Citas ilimitadas</strong></li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Todo del plan gratis</li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Sin suscripción ni compromiso</li>
-                        <li class="flex items-center gap-2"><svg class="w-5 h-5 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Paga solo cuando lo necesites</li>
-                    </ul>
+                <h2 style="font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--slate-900);letter-spacing:-0.02em">Simple y transparente</h2>
+                <p style="color:#6b7280;margin-top:10px;font-size:17px">Sin suscripciones. Paga solo si lo necesitas.</p>
+            </div>
+
+            <div class="pricing-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+                {{-- Free --}}
+                <div class="pricing-card pricing-featured">
+                    <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%)">
+                        <span style="background:linear-gradient(135deg,#D97706,#B45309);color:white;font-size:11px;font-weight:700;padding:5px 16px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em">Popular</span>
+                    </div>
+                    <h3 style="font-size:20px;font-weight:800;color:var(--slate-900);margin-bottom:4px">Gratis</h3>
+                    <div style="font-size:48px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1">$0</div>
+                    <p style="color:#6b7280;margin-bottom:28px;font-size:14px">Para siempre</p>
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            200 citas al mes
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Página de reservas propia
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            WhatsApp automático
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Panel de control completo
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Empleados ilimitados
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Paid --}}
+                <div class="pricing-card pricing-regular">
+                    <h3 style="font-size:20px;font-weight:800;color:var(--slate-900);margin-bottom:4px">Desbloqueo mensual</h3>
+                    <div style="font-size:48px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1">$29.900</div>
+                    <p style="color:#6b7280;margin-bottom:28px;font-size:14px">Pago único por mes</p>
+                    <div style="display:flex;flex-direction:column;gap:14px">
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            <strong>Citas ilimitadas</strong>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Todo del plan gratis
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Sin suscripción ni compromiso
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--slate-900)">
+                            <svg width="20" height="20" fill="var(--teal)" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Paga solo cuando lo necesites
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- Ideal for --}}
-    <section class="py-20 px-4 bg-white border-y border-[#E7E5DF]">
-        <div class="max-w-4xl mx-auto text-center">
-            <span class="text-sm font-semibold text-[#D97706] uppercase tracking-wider">Segmentos</span>
-            <h2 class="text-3xl sm:text-4xl font-bold mt-2 mb-12 text-[#0F172A]">Ideal para</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-                <div class="p-6 bg-[#FAFAF8] rounded-xl border border-[#E7E5DF]">
-                    <div class="text-4xl mb-3">💈</div>
-                    <p class="font-semibold text-[#0F172A]">Barberías</p>
+    <section style="padding:80px 16px;background:white;border-top:1px solid var(--border);border-bottom:1px solid var(--border)" class="reveal">
+        <div style="max-width:800px;margin:0 auto;text-align:center">
+            <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(217,119,6,0.08);border-radius:8px;margin-bottom:12px">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--amber)"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:0.06em">Segmentos</span>
+            </div>
+            <h2 style="font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--slate-900);letter-spacing:-0.02em;margin-bottom:40px">Ideal para</h2>
+            <div class="segments-grid" style="display:grid;grid-template-columns:repeat(4, 1fr);gap:16px">
+                <div class="segment-card">
+                    <span class="segment-icon">&#128136;</span>
+                    <p style="font-weight:700;color:var(--slate-900);font-size:15px">Barberías</p>
                 </div>
-                <div class="p-6 bg-[#FAFAF8] rounded-xl border border-[#E7E5DF]">
-                    <div class="text-4xl mb-3">💇‍♀️</div>
-                    <p class="font-semibold text-[#0F172A]">Salones de belleza</p>
+                <div class="segment-card">
+                    <span class="segment-icon">&#128135;</span>
+                    <p style="font-weight:700;color:var(--slate-900);font-size:15px">Salones de belleza</p>
                 </div>
-                <div class="p-6 bg-[#FAFAF8] rounded-xl border border-[#E7E5DF]">
-                    <div class="text-4xl mb-3">💅</div>
-                    <p class="font-semibold text-[#0F172A]">Centros estéticos</p>
+                <div class="segment-card">
+                    <span class="segment-icon">&#128133;</span>
+                    <p style="font-weight:700;color:var(--slate-900);font-size:15px">Centros estéticos</p>
                 </div>
-                <div class="p-6 bg-[#FAFAF8] rounded-xl border border-[#E7E5DF]">
-                    <div class="text-4xl mb-3">💆</div>
-                    <p class="font-semibold text-[#0F172A]">Spas y masajes</p>
+                <div class="segment-card">
+                    <span class="segment-icon">&#128134;</span>
+                    <p style="font-weight:700;color:var(--slate-900);font-size:15px">Spas y masajes</p>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- CTA --}}
-    <section class="gradient-hero py-24 px-4">
-        <div class="max-w-3xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-white">¿Listo para automatizar tu negocio?</h2>
-            <p class="text-[#9CA3AF] mt-4 text-lg">Únete a los negocios que ya gestionan sus citas con Citora.</p>
-            <a href="{{ route('auth.google.redirect') }}" class="inline-flex items-center gap-3 mt-10 px-8 py-4 cta-primary text-white font-bold rounded-xl transition text-lg shadow-lg shadow-amber-500/25">
-                <svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" opacity=".7"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" opacity=".8"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" opacity=".6"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" opacity=".9"/></svg>
+    <section class="cta-section" style="padding:100px 16px">
+        <div style="position:relative;z-index:2;max-width:640px;margin:0 auto;text-align:center">
+            <h2 style="font-size:clamp(28px,4.5vw,44px);font-weight:900;color:white;letter-spacing:-0.02em;line-height:1.1">
+                ¿Listo para automatizar tu negocio?
+            </h2>
+            <p style="color:var(--slate-400);margin-top:16px;font-size:17px;line-height:1.6">
+                Únete a los negocios que ya gestionan sus citas con Citora. Empieza gratis hoy.
+            </p>
+            <a href="{{ route('auth.google.redirect') }}" class="cta-btn" style="margin-top:36px">
+                <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" opacity=".7"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" opacity=".8"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" opacity=".6"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" opacity=".9"/></svg>
                 Comenzar gratis ahora
             </a>
         </div>
     </section>
 
     {{-- Footer --}}
-    <footer class="py-10 px-4 bg-[#0F172A]">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-2">
-                <img src="/images/logo-dark.png" alt="Citora" class="h-8" onerror="this.style.display='none'">
-                <span class="text-white font-bold text-lg" style="font-family:Poppins">Citora</span>
-            </div>
-            <p class="text-sm text-[#9CA3AF]">&copy; {{ date('Y') }} Citora. Todos los derechos reservados.</p>
-            <div class="flex gap-6 text-sm text-[#9CA3AF]">
-                <a href="#" class="hover:text-[#F59E0B] transition">Términos</a>
-                <a href="#" class="hover:text-[#F59E0B] transition">Privacidad</a>
-                <a href="mailto:webcitora@gmail.com" class="hover:text-[#F59E0B] transition">Contacto</a>
+    <footer style="padding:40px 16px;background:var(--slate-900);border-top:1px solid rgba(255,255,255,0.05)">
+        <div style="max-width:1140px;margin:0 auto">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <img src="/images/logo-dark.png" alt="Citora" style="height:28px" onerror="this.style.display='none'">
+                    <span style="color:white;font-weight:800;font-size:18px;font-family:Poppins;letter-spacing:-0.02em">Citora</span>
+                </div>
+                <p style="font-size:13px;color:var(--slate-400)">&copy; {{ date('Y') }} Citora. Todos los derechos reservados.</p>
+                <div style="display:flex;gap:24px">
+                    <a href="#" class="footer-link">Términos</a>
+                    <a href="#" class="footer-link">Privacidad</a>
+                    <a href="mailto:webcitora@gmail.com" class="footer-link">Contacto</a>
+                </div>
             </div>
         </div>
     </footer>
+
+    {{-- Scroll animations & Nav scroll effect --}}
+    <script>
+        // Nav scroll effect
+        const nav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        }, { passive: true });
+
+        // Scroll reveal
+        const revealEls = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        revealEls.forEach(el => revealObserver.observe(el));
+    </script>
 
 </body>
 </html>
