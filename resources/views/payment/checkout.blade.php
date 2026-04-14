@@ -1,72 +1,81 @@
 <x-layouts.booking title="Desbloquear citas">
-    <div class="max-w-2xl mx-auto px-4 py-12">
+    <div style="max-width:720px;margin:0 auto;padding:32px 16px">
 
         {{-- Header --}}
-        <div class="text-center mb-10">
-            <div class="w-16 h-16 bg-[#D97706]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <div style="text-align:center;margin-bottom:32px">
+            <div style="width:56px;height:56px;background:rgba(217,119,6,0.1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+                <svg width="28" height="28" fill="none" stroke="#D97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <h1 class="text-3xl font-bold text-[#0F172A]" style="font-family:Poppins">Desbloquea tu negocio</h1>
-            <p class="text-[#666666] mt-2 text-lg">{{ $business->name }} · Plan {{ $planType === 'semester' ? 'Semestral' : 'Mensual' }}</p>
+            <h1 style="font-size:28px;font-weight:800;color:#0F172A;font-family:Poppins,sans-serif">Desbloquea tu negocio</h1>
+            <p style="color:#6b7280;margin-top:6px;font-size:16px">{{ $business->name }}</p>
         </div>
 
-        <div class="grid sm:grid-cols-2 gap-6 mb-10">
-            {{-- Current usage --}}
-            <div class="bg-white rounded-2xl border border-[#E7E5DF] p-6">
-                <h3 class="font-bold text-[#0F172A] mb-4" style="font-family:Poppins">Tu uso actual</h3>
-                <div class="flex items-end gap-3 mb-3">
-                    <span class="text-4xl font-bold text-[#D97706]" style="font-family:Poppins">{{ $used }}</span>
-                    <span class="text-[#666666] text-lg mb-1">/ {{ $limit }} citas</span>
-                </div>
-                <div class="w-full bg-[#E7E5DF] rounded-full h-3 mb-3">
-                    <div class="h-3 rounded-full transition-all {{ $used >= $limit ? 'bg-red-500' : 'bg-[#D97706]' }}"
-                         style="width: {{ min(100, ($used / max(1, $limit)) * 100) }}%"></div>
-                </div>
-                @if($used >= $limit)
-                    <p class="text-sm text-red-600 font-medium">Has alcanzado el límite. Tus clientes no pueden reservar.</p>
-                @else
-                    <p class="text-sm text-[#666666]">{{ $limit - $used }} citas restantes este mes.</p>
-                @endif
+        {{-- Usage bar --}}
+        <div style="background:white;border:1px solid #E7E5DF;border-radius:14px;padding:16px 20px;margin-bottom:28px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:13px;font-weight:600;color:#0F172A">Tu uso actual</span>
+                <span style="font-size:13px;color:{{ $used >= $limit ? '#dc2626' : '#6b7280' }};font-weight:600">{{ $used }} / {{ $limit }} citas</span>
             </div>
-
-            {{-- Benefits --}}
-            <div class="bg-[#0F172A] rounded-2xl p-6 text-white">
-                <h3 class="font-bold mb-4" style="font-family:Poppins">Con el desbloqueo obtienes</h3>
-                <ul class="space-y-3">
-                    <li class="flex items-start gap-2.5 text-sm">
-                        <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        <span><strong>Citas ilimitadas</strong> por {{ $planType === 'semester' ? '6 meses' : '30 días' }}</span>
-                    </li>
-                    <li class="flex items-start gap-2.5 text-sm">
-                        <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        <span>Tus clientes reservan <strong>al instante</strong></span>
-                    </li>
-                    <li class="flex items-start gap-2.5 text-sm">
-                        <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        <span><strong>No es suscripción</strong> — un solo pago</span>
-                    </li>
-                    <li class="flex items-start gap-2.5 text-sm">
-                        <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        <span>WhatsApp automático incluido</span>
-                    </li>
-                    <li class="flex items-start gap-2.5 text-sm">
-                        <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        <span>Próximo mes: <strong>200 citas gratis</strong> de nuevo</span>
-                    </li>
-                </ul>
+            <div style="width:100%;background:#e5e7eb;border-radius:999px;height:8px;overflow:hidden">
+                <div style="height:8px;border-radius:999px;background:{{ $used >= $limit ? '#dc2626' : '#D97706' }};width:{{ min(100, ($used / max(1, $limit)) * 100) }}%;transition:all 0.5s"></div>
             </div>
-        </div>
-
-        {{-- Payment card --}}
-        <div class="bg-white rounded-2xl border-2 border-[#D97706] p-8 text-center mb-8 shadow-sm">
-            <p class="text-[#666666] text-sm mb-1">Pago único · {{ $planType === 'semester' ? '6 meses' : '30 días' }}</p>
-            <div class="text-5xl font-bold text-[#0F172A] mb-1" style="font-family:Poppins">${{ number_format($price) }}</div>
-            <p class="text-[#666666] mb-2">COP · IVA incluido</p>
-            @if($planType === 'semester')
-                <p class="text-sm text-[#0D9488] font-semibold mb-6">${{ number_format($price / 6) }}/mes · Ahorras ${{ number_format(($plans['monthly']['price'] * 6) - $price) }}</p>
-            @else
-                <a href="{{ route('payment.checkout', ['business' => $business->slug, 'plan' => 'semester']) }}" class="text-sm text-[#0D9488] hover:underline mb-6 inline-block">Ahorra 15% con el plan semestral →</a>
+            @if($used >= $limit)
+                <p style="font-size:12px;color:#dc2626;margin-top:6px;font-weight:500">Has alcanzado el límite. Tus clientes no pueden reservar.</p>
             @endif
+        </div>
+
+        {{-- Plan selector --}}
+        <p style="font-size:14px;font-weight:700;color:#0F172A;margin-bottom:12px">Elige tu plan</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px">
+            {{-- Monthly --}}
+            <a href="{{ route('payment.checkout', ['business' => $business->slug, 'plan' => 'monthly']) }}"
+               style="display:block;background:white;border-radius:16px;padding:20px;text-decoration:none;transition:all 0.2s;cursor:pointer;position:relative;{{ $planType === 'monthly' ? 'border:2px solid #D97706;box-shadow:0 0 0 3px rgba(217,119,6,0.1)' : 'border:1px solid #E7E5DF' }}">
+                @if($planType === 'monthly')
+                    <div style="position:absolute;top:-10px;right:12px;background:#D97706;color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;text-transform:uppercase">Seleccionado</div>
+                @endif
+                <p style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:4px">Mensual</p>
+                <div style="font-size:32px;font-weight:900;color:#0F172A;font-family:Poppins,sans-serif;line-height:1.1">${{ number_format($plans['monthly']['price']) }}</div>
+                <p style="font-size:12px;color:#6b7280;margin-top:4px">Pago único · 30 días</p>
+                <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:12px;color:#0F172A;display:flex;align-items:center;gap:6px">
+                        <svg width="14" height="14" fill="#0D9488" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        Citas ilimitadas
+                    </span>
+                    <span style="font-size:12px;color:#0F172A;display:flex;align-items:center;gap:6px">
+                        <svg width="14" height="14" fill="#0D9488" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        Sin suscripción
+                    </span>
+                </div>
+            </a>
+
+            {{-- Semester --}}
+            <a href="{{ route('payment.checkout', ['business' => $business->slug, 'plan' => 'semester']) }}"
+               style="display:block;background:white;border-radius:16px;padding:20px;text-decoration:none;transition:all 0.2s;cursor:pointer;position:relative;{{ $planType === 'semester' ? 'border:2px solid #0D9488;box-shadow:0 0 0 3px rgba(13,148,136,0.1)' : 'border:1px solid #E7E5DF' }}">
+                <div style="position:absolute;top:-10px;left:12px;background:linear-gradient(135deg,#0D9488,#0F766E);color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;text-transform:uppercase">Ahorra 15%</div>
+                @if($planType === 'semester')
+                    <div style="position:absolute;top:-10px;right:12px;background:#0D9488;color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;text-transform:uppercase">Seleccionado</div>
+                @endif
+                <p style="font-size:13px;font-weight:600;color:#6b7280;margin-bottom:4px">Semestral</p>
+                <div style="font-size:32px;font-weight:900;color:#0F172A;font-family:Poppins,sans-serif;line-height:1.1">${{ number_format($plans['semester']['price']) }}</div>
+                <p style="font-size:12px;color:#0D9488;margin-top:4px;font-weight:600">${{ number_format($plans['semester']['price'] / 6) }}/mes · 6 meses</p>
+                <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:12px;color:#0F172A;display:flex;align-items:center;gap:6px">
+                        <svg width="14" height="14" fill="#0D9488" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        Citas ilimitadas x 6 meses
+                    </span>
+                    <span style="font-size:12px;color:#0F172A;display:flex;align-items:center;gap:6px">
+                        <svg width="14" height="14" fill="#0D9488" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                        Mejor precio por mes
+                    </span>
+                </div>
+            </a>
+        </div>
+
+        {{-- Payment widget --}}
+        <div style="background:white;border-radius:20px;border:2px solid {{ $planType === 'semester' ? '#0D9488' : '#D97706' }};padding:28px;text-align:center;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+            <p style="font-size:13px;color:#6b7280;margin-bottom:4px">Total a pagar</p>
+            <div style="font-size:40px;font-weight:900;color:#0F172A;font-family:Poppins,sans-serif;letter-spacing:-0.02em">${{ number_format($price) }}</div>
+            <p style="font-size:13px;color:#6b7280;margin-bottom:20px">COP · Plan {{ $planType === 'semester' ? 'Semestral (180 días)' : 'Mensual (30 días)' }}</p>
 
             <form action="{{ config('services.wompi.base_url') }}/v1/payment_links" method="GET" id="wompi-form">
                 <script
@@ -83,47 +92,57 @@
 
             <noscript>
                 <a href="https://checkout.wompi.co/p/?public-key={{ $payment['public_key'] }}&currency={{ $payment['currency'] }}&amount-in-cents={{ $payment['amount_in_cents'] }}&reference={{ $payment['reference'] }}&signature:integrity={{ $payment['signature'] }}&redirect-url={{ urlencode($payment['redirect_url']) }}"
-                   class="inline-block px-8 py-4 bg-[#D97706] text-white font-bold rounded-xl hover:bg-[#B45309] transition text-lg">
+                   style="display:inline-block;padding:14px 32px;background:#D97706;color:white;font-weight:700;border-radius:12px;text-decoration:none;font-size:16px">
                     Pagar con Wompi
                 </a>
             </noscript>
         </div>
 
-        {{-- Payment methods --}}
-        <div class="text-center mb-8">
-            <p class="text-xs text-[#666666] mb-3 font-medium">Métodos de pago aceptados</p>
-            <div class="flex justify-center gap-3 flex-wrap">
-                <span class="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg text-xs text-[#666666] border border-[#E7E5DF]">
-                    <svg class="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                    Tarjeta
+        {{-- Benefits --}}
+        <div style="background:#0F172A;border-radius:16px;padding:20px 24px;margin-bottom:24px">
+            <p style="font-size:13px;font-weight:700;color:white;margin-bottom:12px">Lo que obtienes</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <span style="font-size:12px;color:#94A3B8;display:flex;align-items:center;gap:6px">
+                    <svg width="14" height="14" fill="#F59E0B" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    Citas ilimitadas
                 </span>
-                <span class="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg text-xs text-[#666666] border border-[#E7E5DF]">
-                    <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
-                    PSE
+                <span style="font-size:12px;color:#94A3B8;display:flex;align-items:center;gap:6px">
+                    <svg width="14" height="14" fill="#F59E0B" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    Reservas al instante
                 </span>
-                <span class="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg text-xs text-[#666666] border border-[#E7E5DF]">
-                    <svg class="w-4 h-4 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                    Nequi
+                <span style="font-size:12px;color:#94A3B8;display:flex;align-items:center;gap:6px">
+                    <svg width="14" height="14" fill="#F59E0B" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    WhatsApp automático
                 </span>
-                <span class="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg text-xs text-[#666666] border border-[#E7E5DF]">
-                    <svg class="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Bancolombia
-                </span>
-                <span class="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg text-xs text-[#666666] border border-[#E7E5DF]">
-                    <svg class="w-4 h-4 text-[#0D9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Efecty
+                <span style="font-size:12px;color:#94A3B8;display:flex;align-items:center;gap:6px">
+                    <svg width="14" height="14" fill="#F59E0B" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    Sin suscripción
                 </span>
             </div>
         </div>
 
-        {{-- Security --}}
-        <div class="flex items-center justify-center gap-2 text-xs text-[#666666]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            Pago seguro procesado por Wompi · Datos encriptados
+        {{-- Payment methods --}}
+        <div style="text-align:center;margin-bottom:20px">
+            <p style="font-size:11px;color:#6b7280;margin-bottom:8px;font-weight:500">Métodos de pago aceptados</p>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:white;border-radius:8px;font-size:11px;color:#6b7280;border:1px solid #E7E5DF">
+                    <svg width="14" height="14" fill="none" stroke="#2563EB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    Tarjeta
+                </span>
+                <span style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:white;border-radius:8px;font-size:11px;color:#6b7280;border:1px solid #E7E5DF">PSE</span>
+                <span style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:white;border-radius:8px;font-size:11px;color:#6b7280;border:1px solid #E7E5DF">Nequi</span>
+                <span style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:white;border-radius:8px;font-size:11px;color:#6b7280;border:1px solid #E7E5DF">Bancolombia</span>
+                <span style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:white;border-radius:8px;font-size:11px;color:#6b7280;border:1px solid #E7E5DF">Efecty</span>
+            </div>
         </div>
 
-        <div class="text-center mt-6">
-            <a href="{{ filament()->getUrl() }}" class="text-sm text-[#666666] hover:text-[#D97706] transition">← Volver al panel</a>
+        {{-- Security + back --}}
+        <div style="text-align:center">
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:#6b7280;margin-bottom:16px">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Pago seguro procesado por Wompi · Datos encriptados
+            </div>
+            <a href="{{ filament()->getUrl() }}" style="font-size:13px;color:#6b7280;text-decoration:none">← Volver al panel</a>
         </div>
     </div>
 </x-layouts.booking>
