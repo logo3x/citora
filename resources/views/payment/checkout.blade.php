@@ -7,7 +7,7 @@
                 <svg class="w-8 h-8 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
             <h1 class="text-3xl font-bold text-[#0F172A]" style="font-family:Poppins">Desbloquea tu negocio</h1>
-            <p class="text-[#666666] mt-2 text-lg">{{ $business->name }} · {{ now()->translatedFormat('F Y') }}</p>
+            <p class="text-[#666666] mt-2 text-lg">{{ $business->name }} · Plan {{ $planType === 'semester' ? 'Semestral' : 'Mensual' }}</p>
         </div>
 
         <div class="grid sm:grid-cols-2 gap-6 mb-10">
@@ -35,7 +35,7 @@
                 <ul class="space-y-3">
                     <li class="flex items-start gap-2.5 text-sm">
                         <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                        <span><strong>Citas ilimitadas</strong> por el resto del mes</span>
+                        <span><strong>Citas ilimitadas</strong> por {{ $planType === 'semester' ? '6 meses' : '30 días' }}</span>
                     </li>
                     <li class="flex items-start gap-2.5 text-sm">
                         <svg class="w-5 h-5 text-[#F59E0B] shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -59,9 +59,14 @@
 
         {{-- Payment card --}}
         <div class="bg-white rounded-2xl border-2 border-[#D97706] p-8 text-center mb-8 shadow-sm">
-            <p class="text-[#666666] text-sm mb-1">Pago único</p>
+            <p class="text-[#666666] text-sm mb-1">Pago único · {{ $planType === 'semester' ? '6 meses' : '30 días' }}</p>
             <div class="text-5xl font-bold text-[#0F172A] mb-1" style="font-family:Poppins">${{ number_format($price) }}</div>
-            <p class="text-[#666666] mb-8">COP · IVA incluido</p>
+            <p class="text-[#666666] mb-2">COP · IVA incluido</p>
+            @if($planType === 'semester')
+                <p class="text-sm text-[#0D9488] font-semibold mb-6">${{ number_format($price / 6) }}/mes · Ahorras ${{ number_format(($plans['monthly']['price'] * 6) - $price) }}</p>
+            @else
+                <a href="{{ route('payment.checkout', ['business' => $business->slug, 'plan' => 'semester']) }}" class="text-sm text-[#0D9488] hover:underline mb-6 inline-block">Ahorra 15% con el plan semestral →</a>
+            @endif
 
             <form action="{{ config('services.wompi.base_url') }}/v1/payment_links" method="GET" id="wompi-form">
                 <script

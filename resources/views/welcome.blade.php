@@ -148,6 +148,7 @@
             position: relative;
             max-width: 560px;
             margin: 32px auto 0;
+            z-index: 20;
         }
         .search-box {
             display: flex; align-items: center;

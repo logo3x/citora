@@ -12,18 +12,22 @@ use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
-    public function checkout(Business $business, WompiService $wompi): View
+    public function checkout(Request $request, Business $business, WompiService $wompi): View
     {
         abort_unless((int) auth()->user()->business_id === (int) $business->id || auth()->user()->hasRole('super_admin'), 403);
 
-        $paymentData = $wompi->createPaymentLink($business);
+        $planType = in_array($request->query('plan'), ['monthly', 'semester']) ? $request->query('plan') : 'monthly';
+        $plans = config('services.wompi.plans');
+        $paymentData = $wompi->createPaymentLink($business, $planType);
 
         return view('payment.checkout', [
             'business' => $business,
             'payment' => $paymentData,
             'used' => $business->getMonthlyAppointmentCount(),
             'limit' => $business->monthly_appointment_limit,
-            'price' => config('services.wompi.unlock_price'),
+            'planType' => $planType,
+            'plans' => $plans,
+            'price' => $plans[$planType]['price'],
         ]);
     }
 

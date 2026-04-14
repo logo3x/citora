@@ -102,20 +102,36 @@ class Business extends Model implements HasMedia
 
     public function isUnlockedForPeriod(): bool
     {
-        return $this->payments()
-            ->where('status', 'approved')
-            ->where('paid_at', '>=', now()->subDays(30))
-            ->exists();
+        $lastPayment = $this->getLastApprovedPayment();
+
+        if (! $lastPayment?->paid_at) {
+            return false;
+        }
+
+        $days = $lastPayment->plan_days ?? 30;
+
+        return $lastPayment->paid_at->addDays($days)->isFuture();
     }
 
     public function getUnlockExpiresAt(): ?Carbon
     {
-        $lastPayment = $this->payments()
+        $lastPayment = $this->getLastApprovedPayment();
+
+        if (! $lastPayment?->paid_at) {
+            return null;
+        }
+
+        $days = $lastPayment->plan_days ?? 30;
+
+        return $lastPayment->paid_at->addDays($days);
+    }
+
+    private function getLastApprovedPayment(): ?Payment
+    {
+        return $this->payments()
             ->where('status', 'approved')
             ->latest('paid_at')
             ->first();
-
-        return $lastPayment?->paid_at?->addDays(30);
     }
 
     public function canAcceptAppointments(): bool

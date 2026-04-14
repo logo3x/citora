@@ -52,7 +52,11 @@ return [
         'private_key' => env('WOMPI_PRIVATE_KEY'),
         'events_secret' => env('WOMPI_EVENTS_SECRET'),
         'integrity_secret' => env('WOMPI_INTEGRITY_SECRET'),
-        'unlock_price' => (int) env('WOMPI_UNLOCK_PRICE', 29900),
+        'plans' => [
+            'monthly' => ['price' => (int) env('WOMPI_UNLOCK_PRICE_MONTHLY', 34900), 'days' => 30],
+            'semester' => ['price' => (int) env('WOMPI_UNLOCK_PRICE_SEMESTER', 179400), 'days' => 180],
+        ],
+        'origin' => env('WOMPI_ORIGIN', 'citora'),
         'currency' => 'COP',
         'redirect_base' => env('WOMPI_REDIRECT_BASE'),
         'base_url' => env('WOMPI_ENV', 'test') === 'production'

@@ -9,11 +9,15 @@ use Illuminate\Support\Str;
 
 class WompiService
 {
-    public function createPaymentLink(Business $business): array
+    public function createPaymentLink(Business $business, string $planType = 'monthly'): array
     {
+        $plans = config('services.wompi.plans');
+        $plan = $plans[$planType] ?? $plans['monthly'];
+        $origin = Str::upper(config('services.wompi.origin', 'citora'));
+
         $period = now()->format('Y-m');
-        $reference = 'CITORA-'.Str::upper(Str::random(8)).'-'.$business->id;
-        $amountCop = config('services.wompi.unlock_price');
+        $reference = "{$origin}-".Str::upper(Str::random(8))."-{$business->id}";
+        $amountCop = $plan['price'];
         $amountInCents = $amountCop * 100;
         $currency = config('services.wompi.currency');
 
@@ -24,6 +28,9 @@ class WompiService
             'currency' => $currency,
             'status' => 'pending',
             'period' => $period,
+            'plan_type' => $planType,
+            'plan_days' => $plan['days'],
+            'origin' => Str::lower($origin),
         ]);
 
         $integritySecret = config('services.wompi.integrity_secret');
