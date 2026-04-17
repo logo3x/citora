@@ -265,9 +265,12 @@
 
             <div class="space-y-3">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono / WhatsApp *</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de celular *</label>
                     <input type="tel" id="input-phone" value="{{ auth()->user()?->phone ?? '' }}" placeholder="3001234567" maxlength="20" required
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-amber-500 focus:border-amber-500">
+                    <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                        📱 Lo usamos únicamente para enviarte la <strong>confirmación</strong> y los <strong>recordatorios</strong> de tu cita por SMS. No compartimos tu número con terceros.
+                    </p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Notas (opcional)</label>
