@@ -8,6 +8,16 @@ use Illuminate\Support\Facades\Log;
 
 class HablameSmsService implements MessagingChannel
 {
+    /**
+     * Hablame doesn't use WhatsApp templates — always fall back to plain text.
+     *
+     * @param  array<int|string, string>  $variables
+     */
+    public function sendTemplate(string $to, string $templateKey, array $variables, string $fallbackText): bool
+    {
+        return $this->send($to, $fallbackText);
+    }
+
     public function send(string $to, string $message): bool
     {
         $account = config('services.hablame.account');

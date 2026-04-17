@@ -10,6 +10,16 @@ class SmsService implements MessagingChannel
 {
     private ?Client $client = null;
 
+    /**
+     * SMS providers don't support templates — always fall back to plain text.
+     *
+     * @param  array<int|string, string>  $variables
+     */
+    public function sendTemplate(string $to, string $templateKey, array $variables, string $fallbackText): bool
+    {
+        return $this->send($to, $fallbackText);
+    }
+
     public function send(string $to, string $message): bool
     {
         $sid = config('services.twilio.sid');

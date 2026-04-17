@@ -24,15 +24,43 @@ class AppointmentNotificationService
         $customer = $appointment->customer->name;
         $link = $this->shareLink($appointment);
 
-        $this->sendTo($appointment->customer->phone,
+        $this->sendTemplateTo(
+            $appointment->customer->phone,
+            'appointment.confirmed.customer',
+            [
+                1 => $customer,
+                2 => $business,
+                3 => $service,
+                4 => $employee,
+                5 => $date,
+                6 => $time,
+                7 => $price,
+                8 => $link,
+            ],
             "✅ Cita confirmada en {$business}. {$service} con {$employee}. {$date} {$time}. Valor: {$price}. Detalles: {$link}"
         );
 
-        $this->sendTo($appointment->employee?->phone,
+        $internalVars = [
+            1 => $business,
+            2 => $customer,
+            3 => $service,
+            4 => $employee,
+            5 => $date,
+            6 => $time,
+            7 => $price,
+        ];
+
+        $this->sendTemplateTo(
+            $appointment->employee?->phone,
+            'appointment.new.internal',
+            $internalVars,
             "📋 Nueva cita en {$business}. Cliente: {$customer}. {$service}. {$date} {$time}."
         );
 
-        $this->sendTo($appointment->business->phone,
+        $this->sendTemplateTo(
+            $appointment->business->phone,
+            'appointment.new.internal',
+            $internalVars,
             "🔔 Nueva cita en {$business}. {$customer} - {$service} con {$employee}. {$date} {$time}. {$price}."
         );
     }
@@ -47,20 +75,38 @@ class AppointmentNotificationService
         $service = $appointment->service->name;
         $customer = $appointment->customer->name;
         $byLabel = match ($changedBy) {
-            'cliente' => 'por el cliente',
-            'negocio' => 'por el negocio',
+            'cliente' => 'Cancelada por el cliente',
+            'negocio' => 'Cancelada por el negocio',
             default => '',
         };
 
-        $this->sendTo($appointment->customer->phone,
+        $vars = [
+            1 => $business,
+            2 => $customer,
+            3 => $service,
+            4 => $date,
+            5 => $time,
+            6 => $byLabel,
+        ];
+
+        $this->sendTemplateTo(
+            $appointment->customer->phone,
+            'appointment.cancelled',
+            $vars,
             "❌ Cita cancelada en {$business}. {$service}. {$date} {$time}. {$byLabel}"
         );
 
-        $this->sendTo($appointment->employee?->phone,
+        $this->sendTemplateTo(
+            $appointment->employee?->phone,
+            'appointment.cancelled',
+            $vars,
             "❌ Cita cancelada - {$business}. {$customer} - {$service}. {$date} {$time}. {$byLabel}"
         );
 
-        $this->sendTo($appointment->business->phone,
+        $this->sendTemplateTo(
+            $appointment->business->phone,
+            'appointment.cancelled',
+            $vars,
             "❌ Cita cancelada - {$business}. {$customer} - {$service}. {$date} {$time}. {$byLabel}"
         );
     }
@@ -71,6 +117,7 @@ class AppointmentNotificationService
 
         $url = rtrim(config('app.url'), '/')."/{$appointment->business->slug}";
 
+        // No pre-approved template for this event yet — plain text only.
         $this->sendTo($appointment->customer->phone,
             "🎉 Gracias por tu visita a {$appointment->business->name}. Reserva de nuevo: {$url}"
         );
@@ -85,19 +132,39 @@ class AppointmentNotificationService
         $business = $appointment->business->name;
         $service = $appointment->service->name;
         $byLabel = match ($changedBy) {
-            'cliente' => 'por el cliente',
-            'negocio' => 'por el negocio',
+            'cliente' => 'Reprogramada por el cliente',
+            'negocio' => 'Reprogramada por el negocio',
             default => '',
         };
 
-        $msg = "🔄 Cita reprogramada - {$business}. {$service}. Antes: {$oldDate} {$oldTime}. Ahora: {$newDate} {$newTime}. {$byLabel}";
+        $vars = [
+            1 => $business,
+            2 => $service,
+            3 => $oldDate,
+            4 => $oldTime,
+            5 => $newDate,
+            6 => $newTime,
+            7 => $byLabel,
+        ];
 
-        $this->sendTo($appointment->customer->phone, $msg);
-        $this->sendTo($appointment->employee?->phone, $msg);
-        $this->sendTo($appointment->business->phone, $msg);
+        $fallback = "🔄 Cita reprogramada - {$business}. {$service}. Antes: {$oldDate} {$oldTime}. Ahora: {$newDate} {$newTime}. {$byLabel}";
+
+        $this->sendTemplateTo($appointment->customer->phone, 'appointment.rescheduled', $vars, $fallback);
+        $this->sendTemplateTo($appointment->employee?->phone, 'appointment.rescheduled', $vars, $fallback);
+        $this->sendTemplateTo($appointment->business->phone, 'appointment.rescheduled', $vars, $fallback);
     }
 
     public function notifyReminder24h(Appointment $appointment): void
+    {
+        $this->sendReminder($appointment, 'mañana');
+    }
+
+    public function notifyReminder1h(Appointment $appointment): void
+    {
+        $this->sendReminder($appointment, 'en 1 hora');
+    }
+
+    private function sendReminder(Appointment $appointment, string $whenLabel): void
     {
         $appointment->loadMissing(['service', 'employee', 'customer', 'business']);
 
@@ -108,42 +175,52 @@ class AppointmentNotificationService
         $customer = $appointment->customer->name;
         $link = $this->shareLink($appointment);
 
-        $this->sendTo($appointment->customer->phone,
-            "⏰ Mañana {$time} tienes cita en {$business}: {$service} con {$employee}. Detalles: {$link}"
+        $this->sendTemplateTo(
+            $appointment->customer->phone,
+            'appointment.reminder.customer',
+            [
+                1 => $customer,
+                2 => $whenLabel,
+                3 => $business,
+                4 => $service,
+                5 => $employee,
+                6 => $time,
+                7 => $link,
+            ],
+            "⏰ {$whenLabel} {$time} tienes cita en {$business}: {$service} con {$employee}. Detalles: {$link}"
         );
 
-        $this->sendTo($appointment->employee?->phone,
-            "⏰ Mañana {$time} cita con {$customer} en {$business}: {$service}."
+        $internalVars = [
+            1 => $business,
+            2 => $whenLabel,
+            3 => $customer,
+            4 => $service,
+            5 => $time,
+        ];
+
+        $this->sendTemplateTo(
+            $appointment->employee?->phone,
+            'appointment.reminder.internal',
+            $internalVars,
+            "⏰ {$whenLabel} {$time} cita con {$customer} en {$business}: {$service}."
         );
 
-        $this->sendTo($appointment->business->phone,
-            "⏰ Mañana {$time} cita: {$customer}, {$service}, {$employee}."
-        );
-    }
-
-    public function notifyReminder1h(Appointment $appointment): void
-    {
-        $appointment->loadMissing(['service', 'employee', 'customer', 'business']);
-
-        $time = Carbon::parse($appointment->starts_at)->format('g:i A');
-        $business = $appointment->business->name;
-        $employee = $appointment->employee?->name ?? 'Cualquier profesional';
-        $service = $appointment->service->name;
-        $customer = $appointment->customer->name;
-
-        $this->sendTo($appointment->customer->phone,
-            "🔔 Tu cita en {$business} es en 1h ({$time}). {$service} con {$employee}."
-        );
-
-        $this->sendTo($appointment->employee?->phone,
-            "🔔 Cita en 1h - {$business}. {$customer} - {$service} a las {$time}."
-        );
+        // Owner only on 24h reminder — avoid over-notifying.
+        if ($whenLabel === 'mañana') {
+            $this->sendTemplateTo(
+                $appointment->business->phone,
+                'appointment.reminder.internal',
+                $internalVars,
+                "⏰ {$whenLabel} {$time} cita: {$customer}, {$service}, {$employee}."
+            );
+        }
     }
 
     public function notifyBusinessCreated(string $ownerPhone, string $businessName, string $slug): void
     {
         $url = rtrim(config('app.url'), '/')."/{$slug}";
 
+        // Plain-text only (no template yet).
         $this->sendTo($ownerPhone,
             "🎉 Tu negocio {$businessName} está listo. Comparte: {$url}"
         );
@@ -151,9 +228,27 @@ class AppointmentNotificationService
 
     public function notifyEmployeeRegistered(string $employeePhone, string $employeeName, string $businessName): void
     {
-        $this->sendTo($employeePhone,
+        $this->sendTemplateTo(
+            $employeePhone,
+            'employee.welcome',
+            [
+                1 => $businessName,
+                2 => $employeeName,
+            ],
             "👋 Bienvenido a {$businessName}, {$employeeName}. Recibirás tus citas por este medio."
         );
+    }
+
+    /**
+     * @param  array<int|string, string>  $variables
+     */
+    private function sendTemplateTo(?string $phone, string $templateKey, array $variables, string $fallbackText): void
+    {
+        if (! $phone) {
+            return;
+        }
+
+        $this->channel->sendTemplate($phone, $templateKey, $variables, $fallbackText);
     }
 
     private function sendTo(?string $phone, string $message): void

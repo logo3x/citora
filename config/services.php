@@ -47,6 +47,18 @@ return [
         'channel' => env('TWILIO_CHANNEL', 'sms'),
         'sms_from' => env('TWILIO_SMS_FROM'),
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
+
+        // WhatsApp pre-approved Content SIDs (start with HX...) per template key.
+        // Used by WhatsAppService::sendTemplate() when TWILIO_CHANNEL=whatsapp.
+        'templates' => [
+            'appointment.confirmed.customer' => env('TWILIO_TPL_APPOINTMENT_CONFIRMED_CUSTOMER'),
+            'appointment.new.internal' => env('TWILIO_TPL_APPOINTMENT_NEW_INTERNAL'),
+            'appointment.reminder.customer' => env('TWILIO_TPL_APPOINTMENT_REMINDER_CUSTOMER'),
+            'appointment.reminder.internal' => env('TWILIO_TPL_APPOINTMENT_REMINDER_INTERNAL'),
+            'appointment.cancelled' => env('TWILIO_TPL_APPOINTMENT_CANCELLED'),
+            'appointment.rescheduled' => env('TWILIO_TPL_APPOINTMENT_RESCHEDULED'),
+            'employee.welcome' => env('TWILIO_TPL_EMPLOYEE_WELCOME'),
+        ],
     ],
 
     'hablame' => [

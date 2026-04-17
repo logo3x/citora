@@ -18,19 +18,46 @@ class WhatsAppService implements MessagingChannel
     }
 
     /**
-     * Send a template message with buttons.
+     * Send a pre-approved WhatsApp template by its logical key.
+     * Falls back to sending plain text if no Content SID is configured for the key.
      *
-     * @param  array<string, string>  $variables
+     * @param  array<int|string, string>  $variables
      */
-    public function sendTemplate(string $to, string $contentSid, array $variables = []): bool
+    public function sendTemplate(string $to, string $templateKey, array $variables, string $fallbackText): bool
     {
+        $contentSid = config("services.twilio.templates.{$templateKey}");
+
+        if (! $contentSid) {
+            Log::info('WhatsApp: sin template configurado, enviando texto libre', ['template' => $templateKey]);
+
+            return $this->send($to, $fallbackText);
+        }
+
         $params = ['contentSid' => $contentSid];
 
         if ($variables) {
-            $params['contentVariables'] = json_encode($variables);
+            $params['contentVariables'] = json_encode($this->normalizeVariables($variables));
         }
 
         return $this->sendMessage($to, $params);
+    }
+
+    /**
+     * Twilio expects contentVariables as a JSON object with string keys "1", "2", ...
+     * Accept both associative and sequential arrays.
+     *
+     * @param  array<int|string, string>  $variables
+     * @return array<string, string>
+     */
+    private function normalizeVariables(array $variables): array
+    {
+        $normalized = [];
+
+        foreach ($variables as $key => $value) {
+            $normalized[(string) $key] = (string) $value;
+        }
+
+        return $normalized;
     }
 
     /**
