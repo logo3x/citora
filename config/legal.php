@@ -2,18 +2,24 @@
 
 return [
 
+    // Public-facing data — shown in Privacy and Terms pages.
     'responsible' => [
-        'name' => 'Luis Guillermo Oviedo Ochoa',
-        'id_type' => 'Cédula de Ciudadanía',
-        'id_number' => '1.098.631.735',
-        'economic_activity' => 'Actividades de consultoría informática (CIIU 6202)',
-        'address' => 'Calle 31 #51-13, Barrio El Cerro',
+        'brand' => 'Citora',
+        'email' => 'webcitora@gmail.com',
         'city' => 'Barrancabermeja',
         'state' => 'Santander',
         'country' => 'Colombia',
-        'email' => 'webcitora@gmail.com',
-        'brand' => 'Citora',
         'website' => 'https://citora.com.co',
+    ],
+
+    // Private data — kept here so it can be disclosed upon formal request
+    // from a data subject or a regulator (SIC). Not shown publicly.
+    'responsible_private' => [
+        'name' => env('LEGAL_RESPONSIBLE_NAME'),
+        'id_type' => env('LEGAL_RESPONSIBLE_ID_TYPE'),
+        'id_number' => env('LEGAL_RESPONSIBLE_ID_NUMBER'),
+        'address' => env('LEGAL_RESPONSIBLE_ADDRESS'),
+        'economic_activity' => env('LEGAL_RESPONSIBLE_ACTIVITY'),
     ],
 
     'hosting' => [

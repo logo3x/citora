@@ -8,24 +8,27 @@
     <p class="page-subtitle">Vigentes desde el {{ \Carbon\Carbon::parse($legal['policy']['effective_date'])->translatedFormat('d \\d\\e F \\d\\e Y') }} · Última actualización: {{ \Carbon\Carbon::parse($legal['policy']['last_updated'])->translatedFormat('d \\d\\e F \\d\\e Y') }}</p>
 
     <div class="meta-box">
-        <div><strong>Operador:</strong> {{ $legal['responsible']['name'] }}</div>
-        <div><strong>Identificación:</strong> {{ $legal['responsible']['id_type'] }} {{ $legal['responsible']['id_number'] }}</div>
-        <div><strong>Marca:</strong> {{ $legal['responsible']['brand'] }} — {{ $legal['responsible']['website'] }}</div>
+        <div><strong>Marca:</strong> {{ $legal['responsible']['brand'] }}</div>
+        <div><strong>Sitio web:</strong> <a href="{{ $legal['responsible']['website'] }}" style="color:var(--amber)">{{ $legal['responsible']['website'] }}</a></div>
+        <div><strong>Ciudad:</strong> {{ $legal['responsible']['city'] }}, {{ $legal['responsible']['country'] }}</div>
         <div><strong>Contacto:</strong> <a href="mailto:{{ $legal['responsible']['email'] }}" style="color:var(--amber)">{{ $legal['responsible']['email'] }}</a></div>
     </div>
 
     <div class="content">
         <h2>1. Aceptación de los términos</h2>
         <p>
-            Estos Términos y Condiciones (en adelante, los <strong>"Términos"</strong>) regulan el acceso y uso de la plataforma <strong>Citora</strong> ({{ $legal['responsible']['website'] }}), operada por <strong>{{ $legal['responsible']['name'] }}</strong>, persona natural con {{ $legal['responsible']['id_type'] }} <strong>{{ $legal['responsible']['id_number'] }}</strong>, domiciliada en {{ $legal['responsible']['city'] }}, {{ $legal['responsible']['country'] }} (en adelante, el <strong>"Operador"</strong>).
+            Estos Términos y Condiciones (en adelante, los <strong>"Términos"</strong>) regulan el acceso y uso de la plataforma <strong>{{ $legal['responsible']['brand'] }}</strong> ({{ $legal['responsible']['website'] }}), operada desde {{ $legal['responsible']['city'] }}, {{ $legal['responsible']['country'] }} por la persona natural responsable de la marca (en adelante, el <strong>"Operador"</strong>).
         </p>
         <p>
-            Al registrarte, usar o acceder a Citora, declaras haber leído, entendido y aceptado estos Términos en su totalidad. Si no estás de acuerdo, debes abstenerte de utilizar la plataforma.
+            La identificación completa del Operador puede ser solicitada por escrito al correo <a href="mailto:{{ $legal['responsible']['email'] }}">{{ $legal['responsible']['email'] }}</a>.
+        </p>
+        <p>
+            Al registrarte, usar o acceder a {{ $legal['responsible']['brand'] }}, declaras haber leído, entendido y aceptado estos Términos en su totalidad. Si no estás de acuerdo, debes abstenerte de utilizar la plataforma.
         </p>
 
         <h2>2. Descripción del servicio</h2>
         <p>
-            Citora es una plataforma <strong>SaaS (Software como Servicio)</strong> que permite a negocios de servicios (barberías, peluquerías, salones de belleza, spas, profesionales independientes y similares) gestionar su agenda en línea y recibir reservas de citas por parte de sus clientes finales. La plataforma ofrece:
+            {{ $legal['responsible']['brand'] }} es una plataforma <strong>SaaS (Software como Servicio)</strong> que permite a negocios de servicios (barberías, peluquerías, salones de belleza, spas, profesionales independientes y similares) gestionar su agenda en línea y recibir reservas de citas por parte de sus clientes finales. La plataforma ofrece:
         </p>
         <ul>
             <li>Página pública de reservas para cada negocio registrado.</li>
@@ -36,7 +39,7 @@
         </ul>
 
         <h2>3. Usuarios</h2>
-        <p>Citora reconoce dos tipos de usuarios:</p>
+        <p>{{ $legal['responsible']['brand'] }} reconoce dos tipos de usuarios:</p>
         <ul>
             <li><strong>Negocio:</strong> persona natural o jurídica que registra su establecimiento en la plataforma para recibir reservas de citas.</li>
             <li><strong>Cliente final:</strong> persona que agenda una cita en la página pública de un negocio registrado.</li>
@@ -52,7 +55,7 @@
         </ol>
 
         <h2>5. Uso permitido</h2>
-        <p>Te comprometes a utilizar Citora de forma lícita, respetando los derechos de terceros. Queda prohibido:</p>
+        <p>Te comprometes a utilizar {{ $legal['responsible']['brand'] }} de forma lícita, respetando los derechos de terceros. Queda prohibido:</p>
         <ul>
             <li>Usar la plataforma para actividades ilegales, fraudulentas o contrarias a la moral y las buenas costumbres.</li>
             <li>Comercializar productos o servicios prohibidos por la ley colombiana (drogas, armas, pornografía, etc.).</li>
@@ -65,14 +68,14 @@
         <h2>6. Responsabilidad del negocio</h2>
         <p>El negocio registrado es el <strong>único responsable</strong> de:</p>
         <ul>
-            <li>La calidad, seguridad y legalidad de los servicios que ofrece a través de Citora.</li>
+            <li>La calidad, seguridad y legalidad de los servicios que ofrece a través de {{ $legal['responsible']['brand'] }}.</li>
             <li>Cumplir con las citas agendadas y atender a sus clientes de forma profesional.</li>
             <li>Cumplir con las obligaciones tributarias, laborales y regulatorias aplicables a su actividad.</li>
             <li>Obtener el consentimiento de sus empleados para registrar sus datos en la plataforma.</li>
             <li>Gestionar los reclamos y disputas con sus clientes finales.</li>
         </ul>
         <p>
-            Citora <strong>no es responsable</strong> de la prestación de los servicios que los negocios ofrecen a través de la plataforma, ni de los acuerdos, conflictos o disputas que surjan entre negocios y sus clientes.
+            {{ $legal['responsible']['brand'] }} <strong>no es responsable</strong> de la prestación de los servicios que los negocios ofrecen a través de la plataforma, ni de los acuerdos, conflictos o disputas que surjan entre negocios y sus clientes.
         </p>
 
         <h2>7. Responsabilidad del cliente final</h2>
@@ -86,7 +89,7 @@
 
         <h2>8. Notificaciones por SMS y WhatsApp</h2>
         <p>
-            Al proporcionar un número de celular al registrarte o al agendar una cita, <strong>autorizas expresamente</strong> a Citora a enviar notificaciones transaccionales relacionadas con tus citas, incluyendo:
+            Al proporcionar un número de celular al registrarte o al agendar una cita, <strong>autorizas expresamente</strong> a {{ $legal['responsible']['brand'] }} a enviar notificaciones transaccionales relacionadas con tus citas, incluyendo:
         </p>
         <ul>
             <li>Confirmación de reserva.</li>
@@ -100,7 +103,7 @@
 
         <h2>9. Planes, pagos y suscripciones</h2>
         <p>
-            Citora ofrece planes de suscripción para negocios que deseen acceder a funcionalidades avanzadas. Los planes vigentes, sus precios y condiciones se muestran en la plataforma al momento de la contratación.
+            {{ $legal['responsible']['brand'] }} ofrece planes de suscripción para negocios que deseen acceder a funcionalidades avanzadas. Los planes vigentes, sus precios y condiciones se muestran en la plataforma al momento de la contratación.
         </p>
         <ul>
             <li>Los pagos se procesan a través de <strong>Wompi</strong>, pasarela autorizada en Colombia.</li>
@@ -110,12 +113,12 @@
         </ul>
 
         <div class="callout">
-            <strong>Política de reembolsos:</strong> las suscripciones a Citora <strong>no son reembolsables</strong> una vez activadas. Ante cualquier inconveniente, contáctanos y buscaremos resolverlo a la mayor brevedad.
+            <strong>Política de reembolsos:</strong> las suscripciones a {{ $legal['responsible']['brand'] }} <strong>no son reembolsables</strong> una vez activadas. Ante cualquier inconveniente, contáctanos y buscaremos resolverlo a la mayor brevedad.
         </div>
 
         <h2>10. Propiedad intelectual</h2>
         <p>
-            La marca <strong>Citora</strong>, el logotipo, el diseño de la plataforma, el código fuente, la documentación y demás elementos que componen el sitio son propiedad exclusiva del Operador y están protegidos por las leyes de propiedad intelectual de Colombia e internacionales.
+            La marca <strong>{{ $legal['responsible']['brand'] }}</strong>, el logotipo, el diseño de la plataforma, el código fuente, la documentación y demás elementos que componen el sitio son propiedad exclusiva del Operador y están protegidos por las leyes de propiedad intelectual de Colombia e internacionales.
         </p>
         <p>
             El contenido que tú publiques (nombre del negocio, fotografías, descripciones, etc.) sigue siendo de tu propiedad, pero nos concedes una <strong>licencia no exclusiva, mundial y gratuita</strong> para mostrarlo dentro de la plataforma con el fin de prestar el servicio.
@@ -123,7 +126,7 @@
 
         <h2>11. Disponibilidad del servicio</h2>
         <p>
-            Aunque nos esforzamos por mantener Citora disponible 24/7, el Operador no garantiza que la plataforma estará libre de interrupciones, errores o fallos técnicos. Podemos realizar mantenimientos programados o de emergencia sin previo aviso.
+            Aunque nos esforzamos por mantener {{ $legal['responsible']['brand'] }} disponible 24/7, el Operador no garantiza que la plataforma estará libre de interrupciones, errores o fallos técnicos. Podemos realizar mantenimientos programados o de emergencia sin previo aviso.
         </p>
         <p>
             El Operador no será responsable por daños derivados de la indisponibilidad temporal del servicio, pérdida de datos por causas ajenas a su control, o fallas en proveedores externos (hosting, pasarela de pagos, proveedores de mensajería).
@@ -159,10 +162,8 @@
         </p>
 
         <h2>16. Contacto</h2>
-        <p>Para cualquier duda, notificación o reclamo relacionado con estos Términos, puedes contactarnos en:</p>
-        <ul>
-            <li><strong>Correo:</strong> <a href="mailto:{{ $legal['responsible']['email'] }}">{{ $legal['responsible']['email'] }}</a></li>
-            <li><strong>Dirección:</strong> {{ $legal['responsible']['address'] }}, {{ $legal['responsible']['city'] }}, {{ $legal['responsible']['state'] }}, {{ $legal['responsible']['country'] }}</li>
-        </ul>
+        <p>
+            Para cualquier duda, notificación o reclamo relacionado con estos Términos, escríbenos a <a href="mailto:{{ $legal['responsible']['email'] }}">{{ $legal['responsible']['email'] }}</a>.
+        </p>
     </div>
 @endsection
