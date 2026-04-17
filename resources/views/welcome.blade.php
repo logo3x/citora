@@ -990,8 +990,8 @@
                 </div>
                 <p style="font-size:13px;color:var(--slate-400)">&copy; {{ date('Y') }} Citora. Todos los derechos reservados.</p>
                 <div style="display:flex;gap:24px">
-                    <a href="#" class="footer-link">Términos</a>
-                    <a href="#" class="footer-link">Privacidad</a>
+                    <a href="{{ route('legal.terms') }}" class="footer-link">Términos</a>
+                    <a href="{{ route('legal.privacy') }}" class="footer-link">Privacidad</a>
                     <a href="mailto:webcitora@gmail.com" class="footer-link">Contacto</a>
                 </div>
             </div>

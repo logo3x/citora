@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\AppointmentShareController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CustomerAppointmentController;
 use App\Http\Controllers\DeployController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Business;
@@ -78,6 +80,15 @@ Route::get('buscar', function (Request $request) {
 
     return response()->json(['businesses' => $businesses, 'services' => $services]);
 })->name('search');
+
+// Legal pages
+Route::get('privacidad', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('terminos', [LegalController::class, 'terms'])->name('legal.terms');
+
+// Shareable appointment page (short link for SMS notifications)
+Route::get('c/{token}', [AppointmentShareController::class, 'show'])
+    ->where('token', '[a-z0-9]{8}')
+    ->name('appointment.share');
 
 // Customer appointments
 Route::middleware('auth')->group(function () {

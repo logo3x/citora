@@ -290,8 +290,13 @@
     </div>
 
     {{-- Footer --}}
-    <div class="text-center py-6 text-xs text-[#666666] border-t border-[#E7E5DF] mt-6">
-        Powered by <a href="/" class="text-[#D97706] hover:underline font-medium">Citora</a>
+    <div class="text-center py-6 text-xs text-[#666666] border-t border-[#E7E5DF] mt-6 space-y-2">
+        <div>Powered by <a href="/" class="text-[#D97706] hover:underline font-medium">Citora</a></div>
+        <div>
+            <a href="{{ route('legal.privacy') }}" class="text-[#666666] hover:text-[#D97706]">Privacidad</a>
+            <span class="mx-2">·</span>
+            <a href="{{ route('legal.terms') }}" class="text-[#666666] hover:text-[#D97706]">Términos</a>
+        </div>
     </div>
 
     <script>

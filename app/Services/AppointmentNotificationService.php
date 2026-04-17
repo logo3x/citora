@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\MessagingChannel;
 use App\Models\Appointment;
+use App\Models\AppointmentShareToken;
 use Carbon\Carbon;
 
 class AppointmentNotificationService
@@ -21,9 +22,10 @@ class AppointmentNotificationService
         $business = $appointment->business->name;
         $price = '$'.number_format($appointment->service->price);
         $customer = $appointment->customer->name;
+        $link = $this->shareLink($appointment);
 
         $this->sendTo($appointment->customer->phone,
-            "✅ Cita confirmada en {$business}. {$service} con {$employee}. {$date} {$time}. Valor: {$price}."
+            "✅ Cita confirmada en {$business}. {$service} con {$employee}. {$date} {$time}. Valor: {$price}. Detalles: {$link}"
         );
 
         $this->sendTo($appointment->employee?->phone,
@@ -104,9 +106,10 @@ class AppointmentNotificationService
         $employee = $appointment->employee?->name ?? 'Cualquier profesional';
         $service = $appointment->service->name;
         $customer = $appointment->customer->name;
+        $link = $this->shareLink($appointment);
 
         $this->sendTo($appointment->customer->phone,
-            "⏰ Mañana {$time} tienes cita en {$business}: {$service} con {$employee}."
+            "⏰ Mañana {$time} tienes cita en {$business}: {$service} con {$employee}. Detalles: {$link}"
         );
 
         $this->sendTo($appointment->employee?->phone,
@@ -160,5 +163,12 @@ class AppointmentNotificationService
         }
 
         $this->channel->send($phone, $message);
+    }
+
+    private function shareLink(Appointment $appointment): string
+    {
+        $token = AppointmentShareToken::generateFor($appointment);
+
+        return rtrim(config('app.url'), '/').'/c/'.$token->token;
     }
 }
