@@ -49,6 +49,12 @@ return [
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
     ],
 
+    'hablame' => [
+        'account' => env('HABLAME_ACCOUNT'),
+        'api_key' => env('HABLAME_API_KEY'),
+        'endpoint' => env('HABLAME_ENDPOINT', 'https://www.hablame.co/api/sms/v5/send/priority'),
+    ],
+
     'wompi' => [
         'public_key' => env('WOMPI_PUBLIC_KEY'),
         'private_key' => env('WOMPI_PRIVATE_KEY'),

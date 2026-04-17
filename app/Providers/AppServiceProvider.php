@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Contracts\MessagingChannel;
 use App\Policies\RolePolicy;
+use App\Services\HablameSmsService;
 use App\Services\SmsService;
 use App\Services\WhatsAppService;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(MessagingChannel::class, function ($app) {
             return match (config('services.twilio.channel', 'sms')) {
                 'whatsapp' => $app->make(WhatsAppService::class),
+                'hablame' => $app->make(HablameSmsService::class),
                 default => $app->make(SmsService::class),
             };
         });
