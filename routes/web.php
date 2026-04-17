@@ -39,6 +39,11 @@ Route::post('webhook/whatsapp', [WhatsAppWebhookController::class, 'handle'])
     ->withoutMiddleware(PreventRequestForgery::class)
     ->middleware('throttle:120,1');
 
+Route::post('webhook/sms', [WhatsAppWebhookController::class, 'handle'])
+    ->name('webhook.sms')
+    ->withoutMiddleware(PreventRequestForgery::class)
+    ->middleware('throttle:120,1');
+
 Route::post('webhook/wompi', [PaymentController::class, 'webhook'])
     ->name('webhook.wompi')
     ->withoutMiddleware(PreventRequestForgery::class)

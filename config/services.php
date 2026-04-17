@@ -44,6 +44,8 @@ return [
     'twilio' => [
         'sid' => env('TWILIO_SID'),
         'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'channel' => env('TWILIO_CHANNEL', 'sms'),
+        'sms_from' => env('TWILIO_SMS_FROM'),
         'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
     ],
 

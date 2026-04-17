@@ -2,10 +2,11 @@
 
 namespace App\Services;
 
+use App\Contracts\MessagingChannel;
 use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client;
 
-class WhatsAppService
+class WhatsAppService implements MessagingChannel
 {
     private ?Client $client = null;
 
