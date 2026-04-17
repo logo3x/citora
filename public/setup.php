@@ -174,6 +174,8 @@ $kernel->bootstrap();
                             echo "✅ View cache cleared\n";
                             Artisan::call('cache:clear');
                             echo "✅ Application cache cleared\n";
+                            Artisan::call('queue:restart');
+                            echo "✅ Queue workers restarted\n";
                         }
                         echo "\n✅ Completado";
                     } catch (Throwable $e) {
