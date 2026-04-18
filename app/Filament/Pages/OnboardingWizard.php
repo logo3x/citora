@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Jobs\SendWhatsAppNotification;
+use App\Mail\BusinessCreatedAdminMail;
 use App\Models\Business;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -17,6 +18,7 @@ use Filament\Schemas\Components\Wizard\Step;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -332,9 +334,28 @@ class OnboardingWizard extends Page
                     ]);
                 }
             }
+
+            $this->sendAdminNotification($business);
         });
 
         $this->dispatch('business-created');
+    }
+
+    private function sendAdminNotification(Business $business): void
+    {
+        $adminEmail = config('mail.admin_email');
+
+        if (! $adminEmail) {
+            return;
+        }
+
+        try {
+            Mail::to($adminEmail)->send(new BusinessCreatedAdminMail($business));
+        } catch (\Throwable $e) {
+            Log::error('BusinessCreatedAdminMail failed: '.$e->getMessage(), [
+                'business_id' => $business->id,
+            ]);
+        }
     }
 
     private function attachMedia(HasMedia $model, mixed $filePath, string $collection): void
