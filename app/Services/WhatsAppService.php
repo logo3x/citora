@@ -25,7 +25,9 @@ class WhatsAppService implements MessagingChannel
      */
     public function sendTemplate(string $to, string $templateKey, array $variables, string $fallbackText): bool
     {
-        $contentSid = config("services.twilio.templates.{$templateKey}");
+        // Template keys contain dots, so we can't use dot-notation config lookup.
+        $templates = config('services.twilio.templates', []);
+        $contentSid = $templates[$templateKey] ?? null;
 
         if (! $contentSid) {
             Log::info('WhatsApp: sin template configurado, enviando texto libre', ['template' => $templateKey]);

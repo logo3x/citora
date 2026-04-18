@@ -233,7 +233,8 @@ $kernel->bootstrap();
                             $channel = config('services.twilio.channel');
                             $smsFrom = config('services.twilio.sms_from');
                             $whatsFrom = config('services.twilio.whatsapp_from');
-                            $tpl = config('services.twilio.templates.appointment.confirmed.customer');
+                            $templates = config('services.twilio.templates', []);
+                            $tpl = $templates['appointment.confirmed.customer'] ?? null;
 
                             echo "📋 Configuración actual:\n";
                             echo "   SID:             " . ($sid ? substr($sid, 0, 8) . '…' : '(vacío)') . "\n";
