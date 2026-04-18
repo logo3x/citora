@@ -118,6 +118,7 @@ $kernel->bootstrap();
                     <a href="?key=<?= $secret ?>&step=storage" class="btn btn-outline">🔗 Crear Storage Link</a>
                     <a href="?key=<?= $secret ?>&step=cache" class="btn btn-outline">⚡ Cachear config y rutas</a>
                     <a href="?key=<?= $secret ?>&step=clear" class="btn btn-outline">🧹 Limpiar toda la cache</a>
+                    <a href="?key=<?= $secret ?>&step=email-test" class="btn btn-outline">📧 Enviar email de prueba</a>
                 </div>
             </div>
 
@@ -131,6 +132,7 @@ $kernel->bootstrap();
                         'storage' => '🔗 Storage Link',
                         'cache' => '⚡ Cache',
                         'clear' => '🧹 Limpiar cache',
+                        'email-test' => '📧 Email de prueba',
                         default => '⚙️ Resultado'
                     } ?>
                 </h2>
@@ -176,6 +178,44 @@ $kernel->bootstrap();
                             echo "✅ Application cache cleared\n";
                             Artisan::call('queue:restart');
                             echo "✅ Queue workers restarted\n";
+                        }
+                        if ($step === 'email-test') {
+                            $admin = config('mail.admin_email');
+                            $mailer = config('mail.default');
+                            $host = config("mail.mailers.{$mailer}.host");
+                            $port = config("mail.mailers.{$mailer}.port");
+                            $scheme = config("mail.mailers.{$mailer}.scheme") ?: 'auto';
+                            $username = config("mail.mailers.{$mailer}.username");
+                            $from = config('mail.from.address');
+
+                            echo "📋 Configuración actual:\n";
+                            echo "   Mailer:   {$mailer}\n";
+                            echo "   Host:     " . ($host ?: '(vacío)') . "\n";
+                            echo "   Puerto:   " . ($port ?: '(vacío)') . "\n";
+                            echo "   Scheme:   {$scheme}\n";
+                            echo "   Usuario:  " . ($username ?: '(vacío)') . "\n";
+                            echo "   Desde:    " . ($from ?: '(vacío)') . "\n";
+                            echo "   Admin:    " . ($admin ?: '(no configurado)') . "\n\n";
+
+                            if (! $admin) {
+                                echo "❌ MAIL_ADMIN_EMAIL no está configurado en .env\n";
+                                echo "   Agrega esta línea: MAIL_ADMIN_EMAIL=tu-correo@ejemplo.com\n";
+                            } else {
+                                echo "🚀 Enviando email de prueba a {$admin}...\n\n";
+
+                                Illuminate\Support\Facades\Mail::raw(
+                                    "Este es un correo de prueba enviado desde setup.php de Citora.\n\n"
+                                    ."Si recibes este mensaje, la configuración SMTP está funcionando correctamente.\n\n"
+                                    ."Timestamp: ".now()->toDateTimeString()."\n"
+                                    ."Host: {$host}:{$port} ({$scheme})",
+                                    function ($message) use ($admin) {
+                                        $message->to($admin)->subject('✅ Prueba SMTP - Citora');
+                                    }
+                                );
+
+                                echo "✅ Email enviado correctamente\n";
+                                echo "📬 Revisa la bandeja de entrada (y spam) de {$admin}\n";
+                            }
                         }
                         echo "\n✅ Completado";
                     } catch (Throwable $e) {
