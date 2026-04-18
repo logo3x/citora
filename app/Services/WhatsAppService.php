@@ -39,7 +39,16 @@ class WhatsAppService implements MessagingChannel
             $params['contentVariables'] = json_encode($this->normalizeVariables($variables));
         }
 
-        return $this->sendMessage($to, $params);
+        if ($this->sendMessage($to, $params)) {
+            return true;
+        }
+
+        // Fallback: if sending with the template failed (pending approval, rejected,
+        // invalid variables, etc.) try again as free-form text. This only succeeds
+        // inside the 24h customer-initiated window.
+        Log::warning('WhatsApp: envío con template falló, intentando texto libre', ['template' => $templateKey]);
+
+        return $this->send($to, $fallbackText);
     }
 
     /**
