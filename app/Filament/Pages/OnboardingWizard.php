@@ -343,14 +343,18 @@ class OnboardingWizard extends Page
 
     private function sendAdminNotification(Business $business): void
     {
-        $adminEmail = config('mail.admin_email');
+        $recipients = collect(explode(',', (string) config('mail.admin_email')))
+            ->map(fn (string $email) => trim($email))
+            ->filter()
+            ->values()
+            ->all();
 
-        if (! $adminEmail) {
+        if (empty($recipients)) {
             return;
         }
 
         try {
-            Mail::to($adminEmail)->send(new BusinessCreatedAdminMail($business));
+            Mail::to($recipients)->send(new BusinessCreatedAdminMail($business));
         } catch (\Throwable $e) {
             Log::error('BusinessCreatedAdminMail failed: '.$e->getMessage(), [
                 'business_id' => $business->id,

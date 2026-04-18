@@ -180,7 +180,8 @@ $kernel->bootstrap();
                             echo "✅ Queue workers restarted\n";
                         }
                         if ($step === 'email-test') {
-                            $admin = config('mail.admin_email');
+                            $adminRaw = config('mail.admin_email');
+                            $recipients = array_values(array_filter(array_map('trim', explode(',', (string) $adminRaw))));
                             $mailer = config('mail.default');
                             $host = config("mail.mailers.{$mailer}.host");
                             $port = config("mail.mailers.{$mailer}.port");
@@ -195,26 +196,32 @@ $kernel->bootstrap();
                             echo "   Scheme:   {$scheme}\n";
                             echo "   Usuario:  " . ($username ?: '(vacío)') . "\n";
                             echo "   Desde:    " . ($from ?: '(vacío)') . "\n";
-                            echo "   Admin:    " . ($admin ?: '(no configurado)') . "\n\n";
+                            echo "   Admins:   " . (empty($recipients) ? '(no configurado)' : implode(', ', $recipients)) . "\n\n";
 
-                            if (! $admin) {
+                            if (empty($recipients)) {
                                 echo "❌ MAIL_ADMIN_EMAIL no está configurado en .env\n";
                                 echo "   Agrega esta línea: MAIL_ADMIN_EMAIL=tu-correo@ejemplo.com\n";
+                                echo "   También puedes usar varios separados por coma:\n";
+                                echo "   MAIL_ADMIN_EMAIL=\"correo1@x.com, correo2@x.com\"\n";
                             } else {
-                                echo "🚀 Enviando email de prueba a {$admin}...\n\n";
+                                echo "🚀 Enviando email de prueba a " . count($recipients) . " destinatario(s)...\n\n";
 
                                 Illuminate\Support\Facades\Mail::raw(
                                     "Este es un correo de prueba enviado desde setup.php de Citora.\n\n"
                                     ."Si recibes este mensaje, la configuración SMTP está funcionando correctamente.\n\n"
+                                    ."Destinatarios: ".implode(', ', $recipients)."\n"
                                     ."Timestamp: ".now()->toDateTimeString()."\n"
                                     ."Host: {$host}:{$port} ({$scheme})",
-                                    function ($message) use ($admin) {
-                                        $message->to($admin)->subject('✅ Prueba SMTP - Citora');
+                                    function ($message) use ($recipients) {
+                                        $message->to($recipients)->subject('✅ Prueba SMTP - Citora');
                                     }
                                 );
 
-                                echo "✅ Email enviado correctamente\n";
-                                echo "📬 Revisa la bandeja de entrada (y spam) de {$admin}\n";
+                                echo "✅ Email enviado correctamente a:\n";
+                                foreach ($recipients as $r) {
+                                    echo "   • {$r}\n";
+                                }
+                                echo "\n📬 Revisa las bandejas (y carpetas de spam)\n";
                             }
                         }
                         echo "\n✅ Completado";
