@@ -119,6 +119,7 @@ $kernel->bootstrap();
                     <a href="?key=<?= $secret ?>&step=cache" class="btn btn-outline">⚡ Cachear config y rutas</a>
                     <a href="?key=<?= $secret ?>&step=clear" class="btn btn-outline">🧹 Limpiar toda la cache</a>
                     <a href="?key=<?= $secret ?>&step=email-test" class="btn btn-outline">📧 Enviar email de prueba</a>
+                    <a href="?key=<?= $secret ?>&step=whatsapp-test" class="btn btn-outline">📲 Enviar WhatsApp de prueba</a>
                 </div>
             </div>
 
@@ -133,6 +134,7 @@ $kernel->bootstrap();
                         'cache' => '⚡ Cache',
                         'clear' => '🧹 Limpiar cache',
                         'email-test' => '📧 Email de prueba',
+                        'whatsapp-test' => '📲 WhatsApp de prueba',
                         default => '⚙️ Resultado'
                     } ?>
                 </h2>
@@ -222,6 +224,60 @@ $kernel->bootstrap();
                                     echo "   • {$r}\n";
                                 }
                                 echo "\n📬 Revisa las bandejas (y carpetas de spam)\n";
+                            }
+                        }
+                        if ($step === 'whatsapp-test') {
+                            $testPhone = $_GET['to'] ?? '';
+                            $sid = config('services.twilio.sid');
+                            $token = config('services.twilio.auth_token');
+                            $channel = config('services.twilio.channel');
+                            $smsFrom = config('services.twilio.sms_from');
+                            $whatsFrom = config('services.twilio.whatsapp_from');
+                            $tpl = config('services.twilio.templates.appointment.confirmed.customer');
+
+                            echo "📋 Configuración actual:\n";
+                            echo "   SID:             " . ($sid ? substr($sid, 0, 8) . '…' : '(vacío)') . "\n";
+                            echo "   Token:           " . ($token ? '(configurado)' : '(vacío)') . "\n";
+                            echo "   Channel:         " . ($channel ?: '(no configurado)') . "\n";
+                            echo "   SMS From:        " . ($smsFrom ?: '(vacío)') . "\n";
+                            echo "   WhatsApp From:   " . ($whatsFrom ?: '(vacío)') . "\n";
+                            echo "   Template conf:   " . ($tpl ?: '(vacío — enviará texto libre)') . "\n\n";
+
+                            if (! $testPhone) {
+                                echo "⚠️ Para enviar, agrega ?to=TELEFONO a la URL\n";
+                                echo "   Ejemplo: ?key={$secret}&step=whatsapp-test&to=3143693735\n";
+                                echo "   (Formato: 10 dígitos colombianos, sin +57)\n";
+                            } else {
+                                echo "🚀 Enviando mensaje de prueba a {$testPhone}...\n\n";
+
+                                $channelService = app(\App\Contracts\MessagingChannel::class);
+                                $channelClass = get_class($channelService);
+                                echo "   Clase activa: {$channelClass}\n\n";
+
+                                $result = $channelService->sendTemplate(
+                                    $testPhone,
+                                    'appointment.confirmed.customer',
+                                    [
+                                        1 => 'Prueba',
+                                        2 => 'Citora Test',
+                                        3 => 'Servicio demo',
+                                        4 => 'Profesional demo',
+                                        5 => 'hoy',
+                                        6 => 'ahora',
+                                        7 => '$0',
+                                        8 => rtrim(config('app.url'), '/').'/',
+                                    ],
+                                    'Prueba de Citora: este mensaje llegó correctamente vía '.$channel.'.'
+                                );
+
+                                if ($result) {
+                                    echo "✅ Mensaje despachado correctamente al proveedor\n";
+                                    echo "📱 Revisa tu WhatsApp / SMS al número {$testPhone}\n";
+                                    echo "\n⚠️ Si NO llega, revisa storage/logs/laravel.log y en Twilio Console → Monitor → Logs\n";
+                                } else {
+                                    echo "❌ Falló el despacho\n";
+                                    echo "   Revisa storage/logs/laravel.log para ver el error exacto.\n";
+                                }
                             }
                         }
                         echo "\n✅ Completado";
