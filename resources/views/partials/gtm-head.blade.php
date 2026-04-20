@@ -7,3 +7,15 @@
     })(window,document,'script','dataLayer','{{ $gtm }}');</script>
 @endif
 {{-- End Google Tag Manager (head) --}}
+
+{{-- Google Analytics 4 (gtag.js) --}}
+@if ($ga4 = config('services.ga4.measurement_id'))
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4 }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ $ga4 }}');
+    </script>
+@endif
+{{-- End Google Analytics 4 --}}
