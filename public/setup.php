@@ -120,6 +120,7 @@ $kernel->bootstrap();
                     <a href="?key=<?= $secret ?>&step=clear" class="btn btn-outline">🧹 Limpiar toda la cache</a>
                     <a href="?key=<?= $secret ?>&step=email-test" class="btn btn-outline">📧 Enviar email de prueba</a>
                     <a href="?key=<?= $secret ?>&step=whatsapp-test" class="btn btn-outline">📲 Enviar WhatsApp de prueba</a>
+                    <a href="?key=<?= $secret ?>&step=gen-secret" class="btn btn-outline">🔐 Generar secret aleatorio</a>
                 </div>
             </div>
 
@@ -135,6 +136,7 @@ $kernel->bootstrap();
                         'clear' => '🧹 Limpiar cache',
                         'email-test' => '📧 Email de prueba',
                         'whatsapp-test' => '📲 WhatsApp de prueba',
+                        'gen-secret' => '🔐 Secret aleatorio',
                         default => '⚙️ Resultado'
                     } ?>
                 </h2>
@@ -225,6 +227,23 @@ $kernel->bootstrap();
                                 }
                                 echo "\n📬 Revisa las bandejas (y carpetas de spam)\n";
                             }
+                        }
+                        if ($step === 'gen-secret') {
+                            $hex64 = bin2hex(random_bytes(32));      // 64 chars hex
+                            $b64 = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+                            $alpha = Illuminate\Support\Str::random(64);
+
+                            echo "🔐 Secrets aleatorios generados (usa cualquiera):\n\n";
+                            echo "• HEX (64 chars):\n  {$hex64}\n\n";
+                            echo "• Base64-url (43 chars):\n  {$b64}\n\n";
+                            echo "• Alfanumérico Laravel (64 chars):\n  {$alpha}\n\n";
+                            echo "📋 Pasos:\n";
+                            echo "   1. Copia uno de los valores de arriba\n";
+                            echo "   2. Pega en tu .env como: CRON_SECRET=<el_valor>\n";
+                            echo "   3. Guarda y ejecuta '🧹 Limpiar toda la cache'\n";
+                            echo "   4. Prueba: /cron/reminders?key=<el_valor>\n";
+                            echo "   5. Configura el cron en cron-job.org con esa URL\n\n";
+                            echo "⚠️ NO compartas estos valores en chats ni capturas.\n";
                         }
                         if ($step === 'whatsapp-test') {
                             $testPhone = $_GET['to'] ?? '';
