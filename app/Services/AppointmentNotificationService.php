@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Contracts\MessagingChannel;
+use App\Mail\AppointmentStatusMail;
 use App\Models\Appointment;
 use App\Models\AppointmentShareToken;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentNotificationService
 {
@@ -23,6 +26,10 @@ class AppointmentNotificationService
         $price = '$'.number_format($appointment->service->price);
         $customer = $appointment->customer->name;
         $link = $this->shareLink($appointment);
+
+        $this->sendEmail($appointment->customer->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_CUSTOMER, ['share_link' => $link]);
+        $this->sendEmail($appointment->employee?->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_EMPLOYEE);
+        $this->sendEmail($appointment->business->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_OWNER);
 
         $this->sendTemplateTo(
             $appointment->customer->phone,
@@ -80,6 +87,11 @@ class AppointmentNotificationService
             default => '',
         };
 
+        $emailExtra = ['changed_by' => $byLabel];
+        $this->sendEmail($appointment->customer->email, $appointment, AppointmentStatusMail::EVENT_CANCELLED, AppointmentStatusMail::ROLE_CUSTOMER, $emailExtra);
+        $this->sendEmail($appointment->employee?->email, $appointment, AppointmentStatusMail::EVENT_CANCELLED, AppointmentStatusMail::ROLE_EMPLOYEE, $emailExtra);
+        $this->sendEmail($appointment->business->email, $appointment, AppointmentStatusMail::EVENT_CANCELLED, AppointmentStatusMail::ROLE_OWNER, $emailExtra);
+
         $vars = [
             1 => $business,
             2 => $customer,
@@ -121,6 +133,8 @@ class AppointmentNotificationService
         $this->sendTo($appointment->customer->phone,
             "🎉 Gracias por tu visita a {$appointment->business->name}. Reserva de nuevo: {$url}"
         );
+
+        $this->sendEmail($appointment->customer->email, $appointment, AppointmentStatusMail::EVENT_COMPLETED, AppointmentStatusMail::ROLE_CUSTOMER);
     }
 
     public function notifyRescheduled(Appointment $appointment, string $oldDate, string $oldTime, string $changedBy = 'sistema'): void
@@ -152,6 +166,15 @@ class AppointmentNotificationService
         $this->sendTemplateTo($appointment->customer->phone, 'appointment.rescheduled', $vars, $fallback);
         $this->sendTemplateTo($appointment->employee?->phone, 'appointment.rescheduled', $vars, $fallback);
         $this->sendTemplateTo($appointment->business->phone, 'appointment.rescheduled', $vars, $fallback);
+
+        $emailExtra = [
+            'old_date' => $oldDate,
+            'old_time' => $oldTime,
+            'changed_by' => $byLabel,
+        ];
+        $this->sendEmail($appointment->customer->email, $appointment, AppointmentStatusMail::EVENT_RESCHEDULED, AppointmentStatusMail::ROLE_CUSTOMER, $emailExtra);
+        $this->sendEmail($appointment->employee?->email, $appointment, AppointmentStatusMail::EVENT_RESCHEDULED, AppointmentStatusMail::ROLE_EMPLOYEE, $emailExtra);
+        $this->sendEmail($appointment->business->email, $appointment, AppointmentStatusMail::EVENT_RESCHEDULED, AppointmentStatusMail::ROLE_OWNER, $emailExtra);
     }
 
     public function notifyReminder24h(Appointment $appointment): void
@@ -174,6 +197,14 @@ class AppointmentNotificationService
         $service = $appointment->service->name;
         $customer = $appointment->customer->name;
         $link = $this->shareLink($appointment);
+
+        $emailEvent = $whenLabel === 'mañana' ? AppointmentStatusMail::EVENT_REMINDER_24H : AppointmentStatusMail::EVENT_REMINDER_1H;
+        $emailExtra = ['share_link' => $link];
+        $this->sendEmail($appointment->customer->email, $appointment, $emailEvent, AppointmentStatusMail::ROLE_CUSTOMER, $emailExtra);
+        $this->sendEmail($appointment->employee?->email, $appointment, $emailEvent, AppointmentStatusMail::ROLE_EMPLOYEE, $emailExtra);
+        if ($whenLabel === 'mañana') {
+            $this->sendEmail($appointment->business->email, $appointment, $emailEvent, AppointmentStatusMail::ROLE_OWNER, $emailExtra);
+        }
 
         $this->sendTemplateTo(
             $appointment->customer->phone,
@@ -265,5 +296,29 @@ class AppointmentNotificationService
         $token = AppointmentShareToken::generateFor($appointment);
 
         return rtrim(config('app.url'), '/').'/c/'.$token->token;
+    }
+
+    /**
+     * Send an appointment-status email in parallel to the WhatsApp/SMS channel.
+     * Silently skipped when the recipient has no email on file.
+     *
+     * @param  array<string, mixed>  $extra
+     */
+    private function sendEmail(?string $email, Appointment $appointment, string $event, string $role, array $extra = []): void
+    {
+        if (! $email) {
+            return;
+        }
+
+        try {
+            Mail::to($email)->send(new AppointmentStatusMail($appointment, $event, $role, $extra));
+        } catch (\Throwable $e) {
+            Log::warning('AppointmentStatusMail failed: '.$e->getMessage(), [
+                'appointment_id' => $appointment->id,
+                'event' => $event,
+                'role' => $role,
+                'email' => $email,
+            ]);
+        }
     }
 }
