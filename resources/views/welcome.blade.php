@@ -22,8 +22,23 @@
             --border: #E7E5DF;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y proximity;
+            scroll-padding-top: 72px;
+        }
         body { font-family: 'Inter', sans-serif; background: var(--cream); color: #111; overflow-x: hidden; }
         h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; }
+        section {
+            scroll-snap-align: start;
+            scroll-snap-stop: normal;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; scroll-snap-type: none; }
+            .animate-fade-up, .animate-fade-up-delay-1, .animate-fade-up-delay-2,
+            .animate-fade-up-delay-3, .animate-fade-in, .reveal { animation: none !important; transition: none !important; }
+            .hero-orb, .hero-section { animation: none !important; }
+        }
 
         /* Animations */
         @keyframes fadeUp {
@@ -425,15 +440,19 @@
         .carousel-track::-webkit-scrollbar { display: none; }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .bento-full { padding: 32px 28px; gap: 28px; }
+            section[style*="padding:80px"] { padding-top: 64px !important; padding-bottom: 64px !important; }
+        }
         @media (max-width: 768px) {
-            .bento-grid {
-                grid-template-columns: 1fr;
-            }
+            .bento-grid { grid-template-columns: 1fr; }
             .bento-full {
                 grid-column: span 1;
                 flex-direction: column;
                 gap: 16px;
                 padding: 28px;
+                text-align: center;
             }
             .hero-section { padding: 100px 16px 60px; }
             .nav-actions .nav-label { display: none; }
@@ -442,9 +461,31 @@
             .pricing-grid { grid-template-columns: 1fr !important; }
             .pricing-card { padding: 28px !important; }
             .segments-grid { grid-template-columns: repeat(2, 1fr) !important; }
+            section[style*="padding:80px"] { padding-top: 56px !important; padding-bottom: 56px !important; }
+            section[style*="padding:64px"] { padding-top: 48px !important; padding-bottom: 36px !important; }
+        }
+        @media (max-width: 640px) {
+            .hero-section { padding: 96px 14px 52px; }
+            .search-box { padding: 4px 4px 4px 14px; border-radius: 14px; }
+            .search-box input { font-size: 14px; padding: 12px 10px; }
+            .search-btn { padding: 10px 16px; font-size: 13px; }
+            .bento-card { padding: 24px; border-radius: 18px; }
+            .pricing-card { padding: 24px !important; border-radius: 20px !important; }
+            .segment-card { padding: 20px 14px; }
+            .segment-icon { font-size: 36px; }
+            .cta-btn { padding: 14px 28px; font-size: 15px; }
         }
         @media (max-width: 480px) {
             .segments-grid { grid-template-columns: 1fr !important; }
+            .service-card, .biz-card { width: calc(85vw - 16px) !important; max-width: 280px; }
+            .carousel-track { padding: 8px 14px 20px; }
+            section[style*="padding:80px 16px"] { padding-left: 14px !important; padding-right: 14px !important; }
+            .cta-section { padding: 72px 14px !important; }
+        }
+        @media (max-width: 380px) {
+            .search-btn { padding: 8px 12px; font-size: 12px; }
+            .bento-card { padding: 20px; }
+            .pricing-card { padding: 20px !important; }
         }
     </style>
 </head>
