@@ -40,7 +40,7 @@ class AppointmentObserver
             return 'sistema';
         }
 
-        if ($userId === $appointment->customer_id) {
+        if ((int) $userId === (int) $appointment->customer_id) {
             return 'cliente';
         }
 

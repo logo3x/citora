@@ -154,6 +154,16 @@
                                         </table>
                                     </td>
                                 </tr>
+                                @if ($role !== 'customer' && ! empty($appointment->notes) && in_array($event, ['created', 'rescheduled', 'reminder_24h', 'reminder_1h']))
+                                    <tr>
+                                        <td style="padding:6px 18px 14px">
+                                            <div style="background:#FEF3C7;border-left:3px solid #D97706;border-radius:8px;padding:10px 14px">
+                                                <div style="font-size:11px;color:#92400E;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;margin-bottom:4px">📝 Nota del cliente</div>
+                                                <div style="font-size:13px;color:#451A03;white-space:pre-wrap">{{ $appointment->notes }}</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
                             </table>
                         </td>
                     </tr>
