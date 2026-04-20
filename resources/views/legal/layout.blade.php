@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    @include('partials.gtm-head')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Citora' }}</title>
@@ -58,6 +59,7 @@
     </style>
 </head>
 <body>
+    @include('partials.gtm-body')
     <header class="header">
         <div class="header-inner">
             <a href="/" class="brand">

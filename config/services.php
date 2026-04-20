@@ -92,4 +92,8 @@ return [
         'secret' => env('CRON_SECRET'),
     ],
 
+    'gtm' => [
+        'container_id' => env('GTM_CONTAINER_ID'),
+    ],
+
 ];

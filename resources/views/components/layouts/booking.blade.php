@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    @include('partials.gtm-head')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -19,6 +20,7 @@
     </style>
 </head>
 <body style="min-height:100vh">
+    @include('partials.gtm-body')
     {{-- Top bar for authenticated users --}}
     @auth
     <div style="background:white;border-bottom:1px solid #E7E5DF;padding:8px 16px">
