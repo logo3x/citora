@@ -202,11 +202,13 @@
             </div>
 
             <div class="actions">
-                @if ($status !== 'cancelled' && $status !== 'completed')
-                    <a href="{{ route('customer.appointments') }}" class="btn btn-primary">
-                        Ver todas mis citas
-                    </a>
-                @endif
+                @auth
+                    @if ($status !== 'cancelled' && $status !== 'completed')
+                        <a href="{{ route('customer.appointments') }}" class="btn btn-primary">
+                            Ver todas mis citas
+                        </a>
+                    @endif
+                @endauth
                 <a href="/{{ $appointment->business->slug }}" class="btn btn-outline">
                     Reservar otra cita en {{ $appointment->business->name }}
                 </a>
