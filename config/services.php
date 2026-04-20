@@ -88,4 +88,8 @@ return [
         'secret' => env('DEPLOY_SECRET'),
     ],
 
+    'cron' => [
+        'secret' => env('CRON_SECRET'),
+    ],
+
 ];

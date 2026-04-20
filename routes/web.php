@@ -3,6 +3,7 @@
 use App\Http\Controllers\AppointmentShareController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CronController;
 use App\Http\Controllers\CustomerAppointmentController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\LegalController;
@@ -55,6 +56,11 @@ Route::post('webhook/deploy', [DeployController::class, 'handle'])
     ->name('webhook.deploy')
     ->withoutMiddleware(PreventRequestForgery::class)
     ->middleware('throttle:5,1');
+
+// Cron-job.org endpoint for scheduled tasks (bypass proc_open limitations)
+Route::get('cron/reminders', [CronController::class, 'reminders'])
+    ->name('cron.reminders')
+    ->middleware('throttle:10,1');
 
 // Search
 Route::get('buscar', function (Request $request) {
