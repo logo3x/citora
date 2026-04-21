@@ -76,8 +76,10 @@ class EditMyBusiness extends Page
     public function mount(): void
     {
         $business = $this->getBusiness();
+        $user = auth()->user();
 
         $businessData = $business->attributesToArray();
+        $businessData['owner_display_name'] = $user->display_name;
         $businessData['schedules'] = $business->schedules()
             ->orderByRaw('CASE WHEN day_of_week = 0 THEN 7 ELSE day_of_week END')
             ->get()
@@ -92,6 +94,17 @@ class EditMyBusiness extends Page
         return $schema
             ->components([
                 Form::make([
+                    Section::make('Propietario')
+                        ->description('Este nombre aparece en el saludo del panel y en comunicaciones internas. Si lo dejas vacío, se usará tu nombre de Google.')
+                        ->schema([
+                            TextInput::make('owner_display_name')
+                                ->label('Nombre del propietario')
+                                ->placeholder(auth()->user()->name)
+                                ->helperText('Puede ser tu nombre comercial, apodo o razón social.')
+                                ->maxLength(150),
+                        ])
+                        ->columns(1),
+
                     Section::make('Información general')
                         ->schema([
                             TextInput::make('name')
@@ -219,6 +232,11 @@ class EditMyBusiness extends Page
                 'is_active' => $s->is_active,
             ])
             ->all();
+
+        $ownerDisplayName = isset($data['owner_display_name']) ? trim((string) $data['owner_display_name']) : '';
+        auth()->user()->update([
+            'display_name' => $ownerDisplayName !== '' ? $ownerDisplayName : null,
+        ]);
 
         $business->update([
             'name' => $data['name'],

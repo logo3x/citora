@@ -14,12 +14,22 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'avatar', 'phone'])]
+#[Fillable(['name', 'display_name', 'email', 'password', 'google_id', 'avatar', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasPanelShield, HasRoles, Notifiable;
+
+    /**
+     * Name to greet the user with. Falls back to Google-provided name.
+     */
+    public function getGreetingName(): string
+    {
+        return trim((string) $this->display_name) !== ''
+            ? (string) $this->display_name
+            : (string) $this->name;
+    }
 
     /**
      * @return array<string, string>

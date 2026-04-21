@@ -26,7 +26,7 @@ class Dashboard extends BaseDashboard
             default => 'Buenas noches',
         };
 
-        return "{$greeting}, {$user->name}";
+        return "{$greeting}, {$user->getGreetingName()}";
     }
 
     public function getSubheading(): ?string
