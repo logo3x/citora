@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class UpcomingAppointments extends TableWidget
 {
-    protected static ?string $heading = 'Próximas citas';
+    protected static ?string $heading = 'Próximas citas (desde mañana)';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 7;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -24,7 +24,7 @@ class UpcomingAppointments extends TableWidget
                 $user = auth()->user();
 
                 $query = Appointment::with(['service', 'employee', 'customer'])
-                    ->where('starts_at', '>=', now())
+                    ->whereDate('starts_at', '>=', today()->addDay())
                     ->where('status', '!=', AppointmentStatus::Cancelled)
                     ->orderBy('starts_at');
 

@@ -68,9 +68,9 @@ class Dashboard extends BaseDashboard
 
         if ($user->hasRole('super_admin')) {
             return [
+                TodayAppointments::class,
                 StatsOverview::class,
                 RevenueStats::class,
-                TodayAppointments::class,
                 AppointmentsChart::class,
                 UpcomingAppointments::class,
             ];
@@ -78,9 +78,9 @@ class Dashboard extends BaseDashboard
 
         return [
             PlanUsageWidget::class,
+            TodayAppointments::class,
             StatsOverview::class,
             RevenueStats::class,
-            TodayAppointments::class,
             AppointmentsChart::class,
             ServicePopularityChart::class,
             UpcomingAppointments::class,
