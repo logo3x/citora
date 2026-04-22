@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable(['name', 'slogan', 'description', 'slug', 'email', 'phone', 'address', 'is_active'])]
+#[Fillable(['name', 'slogan', 'description', 'slug', 'email', 'phone', 'address', 'is_active', 'cancellation_min_hours', 'reschedule_min_hours'])]
 class Business extends Model implements HasMedia
 {
     /** @use HasFactory<BusinessFactory> */
@@ -29,7 +29,23 @@ class Business extends Model implements HasMedia
     {
         return [
             'is_active' => 'boolean',
+            'cancellation_min_hours' => 'integer',
+            'reschedule_min_hours' => 'integer',
         ];
+    }
+
+    public function canCustomerCancel(Appointment $appointment): bool
+    {
+        $hours = $this->cancellation_min_hours ?? 2;
+
+        return Carbon::parse($appointment->starts_at)->diffInHours(now(), false) <= -$hours;
+    }
+
+    public function canCustomerReschedule(Appointment $appointment): bool
+    {
+        $hours = $this->reschedule_min_hours ?? 2;
+
+        return Carbon::parse($appointment->starts_at)->diffInHours(now(), false) <= -$hours;
     }
 
     public function registerMediaCollections(): void

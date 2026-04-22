@@ -49,6 +49,16 @@ class CustomerAppointmentController extends Controller
             return response()->json(['error' => 'No puedes cancelar una cita que ya pasó'], 422);
         }
 
+        $appointment->loadMissing('business');
+
+        if (! $appointment->business->canCustomerCancel($appointment)) {
+            $hours = $appointment->business->cancellation_min_hours;
+
+            return response()->json([
+                'error' => "Este negocio no permite cancelaciones con menos de {$hours} horas de anticipación. Por favor contacta directamente al negocio.",
+            ], 422);
+        }
+
         $appointment->update(['status' => AppointmentStatus::Cancelled]);
 
         return response()->json(['success' => true, 'message' => 'Cita cancelada exitosamente']);
@@ -63,6 +73,8 @@ class CustomerAppointmentController extends Controller
         abort_unless($appointment->starts_at > now(), 403);
 
         $appointment->load(['service', 'employee', 'business']);
+
+        abort_unless($appointment->business->canCustomerReschedule($appointment), 403, "Este negocio no permite reprogramar con menos de {$appointment->business->reschedule_min_hours} horas de anticipación.");
 
         return view('customer.reschedule', compact('appointment'));
     }

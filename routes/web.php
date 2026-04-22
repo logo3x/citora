@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentExportController;
 use App\Http\Controllers\AppointmentShareController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BookingController;
@@ -95,6 +96,12 @@ Route::get('terminos', [LegalController::class, 'terms'])->name('legal.terms');
 Route::get('c/{token}', [AppointmentShareController::class, 'show'])
     ->where('token', '[a-z0-9]{8}')
     ->name('appointment.share');
+
+// Export de citas (solo usuarios autenticados con negocio)
+Route::middleware('auth')->group(function () {
+    Route::get('admin/exports/appointments.csv', [AppointmentExportController::class, 'csv'])
+        ->name('appointments.export.csv');
+});
 
 // Customer appointments
 Route::middleware('auth')->group(function () {

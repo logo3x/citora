@@ -3,7 +3,11 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\AppointmentStatus;
+use App\Filament\Resources\Appointments\AppointmentResource;
 use App\Models\Appointment;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -48,18 +52,18 @@ class TodayAppointments extends TableWidget
                         $ends = $record->ends_at;
 
                         if ($ends && $starts->lte($now) && $ends->gte($now)) {
-                            return 'success'; // En curso
+                            return 'success';
                         }
 
                         if ($starts->lte($now)) {
-                            return 'gray'; // Pasada
+                            return 'gray';
                         }
 
                         if ($starts->diffInMinutes($now) <= 60) {
-                            return 'warning'; // Próxima (menos de 1h)
+                            return 'warning';
                         }
 
-                        return 'info'; // Futura
+                        return 'info';
                     })
                     ->sortable(),
                 TextColumn::make('service.name')
@@ -82,18 +86,85 @@ class TodayAppointments extends TableWidget
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn (AppointmentStatus $state): string => match ($state) {
-                        AppointmentStatus::Pending => 'Pendiente',
-                        AppointmentStatus::Confirmed => 'Confirmada',
-                        AppointmentStatus::Completed => 'Completada',
-                        AppointmentStatus::Cancelled => 'Cancelada',
-                    })
-                    ->color(fn (AppointmentStatus $state): string => match ($state) {
-                        AppointmentStatus::Pending => 'warning',
-                        AppointmentStatus::Confirmed => 'info',
-                        AppointmentStatus::Completed => 'success',
-                        AppointmentStatus::Cancelled => 'danger',
-                    }),
+                    ->formatStateUsing(fn (AppointmentStatus $state): string => $state->label())
+                    ->color(fn (AppointmentStatus $state): string => $state->color()),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    Action::make('edit')
+                        ->label('Ver / editar')
+                        ->icon('heroicon-m-pencil-square')
+                        ->url(fn (Appointment $record): string => AppointmentResource::getUrl('edit', ['record' => $record])),
+
+                    Action::make('confirm')
+                        ->label('Confirmar')
+                        ->icon('heroicon-m-check-badge')
+                        ->color('info')
+                        ->visible(fn (Appointment $record): bool => $record->status === AppointmentStatus::Pending)
+                        ->requiresConfirmation()
+                        ->modalHeading('Confirmar cita')
+                        ->modalDescription(fn (Appointment $record) => "Marcar como confirmada la cita de {$record->customer?->name} a las {$record->starts_at->format('g:i A')}.")
+                        ->action(function (Appointment $record): void {
+                            $record->update(['status' => AppointmentStatus::Confirmed]);
+                            Notification::make()->success()->title('Cita confirmada')->send();
+                        }),
+
+                    Action::make('complete')
+                        ->label('Completar')
+                        ->icon('heroicon-m-check-circle')
+                        ->color('success')
+                        ->visible(fn (Appointment $record): bool => ! $record->status->isFinal())
+                        ->requiresConfirmation()
+                        ->modalHeading('Completar cita')
+                        ->modalDescription('Marca la cita como completada. Se notificará al cliente por WhatsApp y correo.')
+                        ->action(function (Appointment $record): void {
+                            $record->update(['status' => AppointmentStatus::Completed]);
+                            Notification::make()->success()->title('Cita completada')->send();
+                        }),
+
+                    Action::make('late')
+                        ->label('Llegó tarde')
+                        ->icon('heroicon-m-clock')
+                        ->color('warning')
+                        ->visible(fn (Appointment $record): bool => ! $record->status->isFinal())
+                        ->requiresConfirmation()
+                        ->modalHeading('Marcar como "llegó tarde"')
+                        ->action(function (Appointment $record): void {
+                            $record->update(['status' => AppointmentStatus::LateArrival]);
+                            Notification::make()->success()->title('Marcada como "llegó tarde"')->send();
+                        }),
+
+                    Action::make('no_show')
+                        ->label('No llegó')
+                        ->icon('heroicon-m-user-minus')
+                        ->color('gray')
+                        ->visible(fn (Appointment $record): bool => ! $record->status->isFinal())
+                        ->requiresConfirmation()
+                        ->modalHeading('Marcar como "no llegó"')
+                        ->modalDescription('El cliente no asistió. Quedará registrado para estadísticas.')
+                        ->action(function (Appointment $record): void {
+                            $record->update(['status' => AppointmentStatus::NoShow]);
+                            Notification::make()->success()->title('Marcada como "no llegó"')->send();
+                        }),
+
+                    Action::make('cancel')
+                        ->label('Cancelar')
+                        ->icon('heroicon-m-x-circle')
+                        ->color('danger')
+                        ->visible(fn (Appointment $record): bool => ! $record->status->isFinal())
+                        ->requiresConfirmation()
+                        ->modalHeading('Cancelar cita')
+                        ->modalDescription('Se notificará al cliente por WhatsApp y correo.')
+                        ->action(function (Appointment $record): void {
+                            $record->update(['status' => AppointmentStatus::Cancelled]);
+                            Notification::make()->success()->title('Cita cancelada')->send();
+                        }),
+                ])
+                    ->label('Acciones')
+                    ->icon('heroicon-m-ellipsis-horizontal')
+                    ->size('sm')
+                    ->color('gray')
+                    ->button(),
             ])
             ->paginated(false);
     }

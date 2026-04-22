@@ -68,15 +68,15 @@
             if (! el || el.dataset.initialized) return;
             el.dataset.initialized = '1';
 
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
             const calendar = new FullCalendar.Calendar(el, {
-                initialView: 'dayGridMonth',
+                initialView: isMobile ? 'timeGridDay' : 'dayGridMonth',
                 locale: 'es',
                 firstDay: 1,
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                },
+                headerToolbar: isMobile
+                    ? { left: 'prev,next', center: 'title', right: 'timeGridDay,listWeek' }
+                    : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
                 buttonText: {
                     today: 'Hoy',
                     month: 'Mes',

@@ -145,6 +145,28 @@ class EditMyBusiness extends Page
                         ])
                         ->columns(2),
 
+                    Section::make('Políticas de cancelación')
+                        ->description('Tiempo mínimo de anticipación que tus clientes necesitan para cancelar o reprogramar. Pasado ese plazo tendrán que contactarte directamente.')
+                        ->schema([
+                            TextInput::make('cancellation_min_hours')
+                                ->label('Horas mínimas para cancelar')
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(168)
+                                ->default(2)
+                                ->suffix('horas')
+                                ->helperText('0 = se puede cancelar en cualquier momento'),
+                            TextInput::make('reschedule_min_hours')
+                                ->label('Horas mínimas para reprogramar')
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(168)
+                                ->default(2)
+                                ->suffix('horas')
+                                ->helperText('0 = se puede reprogramar en cualquier momento'),
+                        ])
+                        ->columns(2),
+
                     Section::make('Imágenes')
                         ->description('Logo: 400x400px recomendado · Banner: 1200x400px recomendado')
                         ->schema([
@@ -246,6 +268,8 @@ class EditMyBusiness extends Page
             'email' => $data['email'] ?? null,
             'phone' => $data['phone'] ?? null,
             'address' => $data['address'] ?? null,
+            'cancellation_min_hours' => (int) ($data['cancellation_min_hours'] ?? 2),
+            'reschedule_min_hours' => (int) ($data['reschedule_min_hours'] ?? 2),
         ]);
 
         $this->form->record($business)->saveRelationships();
