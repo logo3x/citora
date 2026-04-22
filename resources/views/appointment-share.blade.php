@@ -203,14 +203,48 @@
                 @endif
             </div>
 
+            @php
+                $authUser = auth()->user();
+                $isOwner = $authUser && (int) $authUser->business_id === (int) $appointment->business_id;
+                $isCustomer = $authUser && (int) $authUser->id === (int) $appointment->customer_id;
+                $canManage = ! in_array($status, ['cancelled', 'completed']);
+            @endphp
+
             <div class="actions">
+                @if ($canManage && $isOwner)
+                    {{-- Dueño del negocio: acceso al panel --}}
+                    <a href="{{ url('/admin/appointments/'.$appointment->id.'/edit') }}" class="btn btn-primary">
+                        Gestionar en el panel
+                    </a>
+                    <a href="{{ url('/admin/calendario') }}" class="btn btn-outline">
+                        Ver calendario
+                    </a>
+                @elseif ($canManage && $isCustomer)
+                    {{-- Cliente: reprogramar o cancelar --}}
+                    <a href="{{ route('customer.reschedule', $appointment) }}" class="btn btn-primary">
+                        Reprogramar cita
+                    </a>
+                    <form method="POST" action="{{ route('customer.cancel', $appointment) }}" onsubmit="return confirm('¿Seguro que quieres cancelar esta cita?');" style="display:contents">
+                        @csrf
+                        <button type="submit" class="btn btn-outline" style="color:#DC2626;border-color:#FCA5A5">
+                            Cancelar cita
+                        </button>
+                    </form>
+                @elseif (! $authUser && $canManage)
+                    {{-- No autenticado: invitarlo a iniciar sesión --}}
+                    <a href="{{ route('auth.google.redirect', ['redirect_to' => request()->path()]) }}" class="btn btn-primary">
+                        Iniciar sesión para gestionar
+                    </a>
+                @endif
+
                 @auth
-                    @if ($status !== 'cancelled' && $status !== 'completed')
-                        <a href="{{ route('customer.appointments') }}" class="btn btn-primary">
+                    @if ($canManage && $isCustomer)
+                        <a href="{{ route('customer.appointments') }}" class="btn btn-outline">
                             Ver todas mis citas
                         </a>
                     @endif
                 @endauth
+
                 <a href="/{{ $appointment->business->slug }}" class="btn btn-outline">
                     Reservar otra cita en {{ $appointment->business->name }}
                 </a>

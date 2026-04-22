@@ -28,8 +28,8 @@ class AppointmentNotificationService
         $link = $this->shareLink($appointment);
 
         $this->sendEmail($appointment->customer->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_CUSTOMER, ['share_link' => $link]);
-        $this->sendEmail($appointment->employee?->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_EMPLOYEE);
-        $this->sendEmail($appointment->business->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_OWNER);
+        $this->sendEmail($appointment->employee?->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_EMPLOYEE, ['share_link' => $link]);
+        $this->sendEmail($appointment->business->email, $appointment, AppointmentStatusMail::EVENT_CREATED, AppointmentStatusMail::ROLE_OWNER, ['share_link' => $link]);
 
         $this->sendTemplateTo(
             $appointment->customer->phone,
@@ -55,20 +55,21 @@ class AppointmentNotificationService
             5 => $date,
             6 => $time,
             7 => $price,
+            8 => $link,
         ];
 
         $this->sendTemplateTo(
             $appointment->employee?->phone,
             'appointment.new.internal',
             $internalVars,
-            "📋 Nueva cita en {$business}. Cliente: {$customer}. {$service}. {$date} {$time}."
+            "📋 Nueva cita en {$business}. Cliente: {$customer}. {$service}. {$date} {$time}. Gestionar: {$link}"
         );
 
         $this->sendTemplateTo(
             $appointment->business->phone,
             'appointment.new.internal',
             $internalVars,
-            "🔔 Nueva cita en {$business}. {$customer} - {$service} con {$employee}. {$date} {$time}. {$price}."
+            "🔔 Nueva cita en {$business}. {$customer} - {$service} con {$employee}. {$date} {$time}. {$price}. Gestionar: {$link}"
         );
     }
 
