@@ -1,25 +1,38 @@
 <?php
 
-namespace App\Filament\Resources\Appointments\Pages;
+namespace App\Filament\Pages;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Resources\Appointments\AppointmentResource;
 use App\Models\Appointment;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\Page;
+use Filament\Pages\Page;
+use Filament\Support\Icons\Heroicon;
 
-class CalendarAppointments extends Page
+class AppointmentsCalendar extends Page
 {
-    protected static string $resource = AppointmentResource::class;
+    protected string $view = 'filament.pages.appointments-calendar';
 
-    protected string $view = 'filament.resources.appointments.pages.calendar-appointments';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
-    protected static ?string $title = 'Calendario';
+    protected static ?string $navigationLabel = 'Calendario';
 
-    public function getBreadcrumb(): string
+    protected static ?string $title = 'Calendario de citas';
+
+    protected static ?int $navigationSort = 5;
+
+    protected static ?string $slug = 'calendario';
+
+    public function getHeading(): string
     {
-        return 'Calendario';
+        return 'Calendario de citas';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return now()->translatedFormat('F \\d\\e Y');
     }
 
     protected function getHeaderActions(): array
@@ -61,10 +74,10 @@ class CalendarAppointments extends Page
 
         return $query->get()->map(function (Appointment $appointment): array {
             $colorByStatus = match ($appointment->status) {
-                AppointmentStatus::Pending => '#F59E0B',      // amber
-                AppointmentStatus::Confirmed => '#2563EB',    // blue
-                AppointmentStatus::Completed => '#059669',    // green
-                AppointmentStatus::Cancelled => '#9CA3AF',    // gray
+                AppointmentStatus::Pending => '#F59E0B',
+                AppointmentStatus::Confirmed => '#2563EB',
+                AppointmentStatus::Completed => '#059669',
+                AppointmentStatus::Cancelled => '#9CA3AF',
             };
 
             return [

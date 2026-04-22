@@ -432,13 +432,72 @@
         .footer-link:hover { color: var(--amber-light); }
 
         /* Carousel scroll */
+        .carousel-wrapper {
+            position: relative;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
         .carousel-track {
             overflow-x: auto;
-            padding: 8px 16px 20px;
+            overflow-y: hidden;
+            padding: 8px 0 20px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            scroll-snap-type: x proximity;
+            scroll-behavior: smooth;
         }
         .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-track .carousel-list {
+            display: flex;
+            gap: 18px;
+            min-width: max-content;
+        }
+        .carousel-track .service-card,
+        .carousel-track .biz-card {
+            scroll-snap-align: start;
+        }
+
+        /* Carousel buttons */
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.2s ease;
+            color: var(--slate-700);
+        }
+        .carousel-btn:hover:not(:disabled) {
+            background: var(--amber);
+            color: white;
+            border-color: var(--amber);
+            transform: translateY(-50%) scale(1.08);
+        }
+        .carousel-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .carousel-btn-prev { left: -8px; }
+        .carousel-btn-next { right: -8px; }
+        @media (max-width: 768px) {
+            .carousel-btn { width: 36px; height: 36px; }
+            .carousel-btn-prev { left: 4px; }
+            .carousel-btn-next { right: 4px; }
+        }
+        @media (hover: none) and (pointer: coarse) {
+            /* En touch devices ocultar botones (el scroll natural funciona) */
+            .carousel-btn { display: none; }
+        }
 
         /* Responsive */
         @media (max-width: 1024px) {
@@ -665,8 +724,15 @@
                 <p style="font-size:13px;color:var(--slate-400);display:none">Desliza para ver más &rarr;</p>
             </div>
         </div>
-        <div class="carousel-track">
-            <div style="display:flex;gap:18px;max-width:1140px;margin:0 auto;padding:0 16px">
+        <div class="carousel-wrapper">
+            <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Anterior" data-carousel-prev>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button type="button" class="carousel-btn carousel-btn-next" aria-label="Siguiente" data-carousel-next>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="carousel-track" data-carousel-track>
+                <div class="carousel-list">
                 @foreach($services as $service)
                 <a href="{{ route('booking.show', $service->business->slug) }}" class="service-card">
                     <div class="card-img">
@@ -694,6 +760,7 @@
                     </div>
                 </a>
                 @endforeach
+                </div>
             </div>
         </div>
     </section>
@@ -713,8 +780,15 @@
                 </div>
             </div>
         </div>
-        <div class="carousel-track">
-            <div style="display:flex;gap:18px;max-width:1140px;margin:0 auto;padding:0 16px">
+        <div class="carousel-wrapper">
+            <button type="button" class="carousel-btn carousel-btn-prev" aria-label="Anterior" data-carousel-prev>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button type="button" class="carousel-btn carousel-btn-next" aria-label="Siguiente" data-carousel-next>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <div class="carousel-track" data-carousel-track>
+                <div class="carousel-list">
                 @foreach($businesses as $business)
                 <a href="{{ route('booking.show', $business->slug) }}" class="biz-card">
                     <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
@@ -751,6 +825,7 @@
                     </div>
                 </a>
                 @endforeach
+                </div>
             </div>
         </div>
     </section>
@@ -1060,6 +1135,48 @@
             });
         }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
         revealEls.forEach(el => revealObserver.observe(el));
+
+        // Carousels — botones prev/next con scroll horizontal
+        document.querySelectorAll('.carousel-wrapper').forEach((wrapper) => {
+            const track = wrapper.querySelector('[data-carousel-track]');
+            const btnPrev = wrapper.querySelector('[data-carousel-prev]');
+            const btnNext = wrapper.querySelector('[data-carousel-next]');
+
+            if (! track || ! btnPrev || ! btnNext) return;
+
+            const getStep = () => {
+                const firstItem = track.querySelector('.service-card, .biz-card');
+                if (! firstItem) return 300;
+                const itemWidth = firstItem.getBoundingClientRect().width;
+                const gap = 18;
+                return itemWidth + gap;
+            };
+
+            const updateButtons = () => {
+                const maxScroll = track.scrollWidth - track.clientWidth;
+                btnPrev.disabled = track.scrollLeft <= 2;
+                btnNext.disabled = track.scrollLeft >= maxScroll - 2;
+                // Ocultar completamente si no hay nada que scrollear
+                const needsScroll = maxScroll > 4;
+                btnPrev.style.display = needsScroll ? '' : 'none';
+                btnNext.style.display = needsScroll ? '' : 'none';
+            };
+
+            btnPrev.addEventListener('click', () => {
+                track.scrollBy({ left: -getStep() * 2, behavior: 'smooth' });
+            });
+
+            btnNext.addEventListener('click', () => {
+                track.scrollBy({ left: getStep() * 2, behavior: 'smooth' });
+            });
+
+            track.addEventListener('scroll', updateButtons, { passive: true });
+            window.addEventListener('resize', updateButtons, { passive: true });
+
+            // Estado inicial (esperar a que las imágenes marquen el layout)
+            updateButtons();
+            setTimeout(updateButtons, 300);
+        });
     </script>
 
 </body>

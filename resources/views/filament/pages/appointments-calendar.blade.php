@@ -7,7 +7,7 @@
         <div id="citora-calendar" class="p-4" wire:ignore></div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-4 mt-4 text-sm">
+    <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-700 dark:text-gray-300">
         <div class="flex items-center gap-2">
             <span class="inline-block w-3 h-3 rounded-full" style="background:#F59E0B"></span>
             <span>Pendiente</span>
@@ -61,7 +61,6 @@
             initCalendar();
         });
 
-        // En caso de navegar por Livewire (no full reload)
         initCalendar();
 
         function initCalendar() {
@@ -70,7 +69,7 @@
             el.dataset.initialized = '1';
 
             const calendar = new FullCalendar.Calendar(el, {
-                initialView: 'timeGridWeek',
+                initialView: 'dayGridMonth',
                 locale: 'es',
                 firstDay: 1,
                 headerToolbar: {
@@ -90,6 +89,7 @@
                 allDaySlot: false,
                 nowIndicator: true,
                 height: 'auto',
+                dayMaxEventRows: 3,
                 eventTimeFormat: {
                     hour: 'numeric',
                     minute: '2-digit',

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Appointments\Pages;
 
+use App\Filament\Pages\AppointmentsCalendar;
 use App\Filament\Resources\Appointments\AppointmentResource;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -18,7 +19,7 @@ class ListAppointments extends ListRecords
                 ->label('Ver calendario')
                 ->icon('heroicon-o-calendar-days')
                 ->color('gray')
-                ->url(AppointmentResource::getUrl('calendar')),
+                ->url(AppointmentsCalendar::getUrl()),
             CreateAction::make(),
         ];
     }
