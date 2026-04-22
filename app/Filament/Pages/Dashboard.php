@@ -6,6 +6,7 @@ use App\Filament\Widgets\AppointmentsChart;
 use App\Filament\Widgets\PlanUsageWidget;
 use App\Filament\Widgets\ServicePopularityChart;
 use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\TodayAppointments;
 use App\Filament\Widgets\UpcomingAppointments;
 use Filament\Pages\Dashboard as BaseDashboard;
 
@@ -67,6 +68,7 @@ class Dashboard extends BaseDashboard
         if ($user->hasRole('super_admin')) {
             return [
                 StatsOverview::class,
+                TodayAppointments::class,
                 AppointmentsChart::class,
                 UpcomingAppointments::class,
             ];
@@ -75,6 +77,7 @@ class Dashboard extends BaseDashboard
         return [
             PlanUsageWidget::class,
             StatsOverview::class,
+            TodayAppointments::class,
             AppointmentsChart::class,
             ServicePopularityChart::class,
             UpcomingAppointments::class,
