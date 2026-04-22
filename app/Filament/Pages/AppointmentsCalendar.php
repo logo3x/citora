@@ -73,12 +73,7 @@ class AppointmentsCalendar extends Page
         }
 
         return $query->get()->map(function (Appointment $appointment): array {
-            $colorByStatus = match ($appointment->status) {
-                AppointmentStatus::Pending => '#F59E0B',
-                AppointmentStatus::Confirmed => '#2563EB',
-                AppointmentStatus::Completed => '#059669',
-                AppointmentStatus::Cancelled => '#9CA3AF',
-            };
+            $colorByStatus = $appointment->status->hexColor();
 
             return [
                 'id' => $appointment->id,

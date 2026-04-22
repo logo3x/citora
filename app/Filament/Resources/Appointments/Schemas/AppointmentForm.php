@@ -61,7 +61,9 @@ class AppointmentForm
                             ->required(),
                         Select::make('status')
                             ->label('Estado')
-                            ->options(AppointmentStatus::class)
+                            ->options(collect(AppointmentStatus::cases())
+                                ->mapWithKeys(fn (AppointmentStatus $case) => [$case->value => $case->label()])
+                                ->all())
                             ->default(AppointmentStatus::Pending)
                             ->required(),
                     ])

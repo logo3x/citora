@@ -41,12 +41,8 @@ class AppointmentsTable
                 TextColumn::make('status')
                     ->label('Estado')
                     ->badge()
-                    ->color(fn (AppointmentStatus $state): string => match ($state) {
-                        AppointmentStatus::Pending => 'warning',
-                        AppointmentStatus::Confirmed => 'info',
-                        AppointmentStatus::Completed => 'success',
-                        AppointmentStatus::Cancelled => 'danger',
-                    }),
+                    ->formatStateUsing(fn (AppointmentStatus $state): string => $state->label())
+                    ->color(fn (AppointmentStatus $state): string => $state->color()),
                 TextColumn::make('created_at')
                     ->label('Creado')
                     ->dateTime('d/m/Y')
@@ -57,7 +53,9 @@ class AppointmentsTable
             ->filters([
                 SelectFilter::make('status')
                     ->label('Estado')
-                    ->options(AppointmentStatus::class),
+                    ->options(collect(AppointmentStatus::cases())
+                        ->mapWithKeys(fn (AppointmentStatus $case) => [$case->value => $case->label()])
+                        ->all()),
                 SelectFilter::make('service_id')
                     ->label('Servicio')
                     ->relationship('service', 'name'),
