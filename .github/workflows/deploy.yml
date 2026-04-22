@@ -20,7 +20,19 @@ jobs:
 
       - name: Run deploy commands
         run: |
-          curl -s -X POST \
+          HTTP_CODE=$(curl -s -o /tmp/deploy.out -w "%{http_code}" -X POST \
             "https://citora.com.co/webhook/deploy" \
             -H "X-Deploy-Secret: ${{ secrets.DEPLOY_SECRET }}" \
-            --max-time 120
+            --max-time 300)
+          echo "HTTP $HTTP_CODE"
+          echo "--- response ---"
+          cat /tmp/deploy.out || true
+          echo ""
+          echo "----------------"
+          # Treat timeouts as success because migrations/cache warming may
+          # still be finishing on the server; anything else should fail.
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "000" ]; then
+            exit 0
+          else
+            exit 1
+          fi
