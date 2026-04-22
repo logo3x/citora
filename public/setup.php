@@ -121,6 +121,7 @@ $kernel->bootstrap();
                     <a href="?key=<?= $secret ?>&step=email-test" class="btn btn-outline">📧 Enviar email de prueba</a>
                     <a href="?key=<?= $secret ?>&step=whatsapp-test" class="btn btn-outline">📲 Enviar WhatsApp de prueba</a>
                     <a href="?key=<?= $secret ?>&step=gen-secret" class="btn btn-outline">🔐 Generar secret aleatorio</a>
+                    <a href="?key=<?= $secret ?>&step=promote-admin" class="btn btn-outline">👑 Promover webcitora a super_admin</a>
                 </div>
             </div>
 
@@ -137,6 +138,7 @@ $kernel->bootstrap();
                         'email-test' => '📧 Email de prueba',
                         'whatsapp-test' => '📲 WhatsApp de prueba',
                         'gen-secret' => '🔐 Secret aleatorio',
+                        'promote-admin' => '👑 Promover a super_admin',
                         default => '⚙️ Resultado'
                     } ?>
                 </h2>
@@ -226,6 +228,42 @@ $kernel->bootstrap();
                                     echo "   • {$r}\n";
                                 }
                                 echo "\n📬 Revisa las bandejas (y carpetas de spam)\n";
+                            }
+                        }
+                        if ($step === 'promote-admin') {
+                            $targetEmail = 'webcitora@gmail.com';
+
+                            echo "🔍 Buscando usuario {$targetEmail}...\n\n";
+
+                            $user = App\Models\User::where('email', $targetEmail)->first();
+
+                            if (! $user) {
+                                echo "❌ El usuario {$targetEmail} NO existe todavía.\n";
+                                echo "   Solución: inicia sesión en https://citora.com.co usando ese correo (vía Google).\n";
+                                echo "   Luego vuelve a dar clic en este botón.\n";
+                            } else {
+                                echo "✅ Usuario encontrado: {$user->name} (ID: {$user->id})\n\n";
+
+                                // Asegurar que el rol super_admin exista
+                                $role = Spatie\Permission\Models\Role::where('name', 'super_admin')->where('guard_name', 'web')->first();
+
+                                if (! $role) {
+                                    echo "⚙️  El rol super_admin no existe. Ejecutando ShieldSeeder...\n";
+                                    Artisan::call('db:seed', ['--class' => 'ShieldSeeder', '--force' => true]);
+                                    echo Artisan::output()."\n";
+                                    $role = Spatie\Permission\Models\Role::where('name', 'super_admin')->where('guard_name', 'web')->first();
+                                }
+
+                                if (! $role) {
+                                    echo "❌ No se pudo crear/encontrar el rol super_admin. Abortando.\n";
+                                } elseif ($user->hasRole('super_admin')) {
+                                    echo "ℹ️  {$user->email} YA tiene el rol super_admin. Nada que hacer.\n";
+                                } else {
+                                    $user->assignRole('super_admin');
+                                    echo "🎉 ¡Listo! {$user->email} es ahora super_admin.\n";
+                                    echo "   Ya tiene acceso al módulo completo de Administración.\n";
+                                    echo "   Roles actuales: ".implode(', ', $user->fresh()->getRoleNames()->all())."\n";
+                                }
                             }
                         }
                         if ($step === 'gen-secret') {

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Businesses\Tables;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Business;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -29,21 +30,56 @@ class BusinessesTable
                     ->searchable()
                     ->sortable()
                     ->description(fn (Business $record) => $record->slug),
+                TextColumn::make('owner')
+                    ->label('Propietario')
+                    ->getStateUsing(function (Business $record) {
+                        $owner = $record->users()->first();
+
+                        return $owner ? ($owner->display_name ?: $owner->name).' · '.$owner->email : '—';
+                    })
+                    ->wrap()
+                    ->searchable(query: function ($query, string $search) {
+                        $query->whereHas('users', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%")
+                                ->orWhere('display_name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                    }),
                 TextColumn::make('phone')
                     ->label('Teléfono')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('services_count')
                     ->label('Servicios')
                     ->counts('services')
-                    ->sortable(),
+                    ->sortable()
+                    ->alignCenter(),
                 TextColumn::make('employees_count')
                     ->label('Empleados')
                     ->counts('employees')
-                    ->sortable(),
+                    ->sortable()
+                    ->alignCenter(),
                 TextColumn::make('appointments_count')
                     ->label('Citas/mes')
                     ->getStateUsing(fn (Business $record) => $record->getMonthlyAppointmentCount().' / '.$record->monthly_appointment_limit)
-                    ->color(fn (Business $record) => $record->hasReachedMonthlyLimit() ? 'danger' : 'success'),
+                    ->color(fn (Business $record) => $record->hasReachedMonthlyLimit() ? 'danger' : 'success')
+                    ->alignCenter(),
+                TextColumn::make('revenue_month')
+                    ->label('Ingresos del mes')
+                    ->getStateUsing(function (Business $record): string {
+                        $start = now()->startOfMonth();
+                        $end = now()->endOfMonth();
+
+                        $total = $record->appointments()
+                            ->where('status', AppointmentStatus::Completed)
+                            ->whereBetween('starts_at', [$start, $end])
+                            ->join('services', 'appointments.service_id', '=', 'services.id')
+                            ->sum('services.price');
+
+                        return '$'.number_format((int) $total, 0, ',', '.');
+                    })
+                    ->alignEnd()
+                    ->toggleable(),
                 TextColumn::make('plan_status')
                     ->label('Plan')
                     ->getStateUsing(function (Business $record): string {

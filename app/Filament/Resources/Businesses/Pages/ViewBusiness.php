@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Businesses\Pages;
 
+use App\Enums\AppointmentStatus;
 use App\Filament\Resources\Businesses\BusinessResource;
+use App\Models\Appointment;
 use App\Models\Business;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -94,9 +96,44 @@ class ViewBusiness extends ViewRecord
                         TextEntry::make('usage')
                             ->label('Citas del mes')
                             ->getStateUsing(fn (Business $record) => $record->getMonthlyAppointmentCount().' / '.$record->monthly_appointment_limit),
+                        TextEntry::make('revenue_total')
+                            ->label('Ingresos históricos')
+                            ->getStateUsing(function (Business $record): string {
+                                $total = $record->appointments()
+                                    ->where('status', AppointmentStatus::Completed)
+                                    ->join('services', 'appointments.service_id', '=', 'services.id')
+                                    ->sum('services.price');
+
+                                return '$'.number_format((int) $total, 0, ',', '.');
+                            }),
                         TextEntry::make('payments_total')
-                            ->label('Pagos')
+                            ->label('Pagos aprobados')
                             ->getStateUsing(fn (Business $record) => $record->payments()->where('status', 'approved')->count()),
+                    ])
+                    ->columns(2),
+
+                Section::make('Propietario')
+                    ->schema([
+                        TextEntry::make('owner_name')
+                            ->label('Nombre')
+                            ->getStateUsing(function (Business $record): string {
+                                $owner = $record->users()->first();
+
+                                return $owner ? ($owner->display_name ?: $owner->name) : '—';
+                            }),
+                        TextEntry::make('owner_email')
+                            ->label('Correo')
+                            ->getStateUsing(fn (Business $record): string => $record->users()->first()?->email ?? '—')
+                            ->copyable(),
+                        TextEntry::make('owner_phone')
+                            ->label('Teléfono')
+                            ->getStateUsing(fn (Business $record): string => $record->users()->first()?->phone ?? '—'),
+                        TextEntry::make('owner_created_at')
+                            ->label('Registro')
+                            ->getStateUsing(fn (Business $record): string => $record->users()->first()?->created_at?->format('d/m/Y H:i') ?? '—'),
+                        TextEntry::make('users_count')
+                            ->label('Total de usuarios del negocio')
+                            ->getStateUsing(fn (Business $record) => $record->users()->count()),
                     ])
                     ->columns(2),
 
@@ -158,6 +195,73 @@ class ViewBusiness extends ViewRecord
                                             ->color(fn (bool $state) => $state ? 'success' : 'danger'),
                                     ])
                                     ->columns(4),
+                            ])
+                            ->collapsible()
+                            ->collapsed(),
+
+                        Section::make('Últimas 10 citas')
+                            ->schema([
+                                RepeatableEntry::make('recent_appointments')
+                                    ->label('')
+                                    ->state(fn (Business $record) => $record->appointments()
+                                        ->with(['customer', 'service', 'employee'])
+                                        ->latest('starts_at')
+                                        ->limit(10)
+                                        ->get()
+                                        ->map(fn (Appointment $a) => [
+                                            'starts_at' => $a->starts_at?->format('d/m/Y H:i') ?? '—',
+                                            'customer' => $a->customer?->name ?? '—',
+                                            'service' => $a->service?->name ?? '—',
+                                            'employee' => $a->employee?->name ?? '—',
+                                            'status_label' => $a->status->label(),
+                                            'status_color' => $a->status->color(),
+                                        ])->all())
+                                    ->schema([
+                                        TextEntry::make('starts_at')->label('Fecha'),
+                                        TextEntry::make('customer')->label('Cliente'),
+                                        TextEntry::make('service')->label('Servicio'),
+                                        TextEntry::make('employee')->label('Empleado'),
+                                        TextEntry::make('status_label')
+                                            ->label('Estado')
+                                            ->badge()
+                                            ->color(fn ($record) => $record['status_color'] ?? 'gray'),
+                                    ])
+                                    ->columns(5),
+                            ])
+                            ->collapsible()
+                            ->collapsed(),
+
+                        Section::make('Historial de pagos ('.$this->record->payments()->count().')')
+                            ->schema([
+                                RepeatableEntry::make('payments')
+                                    ->label('')
+                                    ->state(fn (Business $record) => $record->payments()
+                                        ->latest('created_at')
+                                        ->limit(20)
+                                        ->get()
+                                        ->map(fn ($p) => [
+                                            'reference' => $p->reference ?? '—',
+                                            'provider' => $p->provider ?? '—',
+                                            'amount' => '$'.number_format((int) ($p->amount ?? 0), 0, ',', '.'),
+                                            'status' => $p->status ?? '—',
+                                            'paid_at' => $p->paid_at?->format('d/m/Y H:i') ?? '—',
+                                        ])->all())
+                                    ->schema([
+                                        TextEntry::make('reference')->label('Referencia'),
+                                        TextEntry::make('provider')->label('Proveedor'),
+                                        TextEntry::make('amount')->label('Monto'),
+                                        TextEntry::make('status')
+                                            ->label('Estado')
+                                            ->badge()
+                                            ->color(fn (string $state) => match ($state) {
+                                                'approved' => 'success',
+                                                'pending' => 'warning',
+                                                'rejected', 'failed' => 'danger',
+                                                default => 'gray',
+                                            }),
+                                        TextEntry::make('paid_at')->label('Pagado'),
+                                    ])
+                                    ->columns(5),
                             ])
                             ->collapsible()
                             ->collapsed(),
