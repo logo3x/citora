@@ -93,9 +93,16 @@ Route::get('privacidad', [LegalController::class, 'privacy'])->name('legal.priva
 Route::get('terminos', [LegalController::class, 'terms'])->name('legal.terms');
 
 // Shareable appointment page (short link for SMS notifications)
-Route::get('c/{token}', [AppointmentShareController::class, 'show'])
-    ->where('token', '[a-z0-9]{8}')
-    ->name('appointment.share');
+Route::prefix('c/{token}')
+    ->where(['token' => '[a-z0-9]{8}'])
+    ->group(function () {
+        Route::get('/', [AppointmentShareController::class, 'show'])->name('appointment.share');
+        Route::post('confirmar', [AppointmentShareController::class, 'confirm'])->name('appointment.share.confirm');
+        Route::post('cancelar', [AppointmentShareController::class, 'cancel'])->name('appointment.share.cancel');
+        Route::get('reprogramar', [AppointmentShareController::class, 'rescheduleForm'])->name('appointment.share.reschedule');
+        Route::get('slots', [AppointmentShareController::class, 'rescheduleSlots'])->name('appointment.share.reschedule.slots');
+        Route::post('reprogramar', [AppointmentShareController::class, 'reschedule'])->name('appointment.share.reschedule.save');
+    });
 
 // Export de citas (solo usuarios autenticados con negocio)
 Route::middleware('auth')->group(function () {

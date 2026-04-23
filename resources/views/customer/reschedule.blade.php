@@ -1,8 +1,16 @@
+@php
+    $slotsUrl = $slotsUrl ?? route('customer.reschedule.slots', $appointment);
+    $saveUrl = $saveUrl ?? route('customer.reschedule.save', $appointment);
+    $backUrl = $backUrl ?? route('customer.appointments');
+    $backLabel = $backLabel ?? '← Mis citas';
+    $successRedirect = $successRedirect ?? route('customer.appointments');
+@endphp
+
 <x-layouts.booking title="Reprogramar cita">
 
     <div style="background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);padding:24px 16px">
         <div style="max-width:600px;margin:0 auto">
-            <a href="{{ route('customer.appointments') }}" style="color:#F59E0B;font-size:13px;text-decoration:none;font-weight:600">← Mis citas</a>
+            <a href="{{ $backUrl }}" style="color:#F59E0B;font-size:13px;text-decoration:none;font-weight:600">{{ $backLabel }}</a>
             <h1 style="color:white;font-weight:700;font-size:20px;margin-top:8px;font-family:Poppins,sans-serif">Reprogramar cita</h1>
         </div>
     </div>
@@ -42,7 +50,9 @@
 
     <script>
         const CSRF = document.querySelector('meta[name="csrf-token"]').content;
-        const APPOINTMENT_ID = {{ $appointment->id }};
+        const SLOTS_URL = @json($slotsUrl);
+        const SAVE_URL = @json($saveUrl);
+        const SUCCESS_REDIRECT = @json($successRedirect);
         let selectedDate = null;
         let selectedTime = null;
 
@@ -80,7 +90,7 @@
             loadingEl.style.display = 'block';
 
             try {
-                const res = await fetch(`/mis-citas/${APPOINTMENT_ID}/slots?date=${date}`);
+                const res = await fetch(`${SLOTS_URL}?date=${date}`);
                 const slots = await res.json();
                 loadingEl.style.display = 'none';
 
@@ -119,7 +129,7 @@
             btn.textContent = 'Guardando...';
 
             try {
-                const res = await fetch(`/mis-citas/${APPOINTMENT_ID}/reprogramar`, {
+                const res = await fetch(SAVE_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
                     body: JSON.stringify({ date: selectedDate, time: selectedTime })
@@ -135,7 +145,7 @@
                     confirmButtonColor: '#D97706'
                 });
 
-                window.location.href = '/mis-citas';
+                window.location.href = SUCCESS_REDIRECT;
             } catch (e) {
                 Swal.fire('Error', e.message, 'error');
                 btn.disabled = false;

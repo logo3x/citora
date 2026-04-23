@@ -204,46 +204,47 @@
             </div>
 
             @php
-                $authUser = auth()->user();
-                $isOwner = $authUser && (int) $authUser->business_id === (int) $appointment->business_id;
-                $isCustomer = $authUser && (int) $authUser->id === (int) $appointment->customer_id;
-                $canManage = ! in_array($status, ['cancelled', 'completed']);
+                $canManage = ! in_array($status, ['cancelled', 'completed', 'no_show'])
+                    && $appointment->starts_at > now();
+                $isPending = $status === 'pending';
             @endphp
 
+            @if (session('success'))
+                <div style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:14px;font-weight:500">
+                    ✓ {{ session('success') }}
+                </div>
+            @elseif (session('error'))
+                <div style="background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:14px;font-weight:500">
+                    {{ session('error') }}
+                </div>
+            @elseif (session('info'))
+                <div style="background:#DBEAFE;color:#1E40AF;border:1px solid #93C5FD;border-radius:12px;padding:12px 16px;margin-bottom:12px;font-size:14px;font-weight:500">
+                    {{ session('info') }}
+                </div>
+            @endif
+
             <div class="actions">
-                @if ($canManage && $isOwner)
-                    {{-- Dueño del negocio: acceso al panel --}}
-                    <a href="{{ url('/admin/appointments/'.$appointment->id.'/edit') }}" class="btn btn-primary">
-                        Gestionar en el panel
+                @if ($canManage)
+                    @if ($isPending)
+                        <form method="POST" action="{{ route('appointment.share.confirm', ['token' => $shareToken]) }}" style="display:contents">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">
+                                ✓ Confirmar cita
+                            </button>
+                        </form>
+                    @endif
+
+                    <a href="{{ route('appointment.share.reschedule', ['token' => $shareToken]) }}" class="btn btn-outline">
+                        🔄 Aplazar
                     </a>
-                    <a href="{{ url('/admin/calendario') }}" class="btn btn-outline">
-                        Ver calendario
-                    </a>
-                @elseif ($canManage && $isCustomer)
-                    {{-- Cliente: reprogramar o cancelar --}}
-                    <a href="{{ route('customer.reschedule', $appointment) }}" class="btn btn-primary">
-                        Reprogramar cita
-                    </a>
-                    <form method="POST" action="{{ route('customer.cancel', $appointment) }}" onsubmit="return confirm('¿Seguro que quieres cancelar esta cita?');" style="display:contents">
+
+                    <form method="POST" action="{{ route('appointment.share.cancel', ['token' => $shareToken]) }}" onsubmit="return confirm('¿Seguro que quieres cancelar esta cita?');" style="display:contents">
                         @csrf
                         <button type="submit" class="btn btn-outline" style="color:#DC2626;border-color:#FCA5A5">
-                            Cancelar cita
+                            ✕ Cancelar
                         </button>
                     </form>
-                @elseif (! $authUser && $canManage)
-                    {{-- No autenticado: invitarlo a iniciar sesión --}}
-                    <a href="{{ route('auth.google.redirect', ['redirect_to' => request()->path()]) }}" class="btn btn-primary">
-                        Iniciar sesión para gestionar
-                    </a>
                 @endif
-
-                @auth
-                    @if ($canManage && $isCustomer)
-                        <a href="{{ route('customer.appointments') }}" class="btn btn-outline">
-                            Ver todas mis citas
-                        </a>
-                    @endif
-                @endauth
 
                 <a href="/{{ $appointment->business->slug }}" class="btn btn-outline">
                     Reservar otra cita en {{ $appointment->business->name }}
