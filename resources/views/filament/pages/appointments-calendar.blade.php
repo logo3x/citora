@@ -7,24 +7,77 @@
         <div id="citora-calendar" class="p-4" wire:ignore></div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-700 dark:text-gray-300">
-        <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3 rounded-full" style="background:#F59E0B"></span>
+    <div class="citora-legend">
+        <span class="citora-legend-title">Estados de cita:</span>
+        <span class="citora-legend-item">
+            <span class="citora-legend-dot" style="background:#F59E0B"></span>
             <span>Pendiente</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3 rounded-full" style="background:#2563EB"></span>
+        </span>
+        <span class="citora-legend-item">
+            <span class="citora-legend-dot" style="background:#2563EB"></span>
             <span>Confirmada</span>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="inline-block w-3 h-3 rounded-full" style="background:#059669"></span>
+        </span>
+        <span class="citora-legend-item">
+            <span class="citora-legend-dot" style="background:#059669"></span>
             <span>Completada</span>
-        </div>
+        </span>
+        <span class="citora-legend-item">
+            <span class="citora-legend-dot" style="background:#9CA3AF"></span>
+            <span>Cancelada</span>
+        </span>
+        <span class="citora-legend-item">
+            <span class="citora-legend-dot" style="background:#6B7280"></span>
+            <span>No llegó</span>
+        </span>
+        <span class="citora-legend-item">
+            <span class="citora-legend-dot" style="background:#F97316"></span>
+            <span>Llegó tarde</span>
+        </span>
     </div>
 
     <style>
         #citora-calendar { min-height: 650px; }
         .fc { font-family: 'Inter', sans-serif; }
+        .citora-legend {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: #FFFBEB;
+            border: 1px solid #FDE68A;
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 14px 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #334155;
+        }
+        .dark .citora-legend {
+            background: rgba(217, 119, 6, 0.06);
+            border-color: rgba(245, 158, 11, 0.2);
+            color: #E5E7EB;
+        }
+        .citora-legend-title {
+            font-weight: 700;
+            color: #92400E;
+            margin-right: 4px;
+        }
+        .dark .citora-legend-title { color: #FCD34D; }
+        .citora-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .citora-legend-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.6),
+                        0 1px 3px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
         .fc-button-primary {
             background: #D97706 !important;
             border-color: #D97706 !important;
