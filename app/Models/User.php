@@ -66,6 +66,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Appointment::class, 'customer_id');
     }
 
+    /**
+     * @return HasMany<PushSubscription, $this>
+     */
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
     public function canImpersonate(): bool
     {
         return $this->hasRole('super_admin');

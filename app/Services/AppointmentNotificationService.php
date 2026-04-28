@@ -6,13 +6,17 @@ use App\Contracts\MessagingChannel;
 use App\Mail\AppointmentStatusMail;
 use App\Models\Appointment;
 use App\Models\AppointmentShareToken;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AppointmentNotificationService
 {
-    public function __construct(private MessagingChannel $channel) {}
+    public function __construct(
+        private MessagingChannel $channel,
+        private PushNotificationService $push,
+    ) {}
 
     public function notifyCreated(Appointment $appointment): void
     {
@@ -71,6 +75,15 @@ class AppointmentNotificationService
             $internalVars,
             "🔔 Nueva cita en {$business}. {$customer} - {$service} con {$employee}. {$date} {$time}. {$price}. Gestionar: {$link}"
         );
+
+        $this->sendPushToBusinessUsers($appointment, [
+            'title' => "🔔 Nueva cita · {$customer}",
+            'body' => "{$service} con {$employee} · {$date} {$time}",
+            'icon' => '/images/logo-light.png',
+            'tag' => "appointment-{$appointment->id}",
+            'url' => '/admin/appointments/'.$appointment->id.'/edit',
+            'requireInteraction' => true,
+        ]);
     }
 
     public function notifyCancelled(Appointment $appointment, string $changedBy = 'sistema'): void
@@ -122,6 +135,14 @@ class AppointmentNotificationService
             $vars,
             "❌ Cita cancelada - {$business}. {$customer} - {$service}. {$date} {$time}. {$byLabel}"
         );
+
+        $this->sendPushToBusinessUsers($appointment, [
+            'title' => "❌ Cita cancelada · {$customer}",
+            'body' => "{$service} · {$date} {$time}".($byLabel ? " · {$byLabel}" : ''),
+            'icon' => '/images/logo-light.png',
+            'tag' => "appointment-{$appointment->id}",
+            'url' => '/admin/appointments',
+        ]);
     }
 
     public function notifyCompleted(Appointment $appointment): void
@@ -176,6 +197,14 @@ class AppointmentNotificationService
         $this->sendEmail($appointment->customer->email, $appointment, AppointmentStatusMail::EVENT_RESCHEDULED, AppointmentStatusMail::ROLE_CUSTOMER, $emailExtra);
         $this->sendEmail($appointment->employee?->email, $appointment, AppointmentStatusMail::EVENT_RESCHEDULED, AppointmentStatusMail::ROLE_EMPLOYEE, $emailExtra);
         $this->sendEmail($appointment->business->email, $appointment, AppointmentStatusMail::EVENT_RESCHEDULED, AppointmentStatusMail::ROLE_OWNER, $emailExtra);
+
+        $this->sendPushToBusinessUsers($appointment, [
+            'title' => '🔄 Cita reprogramada',
+            'body' => "{$service} · {$oldDate} {$oldTime} → {$newDate} {$newTime}",
+            'icon' => '/images/logo-light.png',
+            'tag' => "appointment-{$appointment->id}",
+            'url' => '/admin/appointments/'.$appointment->id.'/edit',
+        ]);
     }
 
     public function notifyReminder24h(Appointment $appointment): void
@@ -246,6 +275,14 @@ class AppointmentNotificationService
                 "⏰ {$whenLabel} {$time} cita: {$customer}, {$service}, {$employee}."
             );
         }
+
+        $this->sendPushToBusinessUsers($appointment, [
+            'title' => "⏰ Recordatorio · cita {$whenLabel}",
+            'body' => "{$customer} · {$service} con {$employee} · {$time}",
+            'icon' => '/images/logo-light.png',
+            'tag' => "reminder-{$appointment->id}",
+            'url' => '/admin/appointments/'.$appointment->id.'/edit',
+        ]);
     }
 
     public function notifyBusinessCreated(string $ownerPhone, string $businessName, string $slug): void
@@ -297,6 +334,30 @@ class AppointmentNotificationService
         $token = AppointmentShareToken::generateFor($appointment);
 
         return rtrim(config('app.url'), '/').'/c/'.$token->token;
+    }
+
+    /**
+     * Sends a web push notification to all users (owner + panel users) of the
+     * appointment's business who have a registered subscription.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    private function sendPushToBusinessUsers(Appointment $appointment, array $payload): void
+    {
+        try {
+            $users = User::where('business_id', $appointment->business_id)
+                ->whereHas('pushSubscriptions')
+                ->get();
+
+            foreach ($users as $user) {
+                $this->push->sendToUser($user, $payload);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Push: error enviando a usuarios del negocio', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
