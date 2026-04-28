@@ -55,6 +55,13 @@ class ServiceForm
                         Toggle::make('is_active')
                             ->label('Activo')
                             ->default(true),
+                        Select::make('employees')
+                            ->label('Empleados que pueden realizar este servicio')
+                            ->multiple()
+                            ->relationship('employees', 'name', fn ($query) => $query->where('business_id', auth()->user()->business_id))
+                            ->preload()
+                            ->helperText('⚠️ Si no asignas al menos un empleado, este servicio no aparecerá disponible para reservar.')
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
             ]);
