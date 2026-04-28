@@ -140,7 +140,8 @@
         });
     }
 
-    async function startTour() {
+    async function startTour(opts) {
+        opts = opts || {};
         await loadDriverIfNeeded();
         const driverObj = window.driver.js.driver({
             showProgress: true,
@@ -150,15 +151,29 @@
             prevBtnText: '← Anterior',
             doneBtnText: '✓ Listo',
             steps: buildSteps(),
-            onDestroyed: () => { markComplete(); },
         });
         driverObj.drive();
     }
 
     function autoStartIfFirstTime() {
         if (!window.CitoraTutorial || window.CitoraTutorial.completed) return;
+
+        // Anti-relanzamiento: si el usuario ya vio el tour en esta sesión del
+        // navegador, no lo volvemos a abrir aunque cambie de página antes de
+        // que la BD haya registrado la finalización.
+        try {
+            if (sessionStorage.getItem('citora_tour_shown') === '1') return;
+            sessionStorage.setItem('citora_tour_shown', '1');
+        } catch (_) { /* sessionStorage puede estar bloqueado: seguimos */ }
+
+        // Marcar como completado de inmediato — el usuario ya está viendo el
+        // tour. Si navega a otra página antes de terminarlo, no se relanza.
+        // Para volver a verlo está el botón "Ver tutorial de nuevo" en
+        // Mi negocio.
+        markComplete();
+
         // Pequeño retraso para que Filament termine de pintar el sidebar
-        setTimeout(startTour, 800);
+        setTimeout(() => startTour({ auto: true }), 800);
     }
 
     window.CitoraTour = {
@@ -170,6 +185,7 @@
                     headers: { 'X-CSRF-TOKEN': csrf(), 'Accept': 'application/json' },
                     credentials: 'same-origin',
                 });
+                try { sessionStorage.removeItem('citora_tour_shown'); } catch (_) {}
                 startTour();
             } catch (e) {
                 alert('No se pudo reiniciar el tutorial: ' + e.message);
