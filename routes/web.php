@@ -9,6 +9,7 @@ use App\Http\Controllers\CustomerAppointmentController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\TutorialController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Business;
 use App\Models\Service;
@@ -62,6 +63,12 @@ Route::post('webhook/deploy', [DeployController::class, 'handle'])
 Route::get('cron/reminders', [CronController::class, 'reminders'])
     ->name('cron.reminders')
     ->middleware('throttle:10,1');
+
+// Onboarding tutorial state (auth required)
+Route::middleware('auth')->group(function () {
+    Route::post('admin/tutorial/complete', [TutorialController::class, 'complete'])->name('tutorial.complete');
+    Route::post('admin/tutorial/reset', [TutorialController::class, 'reset'])->name('tutorial.reset');
+});
 
 // Search
 Route::get('buscar', function (Request $request) {

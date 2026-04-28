@@ -70,6 +70,11 @@ class EditMyBusiness extends Page
                         ->body($publicUrl)
                         ->send();
                 }),
+            HeaderAction::make('reset_tutorial')
+                ->label('Ver tutorial de nuevo')
+                ->icon('heroicon-o-academic-cap')
+                ->color('warning')
+                ->action(fn () => $this->js('window.CitoraTour && window.CitoraTour.reset()')),
         ];
     }
 
