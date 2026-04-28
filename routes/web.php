@@ -9,7 +9,6 @@ use App\Http\Controllers\CustomerAppointmentController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\Business;
 use App\Models\Service;
@@ -63,14 +62,6 @@ Route::post('webhook/deploy', [DeployController::class, 'handle'])
 Route::get('cron/reminders', [CronController::class, 'reminders'])
     ->name('cron.reminders')
     ->middleware('throttle:10,1');
-
-// Web push notifications
-Route::get('push/vapid-key', [PushSubscriptionController::class, 'vapidKey'])->name('push.vapid');
-Route::middleware('auth')->group(function () {
-    Route::post('push/subscribe', [PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
-    Route::post('push/unsubscribe', [PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
-    Route::post('push/test', [PushSubscriptionController::class, 'test'])->name('push.test');
-});
 
 // Search
 Route::get('buscar', function (Request $request) {
