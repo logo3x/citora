@@ -110,51 +110,20 @@ $kernel->bootstrap();
             </div>
 
             <div class="card">
-                <h2>📦 Setup base</h2>
-                <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Ejecuta esto al desplegar el proyecto por primera vez o cuando subas migraciones nuevas.</p>
+                <h2>🚀 Acciones</h2>
                 <div class="actions">
                     <a href="?key=<?= $secret ?>&step=key" class="btn btn-outline">🔑 Generar App Key</a>
                     <a href="?key=<?= $secret ?>&step=migrate" class="btn btn-primary">📦 Ejecutar migraciones</a>
                     <a href="?key=<?= $secret ?>&step=seed" class="btn btn-outline">🌱 Ejecutar seeders</a>
                     <a href="?key=<?= $secret ?>&step=storage" class="btn btn-outline">🔗 Crear Storage Link</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>⚡ Cache</h2>
-                <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Después de cambiar <code>.env</code>, rutas o vistas, limpia la caché para que tome efecto.</p>
-                <div class="actions">
-                    <a href="?key=<?= $secret ?>&step=clear" class="btn btn-primary">🧹 Limpiar toda la cache</a>
-                    <a href="?key=<?= $secret ?>&step=cache" class="btn btn-outline">⚡ Cachear config y rutas (producción)</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🔔 Notificaciones push (web)</h2>
-                <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Configuración inicial de Web Push: genera las claves VAPID y pégalas en <code>.env</code>.</p>
-                <div class="actions">
-                    <a href="?key=<?= $secret ?>&step=push-vapid" class="btn btn-primary">🔐 Generar claves VAPID</a>
-                    <a href="?key=<?= $secret ?>&step=push-status" class="btn btn-outline">📊 Estado de suscripciones push</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>🔍 Diagnóstico</h2>
-                <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Herramientas para investigar por qué algo no llega a destino.</p>
-                <div class="actions">
-                    <a href="?key=<?= $secret ?>&step=reminders-diagnose" class="btn btn-outline">🔍 Diagnosticar recordatorios</a>
-                    <a href="?key=<?= $secret ?>&step=reminders-run" class="btn btn-outline">▶️ Ejecutar recordatorios ahora</a>
+                    <a href="?key=<?= $secret ?>&step=cache" class="btn btn-outline">⚡ Cachear config y rutas</a>
+                    <a href="?key=<?= $secret ?>&step=clear" class="btn btn-outline">🧹 Limpiar toda la cache</a>
                     <a href="?key=<?= $secret ?>&step=email-test" class="btn btn-outline">📧 Enviar email de prueba</a>
                     <a href="?key=<?= $secret ?>&step=whatsapp-test" class="btn btn-outline">📲 Enviar WhatsApp de prueba</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>👑 Administración</h2>
-                <p style="font-size:12px;color:#6b7280;margin-bottom:10px">Acciones puntuales sobre usuarios y secretos.</p>
-                <div class="actions">
-                    <a href="?key=<?= $secret ?>&step=promote-admin" class="btn btn-outline">👑 Promover webcitora a super_admin</a>
                     <a href="?key=<?= $secret ?>&step=gen-secret" class="btn btn-outline">🔐 Generar secret aleatorio</a>
+                    <a href="?key=<?= $secret ?>&step=promote-admin" class="btn btn-outline">👑 Promover webcitora a super_admin</a>
+                    <a href="?key=<?= $secret ?>&step=reminders-diagnose" class="btn btn-outline">🔍 Diagnosticar recordatorios</a>
+                    <a href="?key=<?= $secret ?>&step=reminders-run" class="btn btn-outline">▶️ Ejecutar recordatorios ahora</a>
                 </div>
             </div>
 
@@ -174,8 +143,6 @@ $kernel->bootstrap();
                         'promote-admin' => '👑 Promover a super_admin',
                         'reminders-diagnose' => '🔍 Diagnóstico de recordatorios',
                         'reminders-run' => '▶️ Ejecución manual de recordatorios',
-                        'push-vapid' => '🔐 Generar claves VAPID',
-                        'push-status' => '📊 Estado de suscripciones push',
                         default => '⚙️ Resultado'
                     } ?>
                 </h2>
@@ -408,84 +375,6 @@ $kernel->bootstrap();
                             }
                             echo "\n".str_repeat('=', 60)."\n";
                             echo "✅ Hecho. Vuelve a 🔍 Diagnosticar recordatorios para ver si las citas quedan marcadas como enviadas.\n";
-                        }
-                        if ($step === 'push-vapid') {
-                            echo "🔐 GENERANDO CLAVES VAPID PARA WEB PUSH\n";
-                            echo str_repeat('=', 60)."\n\n";
-
-                            $existingPublic = config('services.webpush.public_key');
-                            $existingPrivate = config('services.webpush.private_key');
-
-                            if ($existingPublic && $existingPrivate) {
-                                echo "⚠️  Ya existen claves VAPID en tu configuración:\n\n";
-                                echo "   VAPID_PUBLIC_KEY  = ".substr($existingPublic, 0, 20)."…\n";
-                                echo "   VAPID_PRIVATE_KEY = (oculta — ya configurada)\n\n";
-                                echo "ℹ️  Si las regeneras, TODAS las suscripciones push existentes\n";
-                                echo "   dejarán de funcionar y los usuarios deberán reactivarlas.\n\n";
-                                echo "   Si necesitas regenerar a la fuerza, borra las claves del .env\n";
-                                echo "   primero, limpia caché y vuelve a entrar aquí.\n";
-                            } elseif (! class_exists(\Minishlink\WebPush\VAPID::class)) {
-                                echo "❌ La librería minishlink/web-push NO está instalada.\n";
-                                echo "   El paquete debería venir con el último pull de git.\n";
-                                echo "   Si no lo tiene, ejecuta en cPanel Terminal:\n";
-                                echo "      cd ~/public_html && composer install --no-dev --optimize-autoloader\n";
-                            } else {
-                                $keys = \Minishlink\WebPush\VAPID::createVapidKeys();
-
-                                echo "✅ Claves generadas correctamente.\n\n";
-                                echo "📋 Copia estas 3 líneas y pégalas al final de tu .env:\n\n";
-                                echo "----------------------------------------------------------\n";
-                                echo "VAPID_PUBLIC_KEY={$keys['publicKey']}\n";
-                                echo "VAPID_PRIVATE_KEY={$keys['privateKey']}\n";
-                                echo "VAPID_SUBJECT=mailto:contacto@citora.com.co\n";
-                                echo "----------------------------------------------------------\n\n";
-                                echo "📌 Después de pegarlas:\n";
-                                echo "   1. Guarda el .env\n";
-                                echo "   2. Vuelve aquí y haz click en 🧹 Limpiar toda la cache\n";
-                                echo "   3. Entra a /admin/notificaciones-push y prueba activar\n\n";
-                                echo "⚠️  IMPORTANTE: NUNCA compartas la PRIVATE KEY ni la subas a git.\n";
-                            }
-                        }
-                        if ($step === 'push-status') {
-                            echo "📊 ESTADO DE SUSCRIPCIONES WEB PUSH\n";
-                            echo str_repeat('=', 60)."\n\n";
-
-                            // 1. Tabla existe?
-                            echo "1️⃣  Tabla push_subscriptions:\n";
-                            $tableExists = \Illuminate\Support\Facades\Schema::hasTable('push_subscriptions');
-                            echo "   • Existe: ".($tableExists ? '✅' : '❌ FALTA — corre 📦 Ejecutar migraciones')."\n\n";
-
-                            if (! $tableExists) {
-                                echo "Ejecuta primero las migraciones para que esta sección funcione.\n";
-                            } else {
-                                // 2. VAPID configuradas?
-                                echo "2️⃣  Configuración VAPID:\n";
-                                $publicKey = config('services.webpush.public_key');
-                                $privateKey = config('services.webpush.private_key');
-                                $subject = config('services.webpush.subject');
-                                echo "   • VAPID_PUBLIC_KEY:  ".($publicKey ? '✅ '.substr($publicKey, 0, 20).'…' : '❌ FALTA — usa botón 🔐 Generar claves VAPID')."\n";
-                                echo "   • VAPID_PRIVATE_KEY: ".($privateKey ? '✅ presente' : '❌ FALTA')."\n";
-                                echo "   • VAPID_SUBJECT:     ".($subject ?: '❌ FALTA')."\n\n";
-
-                                // 3. Suscripciones registradas
-                                echo "3️⃣  Suscripciones activas:\n";
-                                $total = \App\Models\PushSubscription::count();
-                                echo "   • Total: {$total}\n\n";
-
-                                if ($total > 0) {
-                                    $subs = \App\Models\PushSubscription::with('user')->latest()->limit(10)->get();
-                                    echo "   Últimas 10:\n";
-                                    foreach ($subs as $sub) {
-                                        $user = $sub->user?->email ?? '(usuario eliminado)';
-                                        $ua = $sub->user_agent ? substr($sub->user_agent, 0, 60) : '';
-                                        $last = $sub->last_used_at?->diffForHumans() ?? 'nunca';
-                                        echo "   #{$sub->id} · {$user} · usado: {$last}\n";
-                                        if ($ua) {
-                                            echo "          UA: {$ua}\n";
-                                        }
-                                    }
-                                }
-                            }
                         }
                         if ($step === 'gen-secret') {
                             $hex64 = bin2hex(random_bytes(32));      // 64 chars hex
