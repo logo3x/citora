@@ -122,6 +122,8 @@ $kernel->bootstrap();
                     <a href="?key=<?= $secret ?>&step=whatsapp-test" class="btn btn-outline">📲 Enviar WhatsApp de prueba</a>
                     <a href="?key=<?= $secret ?>&step=gen-secret" class="btn btn-outline">🔐 Generar secret aleatorio</a>
                     <a href="?key=<?= $secret ?>&step=promote-admin" class="btn btn-outline">👑 Promover webcitora a super_admin</a>
+                    <a href="?key=<?= $secret ?>&step=reminders-diagnose" class="btn btn-outline">🔍 Diagnosticar recordatorios</a>
+                    <a href="?key=<?= $secret ?>&step=reminders-run" class="btn btn-outline">▶️ Ejecutar recordatorios ahora</a>
                 </div>
             </div>
 
@@ -139,6 +141,8 @@ $kernel->bootstrap();
                         'whatsapp-test' => '📲 WhatsApp de prueba',
                         'gen-secret' => '🔐 Secret aleatorio',
                         'promote-admin' => '👑 Promover a super_admin',
+                        'reminders-diagnose' => '🔍 Diagnóstico de recordatorios',
+                        'reminders-run' => '▶️ Ejecución manual de recordatorios',
                         default => '⚙️ Resultado'
                     } ?>
                 </h2>
@@ -265,6 +269,112 @@ $kernel->bootstrap();
                                     echo "   Roles actuales: ".implode(', ', $user->fresh()->getRoleNames()->all())."\n";
                                 }
                             }
+                        }
+                        if ($step === 'reminders-diagnose') {
+                            echo "🔍 DIAGNÓSTICO DE RECORDATORIOS\n";
+                            echo str_repeat('=', 60)."\n\n";
+
+                            // 1. Verificar columnas en la BD
+                            echo "1️⃣  Columnas anti-duplicado en appointments:\n";
+                            $hasCol24 = \Illuminate\Support\Facades\Schema::hasColumn('appointments', 'reminder_24h_sent_at');
+                            $hasCol1 = \Illuminate\Support\Facades\Schema::hasColumn('appointments', 'reminder_1h_sent_at');
+                            echo "   • reminder_24h_sent_at: ".($hasCol24 ? '✅' : '❌ FALTA')."\n";
+                            echo "   • reminder_1h_sent_at: ".($hasCol1 ? '✅' : '❌ FALTA')."\n\n";
+
+                            // 2. Citas próximas en las próximas 25 horas
+                            echo "2️⃣  Citas pendientes/confirmadas en las próximas 25h:\n";
+                            $upcoming = App\Models\Appointment::with(['service', 'employee', 'customer', 'business'])
+                                ->whereIn('status', [App\Enums\AppointmentStatus::Pending, App\Enums\AppointmentStatus::Confirmed])
+                                ->whereBetween('starts_at', [now(), now()->addHours(25)])
+                                ->orderBy('starts_at')
+                                ->limit(20)
+                                ->get();
+
+                            if ($upcoming->isEmpty()) {
+                                echo "   ⚠️  Ninguna. Sin citas no se mandan recordatorios.\n";
+                            } else {
+                                foreach ($upcoming as $a) {
+                                    $hours = round(now()->diffInMinutes($a->starts_at, false) / 60, 1);
+                                    $r24 = $a->reminder_24h_sent_at ? '✅ '.$a->reminder_24h_sent_at->format('d/m H:i') : '❌';
+                                    $r1 = $a->reminder_1h_sent_at ? '✅ '.$a->reminder_1h_sent_at->format('d/m H:i') : '❌';
+                                    echo "   #{$a->id} | {$a->starts_at->format('d/m H:i')} (en {$hours}h) | ".($a->customer->name ?? '?')." → ".($a->employee->name ?? '?')."\n";
+                                    echo "      24h sent: {$r24}  |  1h sent: {$r1}\n";
+                                }
+                            }
+                            echo "\n";
+
+                            // 3. Configuración Twilio
+                            echo "3️⃣  Configuración mensajería:\n";
+                            $sid = config('services.twilio.sid');
+                            $token = config('services.twilio.auth_token');
+                            $channel = config('services.twilio.channel');
+                            $from = config('services.twilio.whatsapp_from');
+                            $tplCustomer = config('services.twilio.templates.appointment.reminder.customer');
+                            $tplInternal = config('services.twilio.templates.appointment.reminder.internal');
+                            echo "   • TWILIO_SID: ".($sid ? '✅ '.substr($sid, 0, 10).'…' : '❌ FALTA')."\n";
+                            echo "   • TWILIO_AUTH_TOKEN: ".($token ? '✅ presente' : '❌ FALTA')."\n";
+                            echo "   • TWILIO_CHANNEL: {$channel}\n";
+                            echo "   • TWILIO_WHATSAPP_FROM: ".($from ?: '❌ FALTA')."\n";
+                            echo "   • Template REMINDER_CUSTOMER: ".($tplCustomer ?: '❌ FALTA')."\n";
+                            echo "   • Template REMINDER_INTERNAL: ".($tplInternal ?: '❌ FALTA')."\n\n";
+
+                            // 4. Últimas líneas de log filtradas
+                            echo "4️⃣  Últimas líneas del log relacionadas con reminders/whatsapp:\n";
+                            $logFile = storage_path('logs/laravel.log');
+                            if (file_exists($logFile)) {
+                                $lines = [];
+                                $fp = fopen($logFile, 'r');
+                                fseek($fp, max(0, filesize($logFile) - 50000));
+                                while (! feof($fp)) {
+                                    $line = fgets($fp);
+                                    if ($line && preg_match('/reminder|recordatorio|whatsapp|twilio|cron/i', $line)) {
+                                        $lines[] = trim($line);
+                                    }
+                                }
+                                fclose($fp);
+                                if (empty($lines)) {
+                                    echo "   ⚠️  Sin entradas. Probablemente el cron NO ha corrido aún.\n";
+                                } else {
+                                    foreach (array_slice($lines, -15) as $l) {
+                                        echo '   '.substr($l, 0, 200)."\n";
+                                    }
+                                }
+                            } else {
+                                echo "   ❌ {$logFile} no existe\n";
+                            }
+                            echo "\n";
+
+                            // 5. Cron-reminders log (si lo configuraste con > log)
+                            echo "5️⃣  Log específico del cron (cron-reminders.log):\n";
+                            $cronLog = storage_path('logs/cron-reminders.log');
+                            if (file_exists($cronLog)) {
+                                $content = file_get_contents($cronLog);
+                                $tail = array_slice(explode("\n", $content), -20);
+                                echo "   ".implode("\n   ", $tail)."\n";
+                            } else {
+                                echo "   ℹ️  No existe (opcional). Configúralo en cron de cPanel con: > storage/logs/cron-reminders.log 2>&1\n";
+                            }
+                            echo "\n";
+
+                            echo str_repeat('=', 60)."\n";
+                            echo "✅ Diagnóstico completo. Si ves citas con 24h sent: ❌\n";
+                            echo "   y el horario está dentro de la ventana correcta, prueba el botón\n";
+                            echo "   ▶️ Ejecutar recordatorios ahora para forzar el envío.\n";
+                        }
+                        if ($step === 'reminders-run') {
+                            echo "▶️  EJECUTANDO COMANDO send-appointment-reminders MANUALMENTE\n";
+                            echo str_repeat('=', 60)."\n\n";
+
+                            Artisan::call('appointments:send-reminders', [], new Symfony\Component\Console\Output\BufferedOutput);
+                            $output = Artisan::output();
+
+                            if (trim($output) === '') {
+                                echo "✅ Comando ejecutado sin output. Revisa storage/logs/laravel.log para detalles.\n";
+                            } else {
+                                echo $output;
+                            }
+                            echo "\n".str_repeat('=', 60)."\n";
+                            echo "✅ Hecho. Vuelve a 🔍 Diagnosticar recordatorios para ver si las citas quedan marcadas como enviadas.\n";
                         }
                         if ($step === 'gen-secret') {
                             $hex64 = bin2hex(random_bytes(32));      // 64 chars hex
