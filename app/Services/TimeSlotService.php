@@ -190,6 +190,11 @@ class TimeSlotService
     }
 
     /**
+     * Generates contiguous slots starting at $start, stepping by the service
+     * duration so consecutive offers do not overlap. A 15-minute floor keeps
+     * granularity sane for very short services (e.g. a 5-min trim should
+     * still appear every 15 min, not every 5).
+     *
      * @return array<string, string>
      */
     private function generateSlots(Carbon $start, Carbon $end, int $duration): array
@@ -198,6 +203,7 @@ class TimeSlotService
         $current = $start->copy();
         $lastSlot = $end->copy()->subMinutes($duration);
         $now = Carbon::now();
+        $step = max($duration, 15);
 
         while ($current <= $lastSlot) {
             if ($current > $now) {
@@ -205,7 +211,7 @@ class TimeSlotService
                 $slots[$time] = $current->format('g:i A');
             }
 
-            $current->addMinutes(15);
+            $current->addMinutes($step);
         }
 
         return $slots;
