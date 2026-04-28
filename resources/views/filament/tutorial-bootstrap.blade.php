@@ -9,4 +9,4 @@
         completed: {{ $tutorialCompleted ? 'true' : 'false' }},
     };
 </script>
-<script src="/js/citora-tour.js?v=1"></script>
+<script src="/js/citora-tour.js?v=3"></script>
