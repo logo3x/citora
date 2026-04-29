@@ -40,10 +40,10 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->brandName(fn (): string => auth()->user()?->business?->name ?? 'Citora')
-            ->brandLogo(fn (): string => $this->resolveBrandLogo(asset('images/logo-mark.svg')))
-            ->darkModeBrandLogo(fn (): string => $this->resolveBrandLogo(asset('images/logo-mark-dark-bg.svg')))
+            ->brandLogo(fn (): string => $this->resolveBrandLogo(asset('images/logo-mark.png')))
+            ->darkModeBrandLogo(fn (): string => $this->resolveBrandLogo(asset('images/logo-mark-dark.png')))
             ->brandLogoHeight('2.25rem')
-            ->favicon(asset('images/favicon.svg'))
+            ->favicon(asset('images/favicon-32.png'))
             ->font('Inter')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
