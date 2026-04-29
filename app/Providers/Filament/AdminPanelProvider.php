@@ -40,10 +40,10 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Orange,
                 'gray' => Color::Slate,
             ])
-            ->brandName(fn (): string => auth()->user()?->business?->name ?? 'Citora')
-            ->brandLogo(fn (): string => $this->resolveBrandLogo(AssetVersion::url('images/logo-mark.png')))
-            ->darkModeBrandLogo(fn (): string => $this->resolveBrandLogo(AssetVersion::url('images/logo-mark-dark.png')))
-            ->brandLogoHeight('2.25rem')
+            ->brandName(fn (): string => $this->resolveBrandName())
+            ->brandLogo(fn (): string => $this->resolveBrandLogo(AssetVersion::url('images/logo-light.png')))
+            ->darkModeBrandLogo(fn (): string => $this->resolveBrandLogo(AssetVersion::url('images/logo-dark.png')))
+            ->brandLogoHeight('4rem')
             ->favicon(AssetVersion::url('images/favicon-32.png'))
             ->font('Inter')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -102,5 +102,21 @@ class AdminPanelProvider extends PanelProvider
         }
 
         return $fallback;
+    }
+
+    /**
+     * When a business has uploaded its own logo (which usually already
+     * contains its name) we hide the brand text to avoid duplication.
+     * Otherwise we fall back to the Citora wordmark.
+     */
+    private function resolveBrandName(): string
+    {
+        $business = auth()->user()?->business;
+
+        if ($business && $business->hasMedia('logo')) {
+            return '';
+        }
+
+        return 'Citora';
     }
 }
