@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citora — La forma inteligente de gestionar tu agenda</title>
     <meta name="description" content="Plataforma SaaS para gestión de citas en barberías, salones de belleza y centros estéticos. Reservas online, WhatsApp automático y panel de control.">
-    <link rel="icon" href="/images/logo-light.png" type="image/png">
+    <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="/images/logo-light.png" type="image/png">
     @vite(['resources/css/app.css'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -556,7 +557,7 @@
     <nav class="nav-glass" id="main-nav">
         <div style="max-width:1140px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
             <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-                <img src="/images/logo-light.png" alt="Citora" style="height:30px;mix-blend-mode:multiply" onerror="this.style.display='none'">
+                <img src="/images/logo-mark.svg" alt="Citora" style="height:30px" onerror="this.src='/images/logo-light.png'">
                 <span style="font-size:20px;font-weight:800;color:var(--slate-900);font-family:Poppins,sans-serif;letter-spacing:-0.02em">Citora</span>
             </a>
             <div class="nav-actions" style="display:flex;align-items:center;gap:8px;font-size:13px">
@@ -1103,7 +1104,7 @@
         <div style="max-width:1140px;margin:0 auto">
             <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px">
                 <div style="display:flex;align-items:center;gap:10px">
-                    <img src="/images/logo-dark.png" alt="Citora" style="height:28px;mix-blend-mode:lighten" onerror="this.style.display='none'">
+                    <img src="/images/logo-mark-dark-bg.svg" alt="Citora" style="height:28px" onerror="this.src='/images/logo-dark.png'">
                     <span style="color:white;font-weight:800;font-size:18px;font-family:Poppins;letter-spacing:-0.02em">Citora</span>
                 </div>
                 <p style="font-size:13px;color:var(--slate-400)">&copy; {{ date('Y') }} Citora. Todos los derechos reservados.</p>

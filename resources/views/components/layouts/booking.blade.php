@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Reservar cita' }} - Citora</title>
-    <link rel="icon" href="/images/logo-light.png" type="image/png">
+    <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="/images/logo-light.png" type="image/png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <style>
@@ -26,7 +27,7 @@
     <div style="background:white;border-bottom:1px solid #E7E5DF;padding:8px 16px">
         <div style="max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between">
             <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none">
-                <img src="/images/logo-light.png" alt="Citora" style="height:24px" onerror="this.style.display='none'">
+                <img src="/images/logo-mark.svg" alt="Citora" style="height:24px" onerror="this.src='/images/logo-light.png'">
                 <span style="font-weight:700;font-size:14px;color:#0F172A;font-family:Poppins,sans-serif">Citora</span>
             </a>
             <div style="display:flex;align-items:center;gap:14px;font-size:13px">
