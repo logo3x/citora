@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\Login;
 use App\Http\Middleware\EnsureBusinessOnboarded;
+use App\Support\AssetVersion;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -39,11 +40,11 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Orange,
                 'gray' => Color::Slate,
             ])
-            ->brandName('Citora')
-            ->brandLogo(asset('images/logo-light.png'))
-            ->darkModeBrandLogo(asset('images/logo-dark.png'))
-            ->brandLogoHeight('2.5rem')
-            ->favicon(asset('images/logo-light.png'))
+            ->brandName(fn (): string => auth()->user()?->business?->name ?? 'Citora')
+            ->brandLogo(fn (): string => $this->resolveBrandLogo(AssetVersion::url('images/logo-mark.png')))
+            ->darkModeBrandLogo(fn (): string => $this->resolveBrandLogo(AssetVersion::url('images/logo-mark-dark.png')))
+            ->brandLogoHeight('2.25rem')
+            ->favicon(AssetVersion::url('images/favicon-32.png'))
             ->font('Inter')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -83,8 +84,23 @@ class AdminPanelProvider extends PanelProvider
                 fn (): View => view('filament.google-login-button'),
             )
             ->renderHook(
+                PanelsRenderHook::SIDEBAR_NAV_START,
+                fn (): View => view('filament.powered-by-citora'),
+            )
+            ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn (): View => view('filament.tutorial-bootstrap'),
             );
+    }
+
+    private function resolveBrandLogo(string $fallback): string
+    {
+        $business = auth()->user()?->business;
+
+        if ($business && $business->hasMedia('logo')) {
+            return $business->getFirstMediaUrl('logo');
+        }
+
+        return $fallback;
     }
 }

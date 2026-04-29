@@ -5,7 +5,8 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "logo:build": "node scripts/generate-logo-pngs.mjs"
+        "logo:build": "node scripts/generate-logo-pngs.mjs",
+        "logo:build:raster": "node scripts/generate-logo-from-raster.mjs"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

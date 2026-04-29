@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Citora' }}</title>
     <meta name="description" content="{{ $description ?? 'Citora - Plataforma SaaS de gestión de citas' }}">
-    <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
-    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="@vasset('images/favicon-32.png')">
+    <link rel="icon" type="image/png" sizes="16x16" href="@vasset('images/favicon-16.png')">
+    <link rel="apple-touch-icon" href="@vasset('images/favicon-180.png')">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -65,7 +65,7 @@
     <header class="header">
         <div class="header-inner">
             <a href="/" class="brand">
-                <img src="/images/logo-mark-dark-bg.svg" alt="Citora" onerror="this.src='/images/logo-dark.png'">
+                <img src="@vasset('images/logo-mark-dark.png')" alt="Citora">
                 <span>Citora</span>
             </a>
             <a href="/" class="back-link">← Volver al inicio</a>
