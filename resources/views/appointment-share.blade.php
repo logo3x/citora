@@ -7,9 +7,9 @@
     <title>Tu cita en {{ $appointment->business->name }} — Citora</title>
     <meta name="description" content="Detalles de tu cita de {{ $appointment->service->name }} en {{ $appointment->business->name }}.">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16.png">
-    <link rel="apple-touch-icon" href="/images/favicon-180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="@vasset('images/favicon-32.png')">
+    <link rel="icon" type="image/png" sizes="16x16" href="@vasset('images/favicon-16.png')">
+    <link rel="apple-touch-icon" href="@vasset('images/favicon-180.png')">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {

@@ -8,6 +8,7 @@ use App\Services\HablameSmsService;
 use App\Services\SmsService;
 use App\Services\WhatsAppService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\Models\Role;
@@ -30,5 +31,10 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! app()->isProduction());
 
         Gate::policy(Role::class, RolePolicy::class);
+
+        // Cache-busting asset helper: @vasset('images/logo-mark.png')
+        Blade::directive('vasset', function (string $expression): string {
+            return "<?php echo \\App\\Support\\AssetVersion::url($expression); ?>";
+        });
     }
 }
