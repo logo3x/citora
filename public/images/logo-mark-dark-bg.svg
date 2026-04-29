@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 618" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="240 40 580 358" fill="none">
   <title>Citora — isotipo (fondo oscuro)</title>
 
-  <g transform="translate(150, 0)">
-    <!-- Anillas -->
-    <rect x="316" y="62" width="14" height="40" rx="7" fill="#FFFFFF"/>
-    <rect x="413" y="62" width="14" height="40" rx="7" fill="#FFFFFF"/>
-    <rect x="510" y="62" width="14" height="40" rx="7" fill="#FFFFFF"/>
+  <!-- Anillas -->
+  <rect x="316" y="62" width="14" height="40" rx="7" fill="#FFFFFF"/>
+  <rect x="413" y="62" width="14" height="40" rx="7" fill="#FFFFFF"/>
+  <rect x="510" y="62" width="14" height="40" rx="7" fill="#FFFFFF"/>
 
-    <!-- Calendario -->
-    <rect x="260" y="80" width="320" height="198" rx="26"
-          fill="none" stroke="#FFFFFF" stroke-width="20"/>
-    <rect x="298" y="158" width="42" height="42" rx="6" fill="#E8843A"/>
-    <rect x="298" y="212" width="42" height="42" rx="6" fill="#2DB5A8"/>
-    <rect x="352" y="212" width="42" height="42" rx="6" fill="#5C8FCF"/>
+  <!-- Calendario -->
+  <rect x="260" y="80" width="320" height="198" rx="26"
+        fill="none" stroke="#FFFFFF" stroke-width="20"/>
+  <rect x="298" y="158" width="42" height="42" rx="6" fill="#E8843A"/>
+  <rect x="298" y="212" width="42" height="42" rx="6" fill="#2DB5A8"/>
+  <rect x="352" y="212" width="42" height="42" rx="6" fill="#5C8FCF"/>
 
-    <!-- Reloj -->
-    <circle cx="620" cy="260" r="122" fill="none" stroke="#FFFFFF" stroke-width="20"/>
-    <line x1="620" y1="152" x2="620" y2="166" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
-    <line x1="620" y1="354" x2="620" y2="368" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
-    <line x1="512" y1="260" x2="526" y2="260" stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
-    <line x1="714" y1="260" x2="728" y2="260" stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
-    <line x1="620" y1="260" x2="620" y2="198" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
-    <line x1="620" y1="260" x2="682" y2="260" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
-    <circle cx="620" cy="260" r="7" fill="#FFFFFF"/>
+  <!-- Reloj -->
+  <circle cx="620" cy="260" r="122" fill="none" stroke="#FFFFFF" stroke-width="20"/>
+  <line x1="620" y1="152" x2="620" y2="166" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <line x1="620" y1="354" x2="620" y2="368" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <line x1="512" y1="260" x2="526" y2="260" stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="714" y1="260" x2="728" y2="260" stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="620" y1="260" x2="620" y2="198" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <line x1="620" y1="260" x2="682" y2="260" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="620" cy="260" r="7" fill="#FFFFFF"/>
 
-    <!-- Check -->
-    <circle cx="735" cy="135" r="75" fill="#2DB5A8"/>
-    <polyline points="700,135 727,162 772,112"
-              fill="none" stroke="#FFFFFF" stroke-width="16"
-              stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
+  <!-- Check -->
+  <circle cx="735" cy="135" r="75" fill="#2DB5A8"/>
+  <polyline points="700,135 727,162 772,112"
+            fill="none" stroke="#FFFFFF" stroke-width="16"
+            stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
