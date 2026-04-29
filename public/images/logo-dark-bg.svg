@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+  <title>Citora — versión sobre fondo oscuro</title>
+  <desc>Logo de Citora construido sobre la proporción áurea (φ = 1.618), variante para fondos oscuros.</desc>
+
+  <!-- Anillas del calendario -->
+  <rect x="316" y="222" width="14" height="40" rx="7" fill="#FFFFFF"/>
+  <rect x="413" y="222" width="14" height="40" rx="7" fill="#FFFFFF"/>
+  <rect x="510" y="222" width="14" height="40" rx="7" fill="#FFFFFF"/>
+
+  <!-- Cuerpo del calendario -->
+  <rect x="260" y="240" width="320" height="198" rx="26"
+        fill="none" stroke="#FFFFFF" stroke-width="20"/>
+
+  <!-- Cuadrículas internas -->
+  <rect x="298" y="318" width="42" height="42" rx="6" fill="#E8843A"/>
+  <rect x="298" y="372" width="42" height="42" rx="6" fill="#2DB5A8"/>
+  <rect x="352" y="372" width="42" height="42" rx="6" fill="#5C8FCF"/>
+
+  <!-- Reloj -->
+  <circle cx="620" cy="420" r="122"
+          fill="none" stroke="#FFFFFF" stroke-width="20"/>
+
+  <line x1="620" y1="312" x2="620" y2="326"
+        stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <line x1="620" y1="514" x2="620" y2="528"
+        stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <line x1="512" y1="420" x2="526" y2="420"
+        stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="714" y1="420" x2="728" y2="420"
+        stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
+
+  <line x1="620" y1="420" x2="620" y2="358"
+        stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <line x1="620" y1="420" x2="682" y2="420"
+        stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="620" cy="420" r="7" fill="#FFFFFF"/>
+
+  <!-- Insignia de check -->
+  <circle cx="735" cy="295" r="75" fill="#2DB5A8"/>
+  <polyline points="700,295 727,322 772,272"
+            fill="none" stroke="#FFFFFF" stroke-width="16"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="500" y="680" text-anchor="middle"
+        font-family="'Inter','Poppins','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif"
+        font-weight="700" font-size="168" fill="#FFFFFF"
+        letter-spacing="-4">Citora</text>
+
+  <!-- Tagline -->
+  <text x="500" y="770" text-anchor="middle"
+        font-family="'Inter','Poppins','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif"
+        font-weight="400" font-size="32" fill="#E5EDF7"
+        letter-spacing="0.5">La forma inteligente de gestionar tu agenda</text>
+</svg>

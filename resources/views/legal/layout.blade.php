@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Citora' }}</title>
     <meta name="description" content="{{ $description ?? 'Citora - Plataforma SaaS de gestión de citas' }}">
-    <link rel="icon" href="/images/logo-light.png" type="image/png">
+    <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -25,7 +27,7 @@
         .header { background: linear-gradient(135deg, var(--slate-900), var(--slate-800)); padding: 24px 16px; }
         .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
         .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
-        .brand img { height: 28px; mix-blend-mode: lighten; }
+        .brand img { height: 28px; }
         .brand span { color: white; font-weight: 800; font-size: 20px; font-family: Poppins; }
         .back-link { color: var(--amber-light); font-size: 14px; text-decoration: none; font-weight: 500; }
         .back-link:hover { text-decoration: underline; }
@@ -63,7 +65,7 @@
     <header class="header">
         <div class="header-inner">
             <a href="/" class="brand">
-                <img src="/images/logo-dark.png" alt="Citora" onerror="this.style.display='none'">
+                <img src="/images/logo-mark-dark-bg.svg" alt="Citora" onerror="this.src='/images/logo-dark.png'">
                 <span>Citora</span>
             </a>
             <a href="/" class="back-link">← Volver al inicio</a>
