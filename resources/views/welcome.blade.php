@@ -7,7 +7,8 @@
     <title>Citora — La forma inteligente de gestionar tu agenda</title>
     <meta name="description" content="Plataforma SaaS para gestión de citas en barberías, salones de belleza y centros estéticos. Reservas online, WhatsApp automático y panel de control.">
     <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="/images/logo-light.png" type="image/png">
+    <link rel="alternate icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     @vite(['resources/css/app.css'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
     <style>

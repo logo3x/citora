@@ -7,7 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Reservar cita' }} - Citora</title>
     <link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="/images/logo-light.png" type="image/png">
+    <link rel="alternate icon" href="/images/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/images/favicon-180.png">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <style>
