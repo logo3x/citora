@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="none">
+  <title>Citora</title>
+  <desc>Logo de Citora construido sobre la proporción áurea (φ = 1.618).</desc>
+
+  <!--
+    Construcción áurea (φ ≈ 1.618):
+      · Calendario:   320 × 198          (320 / 198 ≈ 1.616)
+      · Reloj:        radio 122          (198 / φ   ≈ 122.4)
+      · Check:        radio 75           (122 / φ   ≈ 75.4)
+      · Wordmark Y:   680                (1000 × 0.68, sección áurea)
+      · Tagline Y:    770                (separación = font-size / φ)
+  -->
+
+  <!-- ============== ISOTIPO ============== -->
+
+  <!-- Anillas / binders del calendario -->
+  <rect x="316" y="222" width="14" height="40" rx="7" fill="#1A2A47"/>
+  <rect x="413" y="222" width="14" height="40" rx="7" fill="#1A2A47"/>
+  <rect x="510" y="222" width="14" height="40" rx="7" fill="#1A2A47"/>
+
+  <!-- Cuerpo del calendario -->
+  <rect x="260" y="240" width="320" height="198" rx="26"
+        fill="#FFFFFF" stroke="#1A2A47" stroke-width="20"/>
+
+  <!-- Cuadrículas internas (proporcionadas a φ) -->
+  <rect x="298" y="318" width="42" height="42" rx="6" fill="#E8843A"/>
+  <rect x="298" y="372" width="42" height="42" rx="6" fill="#2DB5A8"/>
+  <rect x="352" y="372" width="42" height="42" rx="6" fill="#2E5D8A"/>
+
+  <!-- Reloj (radio = altura calendario / φ) -->
+  <circle cx="620" cy="420" r="122"
+          fill="#FFFFFF" stroke="#1A2A47" stroke-width="20"/>
+
+  <!-- Marcas horarias -->
+  <line x1="620" y1="312" x2="620" y2="326"
+        stroke="#1A2A47" stroke-width="8" stroke-linecap="round"/>
+  <line x1="620" y1="514" x2="620" y2="528"
+        stroke="#1A2A47" stroke-width="8" stroke-linecap="round"/>
+  <line x1="512" y1="420" x2="526" y2="420"
+        stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
+  <line x1="714" y1="420" x2="728" y2="420"
+        stroke="#2DB5A8" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Manecillas (longitudes en razón áurea: hora/minuto = 1/φ) -->
+  <line x1="620" y1="420" x2="620" y2="358"
+        stroke="#1A2A47" stroke-width="14" stroke-linecap="round"/>
+  <line x1="620" y1="420" x2="682" y2="420"
+        stroke="#1A2A47" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="620" cy="420" r="7" fill="#1A2A47"/>
+
+  <!-- Insignia de check (radio = radio reloj / φ) -->
+  <circle cx="735" cy="295" r="75" fill="#2DB5A8"/>
+  <polyline points="700,295 727,322 772,272"
+            fill="none" stroke="#FFFFFF" stroke-width="16"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- ============== WORDMARK ============== -->
+
+  <text x="500" y="680" text-anchor="middle"
+        font-family="'Inter','Poppins','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif"
+        font-weight="700" font-size="168" fill="#1A2A47"
+        letter-spacing="-4">Citora</text>
+
+  <!-- ============== TAGLINE ============== -->
+
+  <text x="500" y="770" text-anchor="middle"
+        font-family="'Inter','Poppins','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif"
+        font-weight="400" font-size="32" fill="#1A2A47"
+        letter-spacing="0.5">La forma inteligente de gestionar tu agenda</text>
+</svg>
