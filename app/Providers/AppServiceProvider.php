@@ -3,12 +3,15 @@
 namespace App\Providers;
 
 use App\Contracts\MessagingChannel;
+use App\Listeners\TouchLastLogin;
 use App\Policies\RolePolicy;
 use App\Services\HablameSmsService;
 use App\Services\SmsService;
 use App\Services\WhatsAppService;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\Models\Role;
@@ -36,5 +39,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('vasset', function (string $expression): string {
             return "<?php echo \\App\\Support\\AssetVersion::url($expression); ?>";
         });
+
+        Event::listen(Login::class, TouchLastLogin::class);
     }
 }

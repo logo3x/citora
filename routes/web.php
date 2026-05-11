@@ -8,6 +8,7 @@ use App\Http\Controllers\CronController;
 use App\Http\Controllers\CustomerAppointmentController;
 use App\Http\Controllers\DeployController;
 use App\Http\Controllers\LegalController;
+use App\Http\Controllers\OpenTrackController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TutorialController;
 use App\Http\Controllers\WhatsAppWebhookController;
@@ -63,6 +64,11 @@ Route::post('webhook/deploy', [DeployController::class, 'handle'])
 Route::get('cron/reminders', [CronController::class, 'reminders'])
     ->name('cron.reminders')
     ->middleware('throttle:10,1');
+
+// Email campaign open tracking (1x1 pixel)
+Route::get('m/{campaign}/open.gif', [OpenTrackController::class, 'track'])
+    ->where('campaign', '[0-9]+')
+    ->name('campaign.track');
 
 // Onboarding tutorial state (auth required)
 Route::middleware('auth')->group(function () {

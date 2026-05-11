@@ -40,6 +40,7 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'tutorial_completed_at' => 'datetime',
+            'last_login_at' => 'datetime',
         ];
     }
 
