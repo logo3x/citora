@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\EmailCampaigns\Schemas;
 
+use App\Services\CampaignTemplateLibrary;
 use App\Services\UserSegmentResolver;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\MarkdownEditor;
@@ -10,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class EmailCampaignForm
@@ -18,6 +20,34 @@ class EmailCampaignForm
     {
         return $schema
             ->components([
+                Section::make('Empezar desde una plantilla (opcional)')
+                    ->description('Plantillas prearmadas con asunto, cuerpo y segmento ya configurados. Al seleccionar una, los campos de abajo se rellenan — luego puedes editar libremente.')
+                    ->schema([
+                        Select::make('_template_picker')
+                            ->label('Plantilla')
+                            ->options(CampaignTemplateLibrary::options())
+                            ->placeholder('Empezar en blanco')
+                            ->dehydrated(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, Set $set): void {
+                                if (! $state) {
+                                    return;
+                                }
+
+                                $tpl = CampaignTemplateLibrary::find($state);
+                                if (! $tpl) {
+                                    return;
+                                }
+
+                                $set('subject', $tpl['subject']);
+                                $set('body_markdown', $tpl['body']);
+                                $set('segment', $tpl['segment']);
+                            }),
+                    ])
+                    ->columns(1)
+                    ->collapsible()
+                    ->collapsed(),
+
                 Section::make('Mensaje')
                     ->schema([
                         TextInput::make('subject')
@@ -67,7 +97,7 @@ class EmailCampaignForm
                     ->columns(1),
 
                 Section::make('Programación (opcional)')
-                    ->description('Si dejas la fecha vacía, podrás enviar manualmente desde la lista. Si la fijas, el sistema disparará cuando llegue la hora.')
+                    ->description('Si dejas la fecha vacía, podrás enviar manualmente desde la lista. Si la fijas, el cron disparará el envío cuando llegue la hora (revisa cada 5 min).')
                     ->schema([
                         DateTimePicker::make('scheduled_at')
                             ->label('Enviar el...')

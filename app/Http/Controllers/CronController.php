@@ -31,6 +31,27 @@ class CronController extends Controller
         ]);
     }
 
+    public function campaigns(Request $request): JsonResponse
+    {
+        $this->guard($request);
+
+        $exitCode = Artisan::call('campaigns:run-scheduled');
+        $output = trim(Artisan::output());
+
+        Log::info('Cron campaigns ejecutado', [
+            'exit_code' => $exitCode,
+            'output' => $output,
+            'ip' => $request->ip(),
+        ]);
+
+        return response()->json([
+            'ok' => $exitCode === 0,
+            'exit_code' => $exitCode,
+            'output' => $output,
+            'at' => now()->toIso8601String(),
+        ]);
+    }
+
     private function guard(Request $request): void
     {
         $expected = config('services.cron.secret');

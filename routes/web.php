@@ -65,6 +65,10 @@ Route::get('cron/reminders', [CronController::class, 'reminders'])
     ->name('cron.reminders')
     ->middleware('throttle:10,1');
 
+Route::get('cron/campaigns', [CronController::class, 'campaigns'])
+    ->name('cron.campaigns')
+    ->middleware('throttle:10,1');
+
 // Email campaign open tracking (1x1 pixel)
 Route::get('m/{campaign}/open.gif', [OpenTrackController::class, 'track'])
     ->where('campaign', '[0-9]+')
