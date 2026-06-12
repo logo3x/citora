@@ -1,0 +1,261 @@
+/* =========================================================================
+   Citora · Premium animation layer
+   -------------------------------------------------------------------------
+   Pure CSS keyframes + utility classes. No JS dependencies required.
+   Respects prefers-reduced-motion automatically (see bottom of file).
+   ========================================================================= */
+
+/* --- Keyframes ----------------------------------------------------------- */
+
+@keyframes citora-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes citora-fade-up {
+    from { opacity: 0; transform: translate3d(0, 14px, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes citora-fade-down {
+    from { opacity: 0; transform: translate3d(0, -14px, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes citora-scale-in {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes citora-slide-in-left {
+    from { opacity: 0; transform: translate3d(-24px, 0, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes citora-slide-in-right {
+    from { opacity: 0; transform: translate3d(24px, 0, 0); }
+    to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes citora-shimmer {
+    0%   { background-position: -160% 0; }
+    100% { background-position: 160% 0; }
+}
+
+@keyframes citora-skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.55; }
+}
+
+@keyframes citora-pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgb(217 119 6 / 0.35); }
+    100% { box-shadow: 0 0 0 18px rgb(217 119 6 / 0); }
+}
+
+@keyframes citora-check-pop {
+    0%   { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes citora-float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50%      { transform: translate3d(0, -10px, 0); }
+}
+
+@keyframes citora-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(217 119 6 / 0.0); }
+    50%      { box-shadow: 0 0 28px 4px rgb(217 119 6 / 0.25); }
+}
+
+/* --- Entry utility classes ----------------------------------------------- */
+
+.cit-fade-in     { animation: citora-fade-in    .5s ease-out both; }
+.cit-fade-up     { animation: citora-fade-up    .6s cubic-bezier(.22,1,.36,1) both; }
+.cit-fade-down   { animation: citora-fade-down  .6s cubic-bezier(.22,1,.36,1) both; }
+.cit-scale-in    { animation: citora-scale-in   .45s cubic-bezier(.22,1,.36,1) both; }
+.cit-slide-left  { animation: citora-slide-in-left  .55s cubic-bezier(.22,1,.36,1) both; }
+.cit-slide-right { animation: citora-slide-in-right .55s cubic-bezier(.22,1,.36,1) both; }
+
+/* Staggered children: parent gets .cit-stagger, children get incremental delays. */
+.cit-stagger > * {
+    animation: citora-fade-up .6s cubic-bezier(.22,1,.36,1) both;
+    animation-delay: calc(var(--cit-stagger-step, 70ms) * var(--cit-i, 0));
+}
+.cit-stagger > *:nth-child(1)  { --cit-i: 1; }
+.cit-stagger > *:nth-child(2)  { --cit-i: 2; }
+.cit-stagger > *:nth-child(3)  { --cit-i: 3; }
+.cit-stagger > *:nth-child(4)  { --cit-i: 4; }
+.cit-stagger > *:nth-child(5)  { --cit-i: 5; }
+.cit-stagger > *:nth-child(6)  { --cit-i: 6; }
+.cit-stagger > *:nth-child(7)  { --cit-i: 7; }
+.cit-stagger > *:nth-child(8)  { --cit-i: 8; }
+.cit-stagger > *:nth-child(9)  { --cit-i: 9; }
+.cit-stagger > *:nth-child(10) { --cit-i: 10; }
+.cit-stagger > *:nth-child(11) { --cit-i: 11; }
+.cit-stagger > *:nth-child(12) { --cit-i: 12; }
+
+/* Scroll-reveal: starts hidden, JS adds .is-visible when intersecting. */
+.cit-reveal {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition:
+        opacity .7s cubic-bezier(.22,1,.36,1),
+        transform .7s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--cit-reveal-delay, 0ms);
+    will-change: opacity, transform;
+}
+.cit-reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+.cit-reveal-scale {
+    transform: scale(0.96);
+}
+.cit-reveal-scale.is-visible {
+    transform: scale(1);
+}
+
+/* --- Hover state utilities ---------------------------------------------- */
+
+.cit-hover-lift {
+    transition:
+        transform .35s cubic-bezier(.22,1,.36,1),
+        box-shadow .35s cubic-bezier(.22,1,.36,1);
+    will-change: transform;
+}
+.cit-hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px -18px rgb(15 23 42 / 0.25);
+}
+.cit-hover-lift-strong:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 28px 50px -20px rgb(15 23 42 / 0.35);
+}
+
+.cit-hover-glow {
+    transition: box-shadow .35s ease, transform .35s ease;
+}
+.cit-hover-glow:hover {
+    box-shadow: 0 0 0 1px rgb(217 119 6 / 0.5), 0 18px 40px -16px rgb(217 119 6 / 0.4);
+    transform: translateY(-2px);
+}
+
+.cit-press {
+    transition: transform .12s ease;
+}
+.cit-press:active {
+    transform: scale(0.97);
+}
+
+/* --- Skeleton loader ----------------------------------------------------- */
+
+.cit-skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: rgb(229 231 235);
+    border-radius: 8px;
+    animation: citora-skeleton-pulse 1.4s ease-in-out infinite;
+}
+.cit-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.7) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: citora-shimmer 1.6s linear infinite;
+}
+.dark .cit-skeleton,
+.cit-skeleton.is-dark {
+    background-color: rgb(51 65 85);
+}
+.dark .cit-skeleton::after,
+.cit-skeleton.is-dark::after {
+    background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.08) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+}
+
+/* --- Floating label inputs (for booking forms) -------------------------- */
+
+.cit-float-label {
+    position: relative;
+}
+.cit-float-label input,
+.cit-float-label textarea {
+    width: 100%;
+    padding: 18px 14px 8px;
+    border-radius: 10px;
+    border: 1px solid rgb(229 231 235);
+    background: white;
+    font-size: 15px;
+    font-family: inherit;
+    color: rgb(15 23 42);
+    transition: border-color .2s ease, box-shadow .2s ease;
+    outline: none;
+}
+.cit-float-label input:focus,
+.cit-float-label textarea:focus {
+    border-color: rgb(217 119 6);
+    box-shadow: 0 0 0 3px rgb(217 119 6 / 0.15);
+}
+.cit-float-label label {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    color: rgb(107 114 128);
+    font-size: 14px;
+    pointer-events: none;
+    transition:
+        transform .18s ease,
+        font-size .18s ease,
+        color .18s ease,
+        top .18s ease;
+}
+.cit-float-label input:focus + label,
+.cit-float-label input:not(:placeholder-shown) + label,
+.cit-float-label textarea:focus + label,
+.cit-float-label textarea:not(:placeholder-shown) + label {
+    top: 4px;
+    font-size: 11px;
+    color: rgb(217 119 6);
+    transform: translateY(0);
+}
+
+/* --- Tag helpers --------------------------------------------------------- */
+
+.cit-pulse-ring {
+    position: relative;
+}
+.cit-pulse-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    animation: citora-pulse-ring 1.6s ease-out infinite;
+    pointer-events: none;
+}
+
+.cit-check-pop  { animation: citora-check-pop  .4s cubic-bezier(.22,1,.36,1) both; }
+.cit-soft-float { animation: citora-float 6s ease-in-out infinite; }
+
+/* --- Accessibility: respect reduced motion ------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
