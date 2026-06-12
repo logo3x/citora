@@ -235,8 +235,10 @@
             <div id="slots-container" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-4">
                 <p class="col-span-full text-gray-400 text-sm text-center py-4">Selecciona una fecha para ver horarios disponibles</p>
             </div>
-            <div id="slots-loading" class="hidden text-center py-4">
-                <svg class="animate-spin h-6 w-6 text-amber-500 mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+            <div id="slots-loading" class="hidden grid grid-cols-3 sm:grid-cols-4 gap-2 mb-4">
+                @for ($i = 0; $i < 8; $i++)
+                    <div class="cit-skeleton slot-skeleton"></div>
+                @endfor
             </div>
 
             <button id="btn-continue" onclick="goToStep(3)" disabled class="w-full mt-4 py-3 bg-amber-500 text-white font-bold rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-amber-600 transition">
@@ -264,18 +266,16 @@
             </div>
 
             <div class="space-y-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Número de celular *</label>
-                    <input type="tel" id="input-phone" value="{{ auth()->user()?->phone ?? '' }}" placeholder="3001234567" maxlength="20" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-amber-500 focus:border-amber-500">
+                <div class="cit-float-label">
+                    <input type="tel" id="input-phone" value="{{ auth()->user()?->phone ?? '' }}" placeholder=" " maxlength="20" required>
+                    <label for="input-phone">Número de celular *</label>
                     <p class="text-xs text-gray-500 mt-1.5 leading-relaxed">
                         📱 Lo usamos únicamente para enviarte la <strong>confirmación</strong> y los <strong>recordatorios</strong> de tu cita por SMS. No compartimos tu número con terceros.
                     </p>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Notas (opcional)</label>
-                    <textarea id="input-notes" rows="2" maxlength="1000" placeholder="Algún detalle adicional..."
-                              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-amber-500 focus:border-amber-500"></textarea>
+                <div class="cit-float-label">
+                    <textarea id="input-notes" rows="2" maxlength="1000" placeholder=" "></textarea>
+                    <label for="input-notes">Notas (opcional)</label>
                 </div>
                 <button id="btn-book" onclick="handleConfirm()" class="w-full py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -370,9 +370,12 @@
         }
 
         function selectDate(el, date, label) {
-            document.querySelectorAll('.date-btn').forEach(b => { b.classList.remove('border-amber-500', 'bg-amber-50'); b.classList.add('border-gray-100'); });
+            document.querySelectorAll('.date-btn').forEach(b => {
+                b.classList.remove('border-amber-500', 'bg-amber-50', 'is-selected');
+                b.classList.add('border-gray-100');
+            });
             el.classList.remove('border-gray-100');
-            el.classList.add('border-amber-500', 'bg-amber-50');
+            el.classList.add('border-amber-500', 'bg-amber-50', 'is-selected');
             booking.date = date;
             booking.dateLabel = label;
             booking.time = null;
@@ -383,6 +386,7 @@
         async function loadSlots() {
             const container = document.getElementById('slots-container');
             const loading = document.getElementById('slots-loading');
+            container.classList.add('hidden');
             container.innerHTML = '';
             loading.classList.remove('hidden');
 
@@ -393,6 +397,7 @@
                 const res = await fetch(`/${SLUG}/slots?${params}`);
                 const slots = await res.json();
                 loading.classList.add('hidden');
+                container.classList.remove('hidden');
 
                 const entries = Object.entries(slots);
                 if (entries.length === 0) {
@@ -400,17 +405,31 @@
                     return;
                 }
 
-                entries.forEach(([time, label]) => {
+                entries.forEach(([time, label], i) => {
                     const btn = document.createElement('button');
-                    btn.className = 'slot-btn py-2.5 px-3 rounded-lg border border-gray-200 text-sm font-medium hover:border-amber-400 transition';
+                    btn.className = 'slot-btn py-2.5 px-3 rounded-lg border border-gray-200 text-sm font-medium';
+                    btn.style.animationDelay = `${Math.min(i, 24) * 30}ms`;
                     btn.textContent = label;
                     btn.onclick = () => selectSlot(btn, time, label);
                     container.appendChild(btn);
                 });
             } catch (e) {
                 loading.classList.add('hidden');
+                container.classList.remove('hidden');
                 container.innerHTML = '<p class="col-span-full text-red-500 text-sm text-center py-4">Error al cargar horarios</p>';
             }
+        }
+
+        function fireConfetti() {
+            if (typeof confetti !== 'function') return;
+            const duration = 1200;
+            const end = Date.now() + duration;
+            const colors = ['#D97706', '#F59E0B', '#10B981', '#2DB5A8'];
+            (function frame() {
+                confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors });
+                confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            })();
         }
 
         function selectSlot(el, time, label) {
@@ -429,9 +448,14 @@
                 const p = document.getElementById(`progress-${i}`);
                 const circle = p.querySelector('span:first-child');
                 const label = p.querySelector('span:last-child');
+                const wasActive = circle.classList.contains('bg-amber-500');
                 if (i <= n) {
                     circle.className = 'w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold';
                     if (label) label.className = 'text-sm font-medium text-gray-900 hidden sm:inline';
+                    if (!wasActive) {
+                        circle.classList.add('progress-active-pop');
+                        circle.addEventListener('animationend', () => circle.classList.remove('progress-active-pop'), { once: true });
+                    }
                 } else {
                     circle.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold';
                     if (label) label.className = 'text-sm font-medium text-gray-400 hidden sm:inline';
@@ -490,12 +514,15 @@
 
                 localStorage.removeItem('citora_booking_' + SLUG);
 
+                fireConfetti();
+
                 await Swal.fire({
                     icon: 'success',
                     title: '🎉 ¡Cita agendada!',
                     html: `<p><strong>${data.appointment.service}</strong></p><p>${data.appointment.date}</p><p>${data.appointment.time}</p>`,
                     confirmButtonText: 'Perfecto',
                     confirmButtonColor: '#f59e0b',
+                    showClass: { popup: 'animate__animated animate__zoomIn animate__faster' },
                 });
 
                 window.location.reload();

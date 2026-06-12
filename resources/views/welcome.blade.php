@@ -595,8 +595,8 @@
     <section class="hero-section">
         <div class="hero-mesh"></div>
         <div class="hero-grid"></div>
-        <div class="hero-orb hero-orb-1"></div>
-        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-1" data-cit-parallax="0.08"></div>
+        <div class="hero-orb hero-orb-2" data-cit-parallax="0.05"></div>
 
         <div style="position:relative;z-index:2;max-width:720px;margin:0 auto;text-align:center">
             {{-- Pill badge --}}
@@ -632,13 +632,15 @@
                     Registra tu negocio gratis
                 </a>
                 @auth
-                    <a href="{{ route('customer.appointments') }}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);font-weight:600;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.2s;background:rgba(255,255,255,0.04)"
-                       onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.15)'">
+                    <a href="{{ route('customer.appointments') }}" class="cit-press" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid rgba(255,255,255,0.35);color:white;font-weight:600;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.25s;background:rgba(255,255,255,0.08);backdrop-filter:blur(8px)"
+                       onmouseover="this.style.background='rgba(255,255,255,0.15)';this.style.borderColor='rgba(255,255,255,0.6)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)';this.style.transform='none'">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Consultar mis citas
                     </a>
                 @else
-                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);font-weight:600;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.2s;background:rgba(255,255,255,0.04)"
-                       onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.15)'">
+                    <a href="{{ route('auth.google.redirect', ['redirect_to' => '/mis-citas']) }}" class="cit-press" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:1px solid rgba(255,255,255,0.35);color:white;font-weight:600;border-radius:12px;text-decoration:none;font-size:14px;transition:all 0.25s;background:rgba(255,255,255,0.08);backdrop-filter:blur(8px)"
+                       onmouseover="this.style.background='rgba(255,255,255,0.15)';this.style.borderColor='rgba(255,255,255,0.6)';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.borderColor='rgba(255,255,255,0.35)';this.style.transform='none'">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Consultar mis citas
                     </a>
                 @endauth
@@ -847,7 +849,7 @@
 
             <div class="bento-grid">
                 {{-- Row 1: 2 equal cards --}}
-                <div class="bento-card">
+                <div class="bento-card cit-hover-lift">
                     <div style="width:48px;height:48px;background:rgba(245,158,11,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
                         <svg width="24" height="24" fill="none" stroke="#F59E0B" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
                     </div>
@@ -855,7 +857,7 @@
                     <p style="color:#6b7280;font-size:14px;line-height:1.6">Enlace personalizado para tu negocio. Compártelo en redes, WhatsApp o donde quieras.</p>
                 </div>
 
-                <div class="bento-card">
+                <div class="bento-card cit-hover-lift">
                     <div style="width:48px;height:48px;background:rgba(13,148,136,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
                         <svg width="24" height="24" fill="var(--teal)" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
                     </div>
@@ -864,7 +866,7 @@
                 </div>
 
                 {{-- Row 2: Full-width dark card --}}
-                <div class="bento-card bento-full">
+                <div class="bento-card bento-full cit-hover-lift-strong">
                     <div style="flex:1">
                         <h3 style="font-size:22px;font-weight:800;margin-bottom:8px">Anti-cruces inteligente</h3>
                         <p style="font-size:15px;line-height:1.6">Nunca más citas cruzadas. Validación en tiempo real por profesional y horario. Tu agenda siempre organizada.</p>
@@ -875,7 +877,7 @@
                 </div>
 
                 {{-- Row 3: 2 equal cards --}}
-                <div class="bento-card">
+                <div class="bento-card cit-hover-lift">
                     <div style="width:48px;height:48px;background:rgba(217,119,6,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
                         <svg width="24" height="24" fill="none" stroke="var(--amber)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     </div>
@@ -883,7 +885,7 @@
                     <p style="color:#6b7280;font-size:14px;line-height:1.6">Empleados, servicios asignados y horarios individuales. Todo bajo tu control.</p>
                 </div>
 
-                <div class="bento-card">
+                <div class="bento-card cit-hover-lift">
                     <div style="width:48px;height:48px;background:rgba(13,148,136,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
                         <svg width="24" height="24" fill="none" stroke="var(--teal)" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                     </div>
@@ -892,7 +894,7 @@
                 </div>
 
                 {{-- Row 4: Full-width dark card --}}
-                <div class="bento-card bento-full">
+                <div class="bento-card bento-full cit-hover-lift-strong">
                     <div style="flex-shrink:0;width:64px;height:64px;background:rgba(245,158,11,0.12);border-radius:18px;display:flex;align-items:center;justify-content:center">
                         <svg width="32" height="32" fill="none" stroke="#F59E0B" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                     </div>
@@ -917,19 +919,19 @@
             </div>
 
             <div class="steps-grid" style="display:flex;gap:0;justify-content:center">
-                <div class="step-card" style="flex:1;max-width:280px">
+                <div class="step-card cit-hover-lift" style="flex:1;max-width:280px">
                     <div class="step-number" style="background:var(--slate-900);color:var(--amber-light)">1</div>
                     <div class="step-connector"></div>
                     <h3 style="font-size:18px;font-weight:700;color:var(--slate-900);margin-bottom:8px">Crea tu cuenta</h3>
                     <p style="font-size:14px;color:#6b7280;line-height:1.6">Regístrate con Google en segundos. Sin formularios largos ni verificaciones.</p>
                 </div>
-                <div class="step-card" style="flex:1;max-width:280px">
+                <div class="step-card cit-hover-lift" style="flex:1;max-width:280px">
                     <div class="step-number" style="background:var(--slate-900);color:var(--amber-light)">2</div>
                     <div class="step-connector"></div>
                     <h3 style="font-size:18px;font-weight:700;color:var(--slate-900);margin-bottom:8px">Configura tu negocio</h3>
                     <p style="font-size:14px;color:#6b7280;line-height:1.6">Wizard guiado: servicios, empleados, horarios e imágenes. En 5 minutos.</p>
                 </div>
-                <div class="step-card" style="flex:1;max-width:280px">
+                <div class="step-card cit-hover-lift" style="flex:1;max-width:280px">
                     <div class="step-number" style="background:linear-gradient(135deg,var(--amber),#B45309);color:white">3</div>
                     <h3 style="font-size:18px;font-weight:700;color:var(--slate-900);margin-bottom:8px">Comparte tu enlace</h3>
                     <p style="font-size:14px;color:#6b7280;line-height:1.6">Tus clientes reservan online. Tú recibes todo en tu panel y WhatsApp.</p>
@@ -952,12 +954,12 @@
 
             <div class="pricing-grid" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:20px">
                 {{-- Free --}}
-                <div class="pricing-card pricing-featured">
+                <div class="pricing-card pricing-featured cit-hover-lift-strong">
                     <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%)">
                         <span style="background:linear-gradient(135deg,#D97706,#B45309);color:white;font-size:11px;font-weight:700;padding:5px 16px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em">Popular</span>
                     </div>
                     <h3 style="font-size:18px;font-weight:800;color:var(--slate-900);margin-bottom:4px">Gratis</h3>
-                    <div style="font-size:42px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1">$0</div>
+                    <div style="font-size:42px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1"><span data-cit-counter="0" data-cit-prefix="$">$0</span></div>
                     <p style="color:#6b7280;margin-bottom:24px;font-size:13px">Para siempre</p>
                     <div style="display:flex;flex-direction:column;gap:12px">
                         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--slate-900)">
@@ -984,9 +986,9 @@
                 </div>
 
                 {{-- Monthly --}}
-                <div class="pricing-card pricing-regular">
+                <div class="pricing-card pricing-regular cit-hover-lift-strong">
                     <h3 style="font-size:18px;font-weight:800;color:var(--slate-900);margin-bottom:4px">Mensual</h3>
-                    <div style="font-size:42px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1">$34.900</div>
+                    <div style="font-size:42px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1"><span data-cit-counter="34900" data-cit-prefix="$">$34.900</span></div>
                     <p style="color:#6b7280;margin-bottom:24px;font-size:13px">Pago único por mes</p>
                     <div style="display:flex;flex-direction:column;gap:12px">
                         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--slate-900)">
@@ -1009,12 +1011,12 @@
                 </div>
 
                 {{-- Semester --}}
-                <div class="pricing-card pricing-regular" style="border-color:var(--teal);position:relative">
+                <div class="pricing-card pricing-regular cit-hover-lift-strong" style="border-color:var(--teal);position:relative">
                     <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%)">
                         <span style="background:linear-gradient(135deg,#0D9488,#0F766E);color:white;font-size:11px;font-weight:700;padding:5px 16px;border-radius:999px;text-transform:uppercase;letter-spacing:0.05em">Ahorra 15%</span>
                     </div>
                     <h3 style="font-size:18px;font-weight:800;color:var(--slate-900);margin-bottom:4px">Semestral</h3>
-                    <div style="font-size:42px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1">$179.400</div>
+                    <div style="font-size:42px;font-weight:900;color:var(--slate-900);font-family:Poppins;letter-spacing:-0.03em;line-height:1.1"><span data-cit-counter="179400" data-cit-prefix="$">$179.400</span></div>
                     <p style="color:#6b7280;margin-bottom:24px;font-size:13px">6 meses &middot; <span style="color:var(--teal);font-weight:600">$29.900/mes</span></p>
                     <div style="display:flex;flex-direction:column;gap:12px">
                         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--slate-900)">
@@ -1048,35 +1050,35 @@
             </div>
             <h2 style="font-size:clamp(28px,4vw,40px);font-weight:800;color:var(--slate-900);letter-spacing:-0.02em;margin-bottom:40px">Ideal para</h2>
             <div class="segments-grid" style="display:grid;grid-template-columns:repeat(4, 1fr);gap:14px">
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#128136;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Barberías</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#128135;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Salones de belleza</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#128133;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Centros estéticos</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#128134;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Spas y masajes</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#129657;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Odontología</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#129658;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Fisioterapia</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#127947;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Entrenadores</p>
                 </div>
-                <div class="segment-card">
+                <div class="segment-card cit-hover-lift">
                     <span class="segment-icon">&#128137;</span>
                     <p style="font-weight:700;color:var(--slate-900);font-size:14px">Consultorios médicos</p>
                 </div>

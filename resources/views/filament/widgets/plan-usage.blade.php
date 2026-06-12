@@ -73,8 +73,10 @@
                     </a>
                 </div>
 
-                <div style="width:100%;background:#e5e7eb;border-radius:9999px;height:10px;overflow:hidden">
-                    <div style="height:10px;border-radius:9999px;transition:all 1s;background:{{ $percentage >= 80 ? '#f59e0b' : '#10b981' }};width:{{ $percentage }}%"></div>
+                <div style="width:100%;background:#e5e7eb;border-radius:9999px;height:10px;overflow:hidden;position:relative">
+                    <div style="height:10px;border-radius:9999px;background:{{ $percentage >= 80 ? '#f59e0b' : '#10b981' }};width:{{ $percentage }}%;transition:width 1.2s cubic-bezier(.22,1,.36,1),background-color .35s ease;position:relative;overflow:hidden">
+                        <div style="position:absolute;inset:0;background-image:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);background-size:200% 100%;animation:citora-shimmer 2.4s linear infinite"></div>
+                    </div>
                 </div>
 
                 <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280">
