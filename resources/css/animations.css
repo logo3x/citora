@@ -247,6 +247,104 @@
 .cit-check-pop  { animation: citora-check-pop  .4s cubic-bezier(.22,1,.36,1) both; }
 .cit-soft-float { animation: citora-float 6s ease-in-out infinite; }
 
+/* --- Filament panel polish ---------------------------------------------- */
+
+/* Main page content fades in on every navigation */
+.fi-main {
+    animation: citora-fade-up .35s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* Sidebar items have a quick reveal */
+.fi-sidebar-item {
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        transform .2s ease;
+}
+.fi-sidebar-item:hover {
+    transform: translateX(2px);
+}
+
+/* Stats overview cards lift on hover */
+.fi-wi-stats-overview-stat {
+    transition:
+        transform .3s cubic-bezier(.22,1,.36,1),
+        box-shadow .3s cubic-bezier(.22,1,.36,1),
+        border-color .3s ease;
+}
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px -16px rgb(15 23 42 / 0.18);
+}
+.dark .fi-wi-stats-overview-stat:hover {
+    box-shadow: 0 16px 32px -16px rgb(0 0 0 / 0.5);
+}
+
+/* Stagger entrance of widgets in dashboard grids */
+.fi-page-dashboard .fi-wi {
+    animation: citora-fade-up .55s cubic-bezier(.22,1,.36,1) both;
+}
+.fi-page-dashboard .fi-wi:nth-child(1)  { animation-delay: 0ms; }
+.fi-page-dashboard .fi-wi:nth-child(2)  { animation-delay: 70ms; }
+.fi-page-dashboard .fi-wi:nth-child(3)  { animation-delay: 140ms; }
+.fi-page-dashboard .fi-wi:nth-child(4)  { animation-delay: 210ms; }
+.fi-page-dashboard .fi-wi:nth-child(5)  { animation-delay: 280ms; }
+.fi-page-dashboard .fi-wi:nth-child(6)  { animation-delay: 350ms; }
+.fi-page-dashboard .fi-wi:nth-child(7)  { animation-delay: 420ms; }
+
+/* Section cards: subtle hover lift */
+.fi-section {
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
+.fi-section:hover {
+    box-shadow: 0 4px 18px -8px rgb(15 23 42 / 0.12);
+}
+
+/* Table row hover polish */
+.fi-ta-row {
+    transition: background-color .15s ease;
+}
+.fi-ta-row:hover {
+    background-color: rgb(254 252 232) !important; /* amber-50 */
+}
+.dark .fi-ta-row:hover {
+    background-color: rgb(30 41 59) !important;
+}
+
+/* Action buttons: small press feedback */
+.fi-btn,
+.fi-ac-action {
+    transition:
+        background-color .2s ease,
+        box-shadow .2s ease,
+        transform .1s ease;
+}
+.fi-btn:active,
+.fi-ac-action:active {
+    transform: scale(.97);
+}
+
+/* Smooth dark/light theme cross-fade */
+.fi-body,
+.fi-sidebar,
+.fi-topbar,
+.fi-main,
+.fi-section {
+    transition:
+        background-color .25s ease,
+        border-color .25s ease,
+        color .25s ease;
+}
+
+/* Form field focus ring softens */
+.fi-input:focus,
+.fi-select-input:focus,
+.fi-textarea:focus {
+    transition: box-shadow .2s ease, border-color .2s ease;
+}
+
 /* --- Accessibility: respect reduced motion ------------------------------ */
 
 @media (prefers-reduced-motion: reduce) {

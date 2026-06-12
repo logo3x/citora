@@ -17,11 +17,13 @@
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function setupScrollReveal() {
-    const targets = document.querySelectorAll('.cit-reveal');
-    if (!targets.length) return;
+    const reveals = document.querySelectorAll('.cit-reveal');
+    const counters = document.querySelectorAll('[data-cit-counter]');
+    if (!reveals.length && !counters.length) return;
 
     if (REDUCED || !('IntersectionObserver' in window)) {
-        targets.forEach((el) => el.classList.add('is-visible'));
+        reveals.forEach((el) => el.classList.add('is-visible'));
+        counters.forEach(animateCounter);
         return;
     }
 
@@ -30,16 +32,16 @@ function setupScrollReveal() {
             for (const entry of entries) {
                 if (!entry.isIntersecting) continue;
                 entry.target.classList.add('is-visible');
-                // Counter inside this element?
-                entry.target.querySelectorAll('[data-cit-counter]').forEach(animateCounter);
                 if (entry.target.matches('[data-cit-counter]')) animateCounter(entry.target);
+                entry.target.querySelectorAll('[data-cit-counter]').forEach(animateCounter);
                 observer.unobserve(entry.target);
             }
         },
         { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
     );
 
-    targets.forEach((el) => observer.observe(el));
+    reveals.forEach((el) => observer.observe(el));
+    counters.forEach((el) => observer.observe(el));
 }
 
 function animateCounter(el) {
