@@ -1,118 +1,158 @@
 <x-layouts.booking :title="$business->name">
+    @php
+        $todaySchedule = $business->schedules->firstWhere('day_of_week', now()->dayOfWeek);
+        $isOpenNow = $todaySchedule && $todaySchedule->is_active
+            && now()->between(
+                \Carbon\Carbon::parse($todaySchedule->open_time),
+                \Carbon\Carbon::parse($todaySchedule->close_time)
+            );
+        $todayLabel = $todaySchedule && $todaySchedule->is_active
+            ? \Carbon\Carbon::parse($todaySchedule->open_time)->format('g:i A').' - '.\Carbon\Carbon::parse($todaySchedule->close_time)->format('g:i A')
+            : 'Cerrado hoy';
+        $logoUrl = $business->getFirstMediaUrl('logo');
+        $bannerUrl = $business->getFirstMediaUrl('banner');
+    @endphp
 
-    {{-- Hero / Banner --}}
-    <div class="relative">
-        @if($business->getFirstMediaUrl('banner'))
-            <img src="{{ $business->getFirstMediaUrl('banner') }}" alt="{{ $business->name }}" class="w-full h-40 sm:h-48 object-cover">
-        @else
-            <div class="w-full h-40 sm:h-48" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%)"></div>
+    {{-- =========================
+         Hero
+         ========================= --}}
+    <header class="biz-hero">
+        @if($bannerUrl)
+            <div class="biz-hero-banner" style="background-image:url('{{ $bannerUrl }}')"></div>
         @endif
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-            <div class="max-w-2xl mx-auto flex items-end gap-3">
-                @if($business->getFirstMediaUrl('logo'))
-                    <img src="{{ $business->getFirstMediaUrl('logo') }}" alt="" class="w-14 h-14 rounded-xl border-2 border-white/80 shadow-lg object-cover">
+        <div class="biz-hero-mesh"></div>
+        <div class="biz-hero-orb biz-hero-orb-1"></div>
+        <div class="biz-hero-orb biz-hero-orb-2"></div>
+        <div class="biz-hero-grain"></div>
+
+        <div class="biz-hero-content">
+            @if($logoUrl)
+                <img class="biz-hero-logo" src="{{ $logoUrl }}" alt="{{ $business->name }}">
+            @else
+                <div class="biz-hero-logo-fallback">{{ mb_substr($business->name, 0, 1) }}</div>
+            @endif
+
+            <div style="flex:1;min-width:0">
+                <h1 class="biz-hero-title">{{ $business->name }}</h1>
+                @if($business->slogan)
+                    <p class="biz-hero-slogan">{{ $business->slogan }}</p>
                 @endif
-                <div>
-                    <h1 class="text-xl sm:text-2xl font-bold text-white drop-shadow" style="font-family:Poppins">{{ $business->name }}</h1>
-                    @if($business->slogan)
-                        <p class="text-white/80 text-sm">{{ $business->slogan }}</p>
-                    @endif
-                </div>
+                <span class="biz-hero-status {{ $isOpenNow ? '' : 'is-closed' }}">
+                    <span class="dot"></span>
+                    {{ $isOpenNow ? 'Abierto ahora · '.$todayLabel : $todayLabel }}
+                </span>
             </div>
+        </div>
+    </header>
+
+    {{-- =========================
+         Stats pills
+         ========================= --}}
+    <div class="biz-stats">
+        <div class="biz-stat">
+            <p class="num">{{ $business->services->count() }}</p>
+            <p class="lbl">Servicios</p>
+        </div>
+        <div class="biz-stat">
+            <p class="num">{{ $business->employees->count() ?: '—' }}</p>
+            <p class="lbl">Profesionales</p>
+        </div>
+        <div class="biz-stat">
+            <p class="num" style="font-size:13px;line-height:1.2;font-weight:700;{{ $isOpenNow ? 'color:#059669' : 'color:#dc2626' }}">
+                {{ $isOpenNow ? 'Abierto' : 'Cerrado' }}
+            </p>
+            <p class="lbl">Estado</p>
         </div>
     </div>
 
-    {{-- Business info collapsible --}}
-    <div class="max-w-2xl mx-auto px-4 pt-8 pb-4">
-        <details class="bg-white rounded-2xl border border-[#E7E5DF] overflow-hidden shadow-sm">
-            <summary class="px-5 py-4 cursor-pointer flex items-center justify-between hover:bg-[#FAFAF8] transition">
-                <div class="flex items-center gap-3 min-w-0">
-                    @if($business->getFirstMediaUrl('logo'))
-                        <img src="{{ $business->getFirstMediaUrl('logo') }}" alt="" class="w-10 h-10 rounded-lg object-cover shrink-0 border border-[#E7E5DF]">
-                    @endif
-                    <div class="min-w-0">
-                        <p class="text-sm font-bold text-[#0F172A]">{{ $business->name }}</p>
-                        <p class="text-xs text-[#666666]">
-                            @if($business->phone){{ $business->phone }}@endif
-                            @if($business->phone && $business->address) · @endif
-                            @if($business->address){{ Str::limit($business->address, 30) }}@endif
-                        </p>
-                    </div>
-                </div>
-                <span class="text-xs text-[#D97706] font-medium shrink-0 ml-3">Ver más ▾</span>
-            </summary>
-            <div class="px-5 pb-5 border-t border-[#E7E5DF]">
+    {{-- =========================
+         Quick actions row
+         ========================= --}}
+    <div class="biz-quick-row">
+        @if($business->phone)
+            <a href="https://wa.me/57{{ $business->phone }}" target="_blank" rel="noopener" class="biz-quick is-wa">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                WhatsApp
+            </a>
+            <a href="tel:{{ $business->phone }}" class="biz-quick is-call">
+                <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h2.28a2 2 0 011.94 1.5l.84 3.36a2 2 0 01-1.06 2.31l-1.4.7a14 14 0 006.46 6.46l.7-1.4a2 2 0 012.31-1.06l3.36.84A2 2 0 0121 16.72V19a2 2 0 01-2 2h-1C9.94 21 3 14.06 3 6V5z"/></svg>
+                Llamar
+            </a>
+        @endif
+        @if($business->address)
+            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($business->address) }}" target="_blank" rel="noopener" class="biz-quick is-map">
+                <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.66 16.66L13.41 20.9a2 2 0 01-2.83 0l-4.24-4.24a8 8 0 1111.31 0z"/><circle cx="12" cy="11" r="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Cómo llegar
+            </a>
+        @endif
+        <button type="button" id="biz-info-toggle" class="biz-quick is-info is-toggle" aria-expanded="false" aria-controls="biz-info-panel">
+            <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Más info
+        </button>
+    </div>
+
+    {{-- =========================
+         Expandable info panel
+         ========================= --}}
+    <div id="biz-info-panel" class="biz-info-panel">
+        <div>
+            <div class="biz-info-card">
                 @if($business->description)
-                    <p class="text-sm text-[#666666] leading-relaxed mt-4">{{ $business->description }}</p>
+                    <p class="text-sm text-[#666666] leading-relaxed">{{ $business->description }}</p>
                 @endif
 
-                <div class="space-y-2.5 text-sm mt-4">
-                    @if($business->address)
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($business->address) }}" target="_blank" class="flex items-start gap-2.5 text-[#666666] hover:text-[#2563EB] transition">
-                        <svg class="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        {{ $business->address }}
-                    </a>
-                    @endif
-                    @if($business->phone)
-                    <a href="https://wa.me/57{{ $business->phone }}" target="_blank" class="flex items-center gap-2 text-[#666666] hover:text-[#0D9488] transition">
-                        <svg class="w-4 h-4 text-[#0D9488] shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-                        {{ $business->phone }}
-                    </a>
-                    @endif
-                    @if($business->email)
-                    <a href="mailto:{{ $business->email }}" class="flex items-center gap-2 text-[#666666] hover:text-[#2563EB] transition">
+                @if($business->email)
+                    <a href="mailto:{{ $business->email }}" class="flex items-center gap-2 text-[#666666] hover:text-[#2563EB] transition mt-4 text-sm">
                         <svg class="w-4 h-4 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         {{ $business->email }}
                     </a>
-                    @endif
-                </div>
+                @endif
 
                 {{-- Schedule --}}
                 @if($business->schedules->count() > 0)
-                @php $days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']; @endphp
-                <div class="mt-4 pt-4 border-t border-[#E7E5DF]">
-                    <p class="text-xs font-bold text-[#0F172A] mb-3 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Horario de atención
-                    </p>
-                    <div class="space-y-1.5">
-                        @foreach($business->schedules->sortBy(fn($s) => $s->day_of_week === 0 ? 7 : $s->day_of_week) as $schedule)
-                        <div class="flex justify-between text-xs {{ $schedule->day_of_week === now()->dayOfWeek ? 'text-[#D97706] font-semibold' : 'text-[#666666]' }}">
-                            <span>{{ $days[$schedule->day_of_week] }}</span>
-                            <span>{{ $schedule->is_active ? \Carbon\Carbon::parse($schedule->open_time)->format('g:i A').' - '.\Carbon\Carbon::parse($schedule->close_time)->format('g:i A') : 'Cerrado' }}</span>
+                    @php $days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']; @endphp
+                    <div class="mt-5 pt-4 border-t border-[#E7E5DF]">
+                        <p class="text-xs font-bold text-[#0F172A] mb-3 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-[#D97706]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Horario de atención
+                        </p>
+                        <div class="space-y-1.5">
+                            @foreach($business->schedules->sortBy(fn($s) => $s->day_of_week === 0 ? 7 : $s->day_of_week) as $schedule)
+                                <div class="flex justify-between text-xs {{ $schedule->day_of_week === now()->dayOfWeek ? 'text-[#D97706] font-semibold' : 'text-[#666666]' }}">
+                                    <span>{{ $days[$schedule->day_of_week] }}{{ $schedule->day_of_week === now()->dayOfWeek ? ' · hoy' : '' }}</span>
+                                    <span>{{ $schedule->is_active ? \Carbon\Carbon::parse($schedule->open_time)->format('g:i A').' - '.\Carbon\Carbon::parse($schedule->close_time)->format('g:i A') : 'Cerrado' }}</span>
+                                </div>
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
-                </div>
                 @endif
 
                 {{-- Team --}}
                 @if($business->employees->count() > 0)
-                <div class="mt-4 pt-4 border-t border-[#E7E5DF]">
-                    <p class="text-xs font-bold text-[#0F172A] mb-3 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-[#0D9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Nuestro equipo
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        @foreach($business->employees as $emp)
-                        <div class="flex items-center gap-2.5">
-                            @if($emp->getFirstMediaUrl('photo'))
-                                <img src="{{ $emp->getFirstMediaUrl('photo') }}" alt="" class="w-9 h-9 rounded-full object-cover border border-[#E7E5DF]">
-                            @else
-                                <div class="w-9 h-9 rounded-full bg-[#0D9488]/10 flex items-center justify-center text-[#0D9488] font-bold text-xs">{{ substr($emp->name, 0, 1) }}</div>
-                            @endif
-                            <div>
-                                <span class="text-xs font-medium text-[#0F172A]">{{ $emp->name }}</span>
-                                @if($emp->position)<p class="text-[10px] text-[#666666]">{{ $emp->position }}</p>@endif
-                            </div>
+                    <div class="mt-5 pt-4 border-t border-[#E7E5DF]">
+                        <p class="text-xs font-bold text-[#0F172A] mb-3 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-[#0D9488]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Nuestro equipo
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            @foreach($business->employees as $emp)
+                                <div class="flex items-center gap-2.5">
+                                    @if($emp->getFirstMediaUrl('photo'))
+                                        <img src="{{ $emp->getFirstMediaUrl('photo') }}" alt="" class="w-9 h-9 rounded-full object-cover border border-[#E7E5DF]">
+                                    @else
+                                        <div class="w-9 h-9 rounded-full bg-[#0D9488]/10 flex items-center justify-center text-[#0D9488] font-bold text-xs">{{ substr($emp->name, 0, 1) }}</div>
+                                    @endif
+                                    <div>
+                                        <span class="text-xs font-medium text-[#0F172A]">{{ $emp->name }}</span>
+                                        @if($emp->position)<p class="text-[10px] text-[#666666]">{{ $emp->position }}</p>@endif
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
-                </div>
                 @endif
             </div>
-        </details>
+        </div>
     </div>
 
     {{-- Booking Container --}}
@@ -120,17 +160,17 @@
 
         {{-- Progress Steps --}}
         <div class="flex items-center justify-center gap-3 mb-10">
-            <div id="progress-1" class="flex items-center gap-2">
+            <div id="progress-1" class="progress-step is-active flex items-center gap-2">
                 <span class="w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold">1</span>
                 <span class="text-sm font-medium text-gray-900 hidden sm:inline">Servicio</span>
             </div>
-            <div class="w-8 h-px bg-gray-300"></div>
-            <div id="progress-2" class="flex items-center gap-2">
+            <div id="connector-1-2" class="progress-connector w-10 h-1 rounded-full"></div>
+            <div id="progress-2" class="progress-step flex items-center gap-2">
                 <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold">2</span>
                 <span class="text-sm font-medium text-gray-400 hidden sm:inline">Horario</span>
             </div>
-            <div class="w-8 h-px bg-gray-300"></div>
-            <div id="progress-3" class="flex items-center gap-2">
+            <div id="connector-2-3" class="progress-connector w-10 h-1 rounded-full"></div>
+            <div id="progress-3" class="progress-step flex items-center gap-2">
                 <span class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold">3</span>
                 <span class="text-sm font-medium text-gray-400 hidden sm:inline">Confirmar</span>
             </div>
@@ -255,14 +295,14 @@
 
             <h2 class="text-xl font-bold text-gray-900 mb-4">Confirma tu cita</h2>
 
-            <div class="bg-white rounded-xl border border-gray-200 p-5 mb-6 space-y-3">
-                <div class="flex justify-between"><span class="text-gray-500">Servicio</span><span id="confirm-service" class="font-semibold"></span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Profesional</span><span id="confirm-employee" class="font-semibold"></span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Fecha</span><span id="confirm-date" class="font-semibold"></span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Hora</span><span id="confirm-time" class="font-semibold"></span></div>
-                <div class="flex justify-between"><span class="text-gray-500">Duración</span><span id="confirm-duration" class="font-semibold"></span></div>
+            <div class="confirm-card bg-white rounded-2xl border border-gray-200 p-5 mb-6 space-y-3 shadow-sm">
+                <div class="confirm-row"><span class="text-gray-500">Servicio</span><span id="confirm-service" class="font-semibold"></span></div>
+                <div class="confirm-row"><span class="text-gray-500">Profesional</span><span id="confirm-employee" class="font-semibold"></span></div>
+                <div class="confirm-row"><span class="text-gray-500">Fecha</span><span id="confirm-date" class="font-semibold"></span></div>
+                <div class="confirm-row"><span class="text-gray-500">Hora</span><span id="confirm-time" class="font-semibold"></span></div>
+                <div class="confirm-row"><span class="text-gray-500">Duración</span><span id="confirm-duration" class="font-semibold"></span></div>
                 <hr>
-                <div class="flex justify-between"><span class="text-gray-500">Precio</span><span id="confirm-price" class="font-bold text-amber-600 text-lg"></span></div>
+                <div class="confirm-row"><span class="text-gray-500">Precio</span><span id="confirm-price" class="font-bold text-amber-600 text-lg"></span></div>
             </div>
 
             <div class="space-y-3">
@@ -299,6 +339,20 @@
         </div>
     </div>
 
+    {{-- Success overlay --}}
+    <div id="biz-success" class="biz-success-overlay" role="dialog" aria-live="polite">
+        <div class="biz-success-card">
+            <div class="biz-success-icon">
+                <svg viewBox="0 0 32 32"><polyline points="6,16 14,24 26,10"/></svg>
+            </div>
+            <h2 style="font-family:Poppins,sans-serif;font-size:22px;font-weight:800;color:#0F172A;margin-bottom:6px">¡Cita agendada!</h2>
+            <p id="biz-success-detail" style="color:#6b7280;font-size:14px;line-height:1.5;margin-bottom:22px"></p>
+            <button id="biz-success-close" type="button" style="width:100%;padding:12px 16px;border-radius:12px;background:linear-gradient(135deg,#D97706,#B45309);color:white;font-weight:700;border:none;cursor:pointer;font-family:Inter,sans-serif">
+                Perfecto
+            </button>
+        </div>
+    </div>
+
     <script>
         const SLUG = '{{ $business->slug }}';
         const CSRF = document.querySelector('meta[name="csrf-token"]').content;
@@ -318,11 +372,46 @@
                 d.setDate(d.getDate() + i);
                 const iso = d.toISOString().split('T')[0];
                 const btn = document.createElement('button');
-                btn.className = 'date-btn flex-shrink-0 w-16 py-3 rounded-xl border-2 border-gray-100 text-center hover:border-amber-300 transition';
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                btn.className = 'date-btn flex-shrink-0 w-16 py-3 rounded-xl border-2 border-gray-100 text-center';
+                if (i === 0) btn.classList.add('is-today');
+                if (isWeekend) btn.classList.add('is-weekend');
                 btn.dataset.date = iso;
+                btn.style.animation = 'citora-fade-up .4s cubic-bezier(.22,1,.36,1) both';
+                btn.style.animationDelay = `${Math.min(i, 12) * 35}ms`;
                 btn.innerHTML = `<span class="block text-xs text-gray-400">${days[d.getDay()]}</span><span class="block text-lg font-bold">${d.getDate()}</span><span class="block text-xs text-gray-400">${months[d.getMonth()]}</span>`;
                 btn.onclick = () => selectDate(btn, iso, `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`);
                 container.appendChild(btn);
+            }
+        }
+
+        // Quick-action info panel toggle
+        (function setupInfoToggle() {
+            const toggle = document.getElementById('biz-info-toggle');
+            const panel = document.getElementById('biz-info-panel');
+            if (!toggle || !panel) return;
+            toggle.addEventListener('click', () => {
+                const open = panel.classList.toggle('is-open');
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (open) {
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        })();
+
+        // Success overlay
+        function showSuccessOverlay(detail) {
+            const overlay = document.getElementById('biz-success');
+            const detailEl = document.getElementById('biz-success-detail');
+            const closeBtn = document.getElementById('biz-success-close');
+            if (!overlay) return;
+            if (detailEl) detailEl.innerHTML = detail;
+            overlay.classList.add('is-open');
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    overlay.classList.remove('is-open');
+                    window.location.reload();
+                };
             }
         }
 
@@ -450,17 +539,22 @@
                 const label = p.querySelector('span:last-child');
                 const wasActive = circle.classList.contains('bg-amber-500');
                 if (i <= n) {
+                    p.classList.add('is-active');
                     circle.className = 'w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center text-sm font-bold';
                     if (label) label.className = 'text-sm font-medium text-gray-900 hidden sm:inline';
                     if (!wasActive) {
-                        circle.classList.add('progress-active-pop');
-                        circle.addEventListener('animationend', () => circle.classList.remove('progress-active-pop'), { once: true });
+                        p.classList.add('just-activated');
+                        circle.addEventListener('animationend', () => p.classList.remove('just-activated'), { once: true });
                     }
                 } else {
+                    p.classList.remove('is-active', 'just-activated');
                     circle.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-sm font-bold';
                     if (label) label.className = 'text-sm font-medium text-gray-400 hidden sm:inline';
                 }
             }
+
+            document.getElementById('connector-1-2')?.classList.toggle('is-filled', n >= 2);
+            document.getElementById('connector-2-3')?.classList.toggle('is-filled', n >= 3);
 
             if (n === 3) {
                 document.getElementById('confirm-service').textContent = booking.serviceName;
@@ -515,17 +609,11 @@
                 localStorage.removeItem('citora_booking_' + SLUG);
 
                 fireConfetti();
-
-                await Swal.fire({
-                    icon: 'success',
-                    title: '🎉 ¡Cita agendada!',
-                    html: `<p><strong>${data.appointment.service}</strong></p><p>${data.appointment.date}</p><p>${data.appointment.time}</p>`,
-                    confirmButtonText: 'Perfecto',
-                    confirmButtonColor: '#f59e0b',
-                    showClass: { popup: 'animate__animated animate__zoomIn animate__faster' },
-                });
-
-                window.location.reload();
+                showSuccessOverlay(
+                    `<strong style="color:#0F172A">${data.appointment.service}</strong><br>` +
+                    `${data.appointment.date} · ${data.appointment.time}`
+                );
+                return;
             } catch (e) {
                 Swal.fire('Error', e.message, 'error');
                 btn.disabled = false;
