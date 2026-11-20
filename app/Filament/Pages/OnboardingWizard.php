@@ -12,6 +12,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Components\Wizard\Step;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Spatie\MediaLibrary\HasMedia;
 
@@ -199,7 +201,7 @@ class OnboardingWizard extends Page
 
                     Step::make('Empleados')
                         ->icon('heroicon-o-user-group')
-                        ->description('Agrega tu equipo de trabajo (opcional)')
+                        ->description('Agrega tu equipo y asigna a cada servicio al menos un empleado')
                         ->schema([
                             Repeater::make('employees')
                                 ->label('')
@@ -253,6 +255,8 @@ class OnboardingWizard extends Page
     {
         $data = $this->form->getState();
         $user = auth()->user();
+
+        $this->ensureEveryServiceHasAnEmployee($data);
 
         DB::transaction(function () use ($data, $user): void {
             $business = Business::create([
@@ -339,6 +343,51 @@ class OnboardingWizard extends Page
         });
 
         $this->dispatch('business-created');
+    }
+
+    /**
+     * Impide registrar servicios que ningún empleado pueda realizar,
+     * ya que no podrían reservarse desde la página pública.
+     *
+     * @param  array<string, mixed>  $data
+     *
+     * @throws ValidationException
+     */
+    private function ensureEveryServiceHasAnEmployee(array $data): void
+    {
+        $serviceNames = collect($data['services'] ?? [])
+            ->pluck('name')
+            ->filter()
+            ->unique();
+
+        if ($serviceNames->isEmpty()) {
+            return;
+        }
+
+        $assignedServiceNames = collect($data['employees'] ?? [])
+            ->pluck('service_names')
+            ->flatten()
+            ->filter()
+            ->unique();
+
+        $servicesWithoutEmployee = $serviceNames->diff($assignedServiceNames);
+
+        if ($servicesWithoutEmployee->isEmpty()) {
+            return;
+        }
+
+        $message = 'Cada servicio debe tener al menos un empleado asignado. Sin empleado: '.$servicesWithoutEmployee->join(', ').'.';
+
+        Notification::make()
+            ->danger()
+            ->title('Faltan empleados por asignar')
+            ->body($message)
+            ->persistent()
+            ->send();
+
+        throw ValidationException::withMessages([
+            'data.employees' => $message,
+        ]);
     }
 
     private function sendAdminNotification(Business $business): void

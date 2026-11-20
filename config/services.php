@@ -58,6 +58,7 @@ return [
             'appointment.cancelled' => env('TWILIO_TPL_APPOINTMENT_CANCELLED'),
             'appointment.rescheduled' => env('TWILIO_TPL_APPOINTMENT_RESCHEDULED'),
             'employee.welcome' => env('TWILIO_TPL_EMPLOYEE_WELCOME'),
+            'business.services_without_employee' => env('TWILIO_TPL_BUSINESS_SERVICES_WITHOUT_EMPLOYEE'),
         ],
     ],
 

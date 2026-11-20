@@ -272,6 +272,30 @@ class AppointmentNotificationService
     }
 
     /**
+     * Avisa al negocio que tiene servicios sin empleado activo y que por eso
+     * no se pueden reservar desde su página pública.
+     *
+     * @param  array<int, string>  $serviceNames
+     */
+    public function notifyServicesWithoutEmployee(string $phone, string $businessName, array $serviceNames): void
+    {
+        $services = implode(', ', $serviceNames);
+        $panelUrl = rtrim(config('app.url'), '/').'/admin/services';
+
+        $this->sendTemplateTo(
+            $phone,
+            'business.services_without_employee',
+            [
+                1 => $businessName,
+                2 => $services,
+                3 => $panelUrl,
+            ],
+            "⚠️ Hola, {$businessName}. Estos servicios no tienen un empleado asignado y tus clientes no pueden reservarlos: {$services}. "
+            ."Entra a {$panelUrl}, edita cada servicio y asigna al menos un empleado para que vuelvan a aparecer en tu página."
+        );
+    }
+
+    /**
      * @param  array<int|string, string>  $variables
      */
     private function sendTemplateTo(?string $phone, string $templateKey, array $variables, string $fallbackText): void

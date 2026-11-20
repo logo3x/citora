@@ -23,7 +23,8 @@ class BookingController extends Controller
         abort_unless($business->is_active, 404);
 
         $business->load([
-            'services' => fn ($q) => $q->where('is_active', true),
+            'services' => fn ($q) => $q->where('is_active', true)
+                ->whereHas('employees', fn ($employees) => $employees->where('is_active', true)),
             'services.media',
             'employees' => fn ($q) => $q->where('is_active', true),
             'employees.media',
