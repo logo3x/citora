@@ -60,7 +60,27 @@ class ServiceForm
                             ->multiple()
                             ->relationship('employees', 'name', fn ($query) => $query->where('business_id', auth()->user()->business_id))
                             ->preload()
-                            ->helperText('⚠️ Si no asignas al menos un empleado, este servicio no aparecerá disponible para reservar.')
+                            ->required()
+                            ->minItems(1)
+                            ->validationMessages([
+                                'required' => 'Debes asignar al menos un empleado que realice este servicio.',
+                                'min' => 'Debes asignar al menos un empleado que realice este servicio.',
+                            ])
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label('Nombre')
+                                    ->required()
+                                    ->maxLength(255),
+                                TextInput::make('position')
+                                    ->label('Cargo')
+                                    ->maxLength(255),
+                                TextInput::make('phone')
+                                    ->label('Teléfono / WhatsApp')
+                                    ->tel()
+                                    ->maxLength(20),
+                            ])
+                            ->createOptionUsing(fn (array $data): int => auth()->user()->business->employees()->create($data)->getKey())
+                            ->helperText('Obligatorio: asigna al menos un empleado. Si aún no tienes, créalo con el botón "+".')
                             ->columnSpanFull(),
                     ])
                     ->columns(2),

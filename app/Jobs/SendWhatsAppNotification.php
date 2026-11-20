@@ -52,6 +52,11 @@ class SendWhatsAppNotification implements ShouldQueue
                 $this->extra['name'] ?? '',
                 $this->extra['business_name'] ?? '',
             ),
+            'business.services_without_employee' => $notifier->notifyServicesWithoutEmployee(
+                $this->extra['phone'] ?? '',
+                $this->extra['business_name'] ?? '',
+                $this->extra['service_names'] ?? [],
+            ),
             default => null,
         };
     }

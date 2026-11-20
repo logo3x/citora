@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ServicesTable
 {
@@ -23,6 +24,11 @@ class ServicesTable
                     ->label('')
                     ->collection('image')
                     ->circular(),
+                TextColumn::make('business.name')
+                    ->label('Negocio')
+                    ->searchable()
+                    ->sortable()
+                    ->visible(fn (): bool => auth()->user()->hasRole('super_admin')),
                 TextColumn::make('name')
                     ->label('Nombre')
                     ->searchable()
@@ -40,9 +46,9 @@ class ServicesTable
                     ->badge()
                     ->separator(', ')
                     ->placeholder('⚠️ Sin asignar')
-                    ->color(fn (Service $record) => $record->employees->isEmpty() ? 'danger' : 'success')
-                    ->tooltip(fn (Service $record) => $record->employees->isEmpty()
-                        ? 'Este servicio no aparece como reservable. Edítalo y asigna al menos un empleado.'
+                    ->color(fn (Service $record): string => $record->employees->where('is_active', true)->isEmpty() ? 'danger' : 'success')
+                    ->tooltip(fn (Service $record): ?string => $record->employees->where('is_active', true)->isEmpty()
+                        ? 'Este servicio no aparece en la página pública. Edítalo y asigna al menos un empleado activo.'
                         : null),
                 IconColumn::make('is_active')
                     ->label('Activo')
@@ -56,8 +62,11 @@ class ServicesTable
                     ->trueLabel('Activos')
                     ->falseLabel('Inactivos'),
                 Filter::make('without_employees')
-                    ->label('Sin empleados asignados')
-                    ->query(fn ($query) => $query->whereDoesntHave('employees')),
+                    ->label('Sin empleados activos (no reservables)')
+                    ->query(fn (Builder $query): Builder => $query->whereDoesntHave(
+                        'employees',
+                        fn (Builder $employees): Builder => $employees->where('is_active', true),
+                    )),
             ])
             ->recordActions([
                 EditAction::make(),
